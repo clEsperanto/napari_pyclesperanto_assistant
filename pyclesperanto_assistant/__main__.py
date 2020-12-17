@@ -10,7 +10,7 @@ def main():
     import napari
     from skimage.io import imread
     import pyclesperanto_prototype as cle
-    from pyclesperanto_assistant._gui._MainMenu import Gui
+    from pyclesperanto_assistant._gui._AssistantGui import AssistantGUI
 
     #filename = 'data/Lund_000500_resampled-cropped.tif'
     filename = 'data/CalibZAPWfixed_000154_max-16.tif'
@@ -28,16 +28,8 @@ def main():
         layer = viewer.add_image(image)
         layer.filename = filename
 
-        def _on_removed(event):
-            layer = event.value
-            try:
-                layer.dialog._removed()
-            except AttributeError:
-                pass
-        viewer.layers.events.removed.connect(_on_removed)
-
-        # add the _gui to the viewer as a dock widget
-        viewer.window.add_dock_widget(Gui(viewer), area='right')
+        from pyclesperanto_assistant import napari_plugin
+        napari_plugin(viewer)
 
 
 if __name__ == '__main__':
