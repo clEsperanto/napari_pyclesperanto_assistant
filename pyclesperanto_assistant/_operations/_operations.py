@@ -43,7 +43,7 @@ def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: 
     y={'minimum': -1000, 'maximum': 1000},
     z={'minimum': -1000, 'maximum': 1000},
 )
-def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__name__, x: float = 1, y: float = 1, z: float = 0):
+def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__name__, x: float = 10, y: float = 10, z: float = 0):
     if input1:
         # execute operation
         cle_input = cle.push_zyx(input1.data)
