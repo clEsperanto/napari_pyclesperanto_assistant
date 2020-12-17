@@ -25,5 +25,26 @@ In case napari doesn't start up  ([see also](https://github.com/napari/napari/is
 C:\Users\<username>\AppData\Local\Programs\napari\python\python.exe -m pip install numpy==1.19.3
 ```
 
+## For developers
+
+Getting the recent code from github and locally installing it
+```
+git clone https://github.com/haesleinhuepf/pyclesperanto_assistant.git
+
+pip install -e ./pyclesperanto_assistant
+```
+
+Optional: Also install pyclesperantos recent source code from github:
+```
+git clone https://github.com/clEsperanto/pyclesperanto_prototype.git
+
+pip install -e ./pyclesperanto_prototype
+```
+
+Starting up napari with the pyclesperanto assistant installed:
+```
+ipython --gui=qt pyclesperanto_assistant\pyclesperanto_assistant
+```
+
 ## Feedback welcome!
 clEsperanto is developed in the open because we believe in the [open source community](https://clij.github.io/clij2-docs/community_guidelines). Feel free to drop feedback as [github issue](https://github.com/clEsperanto/pyclesperanto_prototype/issues) or via [image.sc](https://image.sc)
