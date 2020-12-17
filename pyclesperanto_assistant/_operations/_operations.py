@@ -9,7 +9,65 @@ import pyclesperanto_prototype as cle
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['filter', 'in assistant'], must_not_have_categories=['combine']).keys()},
+    operation_name={'choices':cle.operations(must_have_categories=['filter', 'denoise','in assistant'], must_not_have_categories=['combine']).keys()},
+    x={'minimum': -1000, 'maximum': 1000},
+    y={'minimum': -1000, 'maximum': 1000},
+    z={'minimum': -1000, 'maximum': 1000},
+)
+def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: float = 1, y: float = 1, z: float = 0):
+    if input1:
+        # execute operation
+        cle_input = cle.push_zyx(input1.data)
+        output = cle.create_like(cle_input)
+        operation = cle.operation(operation_name)
+        operation(cle_input, output, x, y, z)
+        max_intensity = cle.maximum_of_all_pixels(output)
+        if max_intensity == 0:
+            max_intensity = 1 # prevent division by zero in vispy
+        output = cle.pull_zyx(output)
+
+        # show result in napari
+        if (denoise.initial_call):
+            denoise.self.viewer.add_image(output, colormap=input1.colormap)
+            denoise.initial_call = False
+        else:
+            denoise.self.layer.data = output
+            denoise.self.layer.name = operation.__name__
+            denoise.self.layer.contrast_limits=(0, max_intensity)
+
+@magicgui(
+    auto_call=True,
+    layout='vertical',
+    operation_name={'choices':cle.operations(must_have_categories=['filter', 'background removal','in assistant'], must_not_have_categories=['combine']).keys()},
+    x={'minimum': -1000, 'maximum': 1000},
+    y={'minimum': -1000, 'maximum': 1000},
+    z={'minimum': -1000, 'maximum': 1000},
+)
+def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__name__, x: float = 1, y: float = 1, z: float = 0):
+    if input1:
+        # execute operation
+        cle_input = cle.push_zyx(input1.data)
+        output = cle.create_like(cle_input)
+        operation = cle.operation(operation_name)
+        operation(cle_input, output, x, y, z)
+        max_intensity = cle.maximum_of_all_pixels(output)
+        if max_intensity == 0:
+            max_intensity = 1 # prevent division by zero in vispy
+        output = cle.pull_zyx(output)
+
+        # show result in napari
+        if (background_removal.initial_call):
+            background_removal.self.viewer.add_image(output, colormap=input1.colormap)
+            background_removal.initial_call = False
+        else:
+            background_removal.self.layer.data = output
+            background_removal.self.layer.name = operation.__name__
+            background_removal.self.layer.contrast_limits=(0, max_intensity)
+
+@magicgui(
+    auto_call=True,
+    layout='vertical',
+    operation_name={'choices':cle.operations(must_have_categories=['filter', 'in assistant'], must_not_have_categories=['combine', 'denoise', 'background removal']).keys()},
     x={'minimum': -1000, 'maximum': 1000},
     y={'minimum': -1000, 'maximum': 1000},
     z={'minimum': -1000, 'maximum': 1000},
