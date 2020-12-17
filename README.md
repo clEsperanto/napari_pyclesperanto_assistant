@@ -2,7 +2,7 @@
 pyclesperanto-assistant is a yet experimental napari plugin for building GPU-accelerated image processing workflows. 
 It is part of the [clEsperanto](http://clesperanto.net) project.
 
-![](images/docs/screenshot.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
 
 ## Installation
 
