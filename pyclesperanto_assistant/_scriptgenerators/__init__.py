@@ -1,1 +1,1 @@
-from ._PythonScriptGenerator import PythonScriptGenerator
+from ._PythonGenerator import PythonGenerator

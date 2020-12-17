@@ -1,8 +1,11 @@
+from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
+from magicgui._qt.widgets import QDataComboBox
+from napari.layers import Image, Labels
+import pyclesperanto_prototype as cle
+
 from ._ScriptGeneratorBase import ScriptGenerator
 
-class PythonScriptGenerator(ScriptGenerator):
-    def __init__(self, layers):
-        self.layers = layers
+class PythonGenerator(ScriptGenerator):
     def generate(self):
         code = self._header()
 
@@ -15,22 +18,20 @@ class PythonScriptGenerator(ScriptGenerator):
             if parse_layer:
                 code = code + self._export_layer(layer, i)
 
-        code = code + "\n" + self._comment(" show result") + "\n" \
-                      "from skimage.io import imshow\n" + \
-            "imshow(cle.pull_zyx(image" + str(len(self.layers) - 1) + "))\n"
+        code = code + self._pull(self.layers[-1], len(self.layers) - 1)
 
-        return code
+        return self._finish(code)
 
     def _header(self):
         return "import pyclesperanto_prototype as cle\n"
 
     def _push(self, layer, layer_number):
         return "from skimage.io import imread\n" + \
-            "image = imread('" + layer.filename + "')\n" + \
+            "image = imread('" + layer.filename.replace("\\", "/") + "')\n" + \
             "image" + str(layer_number) + " = cle.push_zyx(image)\n"
 
     def _execute(self, layer, layer_number):
-        method = cle.operation(cle.operation(layer.dialog.filter_gui.get_widget("operation").currentData()))
+        method = cle.operation(layer.dialog.filter_gui.get_widget("operation_name").currentData())
         method_name = method.__name__
         method_name = "cle." + method_name
         method_name = method_name.replace("please_select", "copy")
@@ -60,14 +61,20 @@ class PythonScriptGenerator(ScriptGenerator):
                 elif isinstance(value, Image) or isinstance(value, Labels):
                     command = command + comma + parameter_names[i] + "=image" + str(self._get_index_of_layer(value))
                 elif isinstance(value, str):
-                    command = command + comma + parameter_names[i] + "='" + value + "'"
+                    if parameter_name != "operation_name":
+                        command = command + comma + parameter_names[i] + "='" + value + "'"
                 else:
                     command = command + comma + parameter_names[i] + "=" + str(value)
 
         command = command + ")\n"
         command = "image" + str(layer_number) + " = " + command
 
-        return command
+        return "\n" + self._comment(" Layer " + layer.name) + "\n" + command
+
+    def _pull(self, layer, layer_number):
+        return "\n" + self._comment(" show result") + "\n" \
+                                               "from skimage.io import imshow\n" + \
+        "imshow(cle.pull_zyx(image" + str(layer_number) + "))\n"
 
     def _get_index_of_layer(self, layer):
         for i, other_layer in enumerate(self.layers):
@@ -75,7 +82,7 @@ class PythonScriptGenerator(ScriptGenerator):
                 return i
 
     def _export_layer(self, layer, layer_number):
-        code = "\n" + self._comment(" Layer " + layer.name) + "\n"
+        code = ""
 
         record_push = False
         try:
@@ -108,3 +115,10 @@ class PythonScriptGenerator(ScriptGenerator):
             if parse_layer:
                 code = code + self._export_layer(other_layer, i)
         return code
+
+    def _comment(self, text):
+        return "#" + text
+
+
+    def file_ending(self):
+        return ".py"

@@ -2,12 +2,13 @@ from pathlib import Path
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton
-
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, QFileDialog
 
 from .._gui._LayerDialog import LayerDialog
-from .._scriptgenerators import PythonScriptGenerator
+from .._scriptgenerators import PythonGenerator
 from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure
+from .._scriptgenerators._PythonJupyterNotebookGenerator import PythonJupyterNotebookGenerator
+
 
 class AssistantGUI(QWidget):
     """This Gui takes a napari as parameter and infiltrates it.
@@ -54,9 +55,14 @@ class AssistantGUI(QWidget):
         self.setLayout(self.layout)
 
         # Add a menu
-        action = QAction('Export pyclesperanto code', self.viewer.window._qt_window)
+        action = QAction('Export Python code', self.viewer.window._qt_window)
         action.triggered.connect(self._export_code)
         self.viewer.window.plugins_menu.addAction(action)
+
+        action = QAction('Export Jupyter Notebook', self.viewer.window._qt_window)
+        action.triggered.connect(self._export_notebook)
+        self.viewer.window.plugins_menu.addAction(action)
+
 
         def _on_removed(event):
             layer = event.value
@@ -115,4 +121,29 @@ class AssistantGUI(QWidget):
         LayerDialog(self.viewer, magicgui)
 
     def _export_code(self):
-        print(PythonScriptGenerator(self.viewer.layers).generate())
+        generator = PythonGenerator(self.viewer.layers)
+        code = generator.generate()
+        self._save_code(code, default_fileending=generator.file_ending())
+
+    def _export_notebook(self):
+        generator = PythonJupyterNotebookGenerator(self.viewer.layers)
+        code = generator.generate()
+        filename = self._save_code(code, default_fileending=generator.file_ending())
+        if filename is not None:
+            import os
+            os.system('jupyter nbconvert --to notebook --inplace --execute ' + filename)
+            os.system('jupyter notebook ' + filename)
+
+    def _save_code(self, code, default_fileending = "*.*", filename = None):
+        if filename is None:
+            filename = QFileDialog.getSaveFileName(self, 'Save code as...', '.', default_fileending)
+        if filename[0] == '':
+            return None
+
+        filename = filename[0] + default_fileending
+
+        file = open(filename, "w+")
+        file.write(code)
+        file.close()
+
+        return filename

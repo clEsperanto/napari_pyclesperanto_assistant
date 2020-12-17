@@ -6,3 +6,9 @@ class ScriptGenerator():
 
     def _comment(self, text):
         return text
+
+    def _finish(self, code : str):
+        return code
+
+    def file_ending(self):
+        return ".txt"

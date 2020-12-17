@@ -5,6 +5,8 @@
 # operations are updated. This facilitates finding a good parameter setting for complex workflows.
 #
 # -----------------------------------------------------------------------------
+from pathlib import Path
+
 
 def main():
     import napari
@@ -13,7 +15,7 @@ def main():
     from pyclesperanto_assistant._gui._AssistantGui import AssistantGUI
 
     #filename = 'data/Lund_000500_resampled-cropped.tif'
-    filename = 'data/CalibZAPWfixed_000154_max-16.tif'
+    filename = str(Path(__file__).parent) + '/data/CalibZAPWfixed_000154_max-16.tif'
     image = imread(filename)
     #image = imread('https://samples.fiji.sc/blobs.png'')
     #image = imread('C:/structure/data/lund_000500_resampled.tif')
