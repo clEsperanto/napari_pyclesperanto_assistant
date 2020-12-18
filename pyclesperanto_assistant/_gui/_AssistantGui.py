@@ -5,10 +5,8 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, QFileDialog
 
 from .._gui._LayerDialog import LayerDialog
-from .._scriptgenerators import PythonGenerator
+from .._scriptgenerators import PythonGenerator, JythonGenerator, PythonJupyterNotebookGenerator
 from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure
-from .._scriptgenerators._PythonJupyterNotebookGenerator import PythonJupyterNotebookGenerator
-
 
 class AssistantGUI(QWidget):
     """This Gui takes a napari as parameter and infiltrates it.
@@ -56,7 +54,11 @@ class AssistantGUI(QWidget):
 
         # Add a menu
         action = QAction('Export Python code', self.viewer.window._qt_window)
-        action.triggered.connect(self._export_code)
+        action.triggered.connect(self._export_python_code)
+        self.viewer.window.plugins_menu.addAction(action)
+
+        action = QAction('Export Jython code', self.viewer.window._qt_window)
+        action.triggered.connect(self._export_jython_code)
         self.viewer.window.plugins_menu.addAction(action)
 
         action = QAction('Export Jupyter Notebook', self.viewer.window._qt_window)
@@ -120,8 +122,14 @@ class AssistantGUI(QWidget):
     def _activate(self, magicgui):
         LayerDialog(self.viewer, magicgui)
 
-    def _export_code(self):
+
+    def _export_python_code(self):
         generator = PythonGenerator(self.viewer.layers)
+        code = generator.generate()
+        self._save_code(code, default_fileending=generator.file_ending())
+
+    def _export_jython_code(self):
+        generator = JythonGenerator(self.viewer.layers)
         code = generator.generate()
         self._save_code(code, default_fileending=generator.file_ending())
 

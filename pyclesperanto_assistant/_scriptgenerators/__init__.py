@@ -1,1 +1,3 @@
 from ._PythonGenerator import PythonGenerator
+from ._JythonGenerator import JythonGenerator
+from ._PythonJupyterNotebookGenerator import PythonJupyterNotebookGenerator
