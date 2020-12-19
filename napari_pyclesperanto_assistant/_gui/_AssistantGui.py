@@ -57,7 +57,7 @@ class AssistantGUI(QWidget):
         action.triggered.connect(self._export_python_code)
         self.viewer.window.plugins_menu.addAction(action)
 
-        action = QAction('Export Jython code', self.viewer.window._qt_window)
+        action = QAction('Export Jython/Python code', self.viewer.window._qt_window)
         action.triggered.connect(self._export_jython_code)
         self.viewer.window.plugins_menu.addAction(action)
 
@@ -140,7 +140,7 @@ class AssistantGUI(QWidget):
         if filename is not None:
             import os
             os.system('jupyter nbconvert --to notebook --inplace --execute ' + filename)
-            os.system('jupyter notebook ' + filename)
+            # os.system('jupyter notebook ' + filename) # todo: this line freezes napari
 
     def _save_code(self, code, default_fileending = "*.*", filename = None):
         if filename is None:
@@ -148,7 +148,9 @@ class AssistantGUI(QWidget):
         if filename[0] == '':
             return None
 
-        filename = filename[0] + default_fileending
+        filename = filename[0]
+        if not filename.endswith(default_fileending):
+            filename = filename + default_fileending
 
         file = open(filename, "w+")
         file.write(code)

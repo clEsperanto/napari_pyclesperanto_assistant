@@ -6,25 +6,19 @@ import pyclesperanto_prototype as cle
 from ._ScriptGeneratorBase import ScriptGenerator
 
 class PythonGenerator(ScriptGenerator):
-    def generate(self):
-        code = self._header()
-
-        for i, layer in enumerate(self.layers):
-            parse_layer = False
-            try:
-                layer.dialog
-            except AttributeError:
-                parse_layer = True
-            if parse_layer:
-                code = code + self._export_layer(layer, i)
-
-        code = code + self._pull(self.layers[-1], len(self.layers) - 1)
-
-        return self._finish(code)
 
     def _header(self):
-        return "import pyclesperanto_prototype as cle\n" + \
-                "from skimage.io import imread, imshow\n"
+        from .. import __version__ as version
+
+        return "# To make this script run in cpython, install pyclesperanto_prototype:\n" + \
+                "# pip install pyclesperanto_prototype\n" + \
+                "# Read more: \n" + \
+                "# https://clesperanto.net\n" + \
+                "# \n" + \
+                "# Generator (P) version: " + version + "\n" + \
+                "# \n" + \
+                "import pyclesperanto_prototype as cle\n" + \
+                "from skimage.io import imread, imshow\n\n"
 
     def _push(self, layer, layer_number):
         return \
@@ -71,54 +65,16 @@ class PythonGenerator(ScriptGenerator):
         command = "image" + str(layer_number) + " = " + command
 
         command = self._comment(" Layer " + layer.name) + "\n" + command
-        if (layer.visible):
-            command = command + self._pull(layer, layer_number)
-        return command + "\n"
-
+        return command
 
     def _pull(self, layer, layer_number):
-        return "\n" + self._comment(" show result") + "\n" \
-        "imshow(cle.pull_zyx(image" + str(layer_number) + "))\n"
+        return self._comment(" show result") + "\n" + \
+        "imshow(cle.pull_zyx(image" + str(layer_number) + "))\n\n"
 
     def _get_index_of_layer(self, layer):
         for i, other_layer in enumerate(self.layers):
             if other_layer == layer:
                 return i
-
-    def _export_layer(self, layer, layer_number):
-        code = ""
-
-        record_push = False
-        try:
-            if layer.filename is not None:
-                record_push = True
-        except:
-            pass
-        if record_push:
-            code = code + self._push(layer, layer_number)
-
-        record_exec = False
-        try:
-            if layer.dialog is not None:
-                record_exec = True
-        except:
-            pass
-        if record_exec:
-            code = code + self._execute(layer, layer_number)
-
-        for i, other_layer in enumerate(self.layers):
-            parse_layer = False
-            try:
-                if other_layer.dialog is not None:
-                    if (other_layer.dialog.filter_gui.get_widget("input1").currentData() == layer):
-                        parse_layer = True
-                    if (other_layer.dialog.filter_gui.get_widget("input2").currentData() == layer):
-                        parse_layer = True
-            except AttributeError:
-                pass
-            if parse_layer:
-                code = code + self._export_layer(other_layer, i)
-        return code
 
     def _comment(self, text):
         return "#" + text

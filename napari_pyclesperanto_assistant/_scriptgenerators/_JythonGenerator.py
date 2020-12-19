@@ -8,13 +8,26 @@ from ._ScriptGeneratorBase import ScriptGenerator
 class JythonGenerator(ScriptGenerator):
 
     def _header(self):
-        return "import net.clesperanto.javaprototype.Snake as cle\n"
+        from .. import __version__ as version
+
+        return \
+        "# To make this script run in cpython, install pyclesperanto_prototype:\n" + \
+        "# pip install pyclesperanto_prototype\n" + \
+        "# Read more: \n" + \
+        "# https://clesperanto.net\n" + \
+        "# \n" + \
+        "# To make this script run in Fiji, please activate the clij, " + \
+        "# clij2 and clijx-assistant update sites in your Fiji. \n" + \
+        "# Read more: \n" + \
+        "# https://clij.github.io/assistant\n" + \
+        "# \n" + \
+        "# Generator (P) version: " + version + "\n" + \
+        "# \n" + \
+        "import pyclesperanto_prototype as cle\n\n"
 
     def _push(self, layer, layer_number):
-        return "from ij import IJ\n" + \
-            "image = IJ.openImage('" + layer.filename.replace("\\", "/") + "')\n" + \
-            "image" + str(layer_number) + " = cle.push(image)\n" + \
-            "image.show()\n"
+        return "image" + str(layer_number) + " = cle.imread('" + layer.filename.replace("\\", "/") + "')\n"
+
 
     def _execute(self, layer, layer_number):
         method = cle.operation(layer.dialog.filter_gui.get_widget("operation_name").currentData())
@@ -58,70 +71,33 @@ class JythonGenerator(ScriptGenerator):
                     command = command + comma + str(value)
 
         command = command + ")\n"
-        command = "image" + str(layer_number) + " = cle.create(" + first_image_parameter + ")\n" + \
+        command = "image" + str(layer_number) + " = cle.create_like(" + first_image_parameter + ")\n" + \
                                                 command
 
         command = self._comment(" Layer " + layer.name) + "\n" + command
-        if (layer.visible):
-            command = command + self._pull(layer, layer_number)
+
         return command
 
 
     def _pull(self, layer, layer_number):
-        code = self._comment(" show result") + "\n" + \
-               "image = cle.pull(image" + str(layer_number) + ")\n" + \
-               "image.setTitle(\"" + layer.name + "\")\n"
-        if isinstance(layer, Labels):
-            code = code + \
-                "image.resetDisplayRange()\n" + \
-                "IJ.run(image, \"glasbey_on_dark\", \"\")\n"
-        else:
-            code = code + \
-                "image.setDisplayRange(" + str(layer.contrast_limits[0]) + ", " + str(layer.contrast_limits[1]) + ")\n"
 
-        code = code + \
-               "image.show()\n"
+        if isinstance(layer, Labels):
+            is_labels = "True"
+            intensity_config = ""
+
+        else:
+            is_labels = "False"
+            intensity_config = ", " + str(layer.contrast_limits[0]) + ", " + str(layer.contrast_limits[1])
+
+        code = self._comment(" show result") + "\n" + \
+               "cle.imshow(image" + str(layer_number) + ", '" + layer.name + "', " + is_labels + intensity_config + ")\n\n"
+
         return code
 
     def _get_index_of_layer(self, layer):
         for i, other_layer in enumerate(self.layers):
             if other_layer == layer:
                 return i
-
-    def _export_layer(self, layer, layer_number):
-        code = ""
-
-        record_push = False
-        try:
-            if layer.filename is not None:
-                record_push = True
-        except:
-            pass
-        if record_push:
-            code = code + self._push(layer, layer_number)
-
-        record_exec = False
-        try:
-            if layer.dialog is not None:
-                record_exec = True
-        except:
-            pass
-        if record_exec:
-            code = code + self._execute(layer, layer_number)
-
-        for i, other_layer in enumerate(self.layers):
-            parse_layer = False
-            try:
-                if other_layer.dialog is not None:
-                    if (other_layer.dialog.filter_gui.get_widget("input1").currentData() == layer):
-                        parse_layer = True
-                    if (other_layer.dialog.filter_gui.get_widget("input2").currentData() == layer):
-                        parse_layer = True
-            except AttributeError:
-                pass
-            if parse_layer:
-                code = code + self._export_layer(other_layer, i)
-        return code
 
     def _comment(self, text):
         return "#" + text

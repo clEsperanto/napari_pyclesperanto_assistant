@@ -21,7 +21,7 @@ setuptools.setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
         "Framework :: napari",
-        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
         "Development Status :: 3 - Alpha",
     ],
     entry_points={
