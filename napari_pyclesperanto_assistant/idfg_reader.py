@@ -17,6 +17,12 @@ def napari_get_reader(
     return None
 
 def reader_function(path):
+    """We're utilizing the reader hook to open a new napari window with the assistant installed.
+    This is a workaround until napari plugin hooks for dock-widgets are specified.
+
+    The end-user can use this plugin by opening any whatever.idfg.py file.
+
+    """
     print("IDFG read", path)
     import napari
     #with napari.gui_qt():
@@ -28,5 +34,4 @@ def reader_function(path):
     from napari_pyclesperanto_assistant import napari_plugin
     napari_plugin(viewer)
 
-    import numpy as np
     return None
