@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pyclesperanto_assistant",
+    name="napari_pyclesperanto_assistant",
     version="0.1.0",
     author="haesleinhuepf",
     author_email="robert_haase@tu-dresden.de",
@@ -22,5 +22,11 @@ setuptools.setup(
         "Operating System :: OS Independent",
         "Framework :: napari",
         "Intended Audience :: Developers",
+        "Development Status :: 3 - Alpha",
     ],
+    entry_points={
+        'napari.plugin': [
+            'pyclesperanto = napari_pyclesperanto_assistant',
+        ],
+    },
 )

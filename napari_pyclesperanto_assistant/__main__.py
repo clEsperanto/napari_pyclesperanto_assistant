@@ -12,7 +12,7 @@ def main():
     import napari
     from skimage.io import imread
     import pyclesperanto_prototype as cle
-    from pyclesperanto_assistant._gui._AssistantGui import AssistantGUI
+    from napari_pyclesperanto_assistant._gui._AssistantGui import AssistantGUI
 
     #filename = 'data/Lund_000500_resampled-cropped.tif'
     filename = str(Path(__file__).parent) + '/data/CalibZAPWfixed_000154_max-16.tif'
@@ -30,7 +30,7 @@ def main():
         layer = viewer.add_image(image)
         layer.filename = filename
 
-        from pyclesperanto_assistant import napari_plugin
+        from napari_pyclesperanto_assistant import napari_plugin
         napari_plugin(viewer)
 
 
