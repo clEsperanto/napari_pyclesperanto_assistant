@@ -82,7 +82,7 @@ class AssistantGUI(QWidget):
 
         # icon
         btn.setIcon(QtGui.QIcon(str(Path(__file__).parent) + "/icons/" + title.lower().replace(" ", "_").replace("(", "").replace(")", "") + ".png"))
-        btn.setIconSize(QSize(30, 30))
+        btn.setIconSize(QSize(20, 20))
         btn.setStyleSheet("text-align:left;");
 
         # action
