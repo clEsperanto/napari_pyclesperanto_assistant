@@ -1,0 +1,8 @@
+title: clEsperanto
+logo: /docs/images/cle_logo.png
+description: clEsperanto - GPU-accelerated image processing across languages and platforms
+show_downloads: false
+google_analytics:
+theme: jekyll-theme-minimal
+plugins:
+  - jekyll-redirect-from

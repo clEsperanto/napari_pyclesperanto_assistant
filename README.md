@@ -7,7 +7,9 @@ It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) 
 
 ## Installation
 
-Download and install `napari-pyclesperanto-assitant` uing `pip`. Windows user should follow the instructions in the section below in case of trouble.
+If you have no python/conda environment installed yet, please follow the instructions [here](https://mpicbg-scicomp.github.io/ipf_howtoguides/guides/Python_Conda_Environments) first.
+
+Download and install `napari-pyclesperanto-assitant` uing `pip`. Windows users should follow the instructions in the section below in case of trouble.
 
 ```
 pip install napari-pyclesperanto-assistant
@@ -113,3 +115,5 @@ ipython --gui=qt napari_pyclesperanto_assistant\napari_pyclesperanto_assistant
 
 ## Feedback welcome!
 clEsperanto is developed in the open because we believe in the [open source community](https://clij.github.io/clij2-docs/community_guidelines). Feel free to drop feedback as [github issue](https://github.com/clEsperanto/pyclesperanto_prototype/issues) or via [image.sc](https://image.sc)
+
+[Imprint](https://clesperanto.github.io/imprint)
