@@ -1,6 +1,7 @@
-# pyclesperanto-assistant
-pyclesperanto-assistant is a yet experimental napari plugin for building GPU-accelerated image processing workflows. 
-It is part of the [clEsperanto](http://clesperanto.net) project.
+# napari-pyclesperanto-assistant
+The py-clEsperanto-assistant is a yet experimental [napari](https://github.com/napari/napari) plugin for building GPU-accelerated image processing workflows. 
+It is part of the [clEsperanto](http://clesperanto.net) project. 
+It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) as backend for processing images.
 
 ![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
 
@@ -26,18 +27,76 @@ Enter your username and the correct `pyopencl-...` filename in the following lin
 C:\Users\<username>\AppData\Local\Programs\napari\python\python.exe -m pip install pyopencl-2020.2.2+cl12-cp38-cp38-win_amd64.whl
 ```
 
-In case napari doesn't start up  ([see also](https://github.com/napari/napari/issues/2022)), enter your username in the following line and execute it from the command line:
+In case napari doesn't start up with an error mentioning numpy ([see also](https://github.com/napari/napari/issues/2022)), execute this from the command line:
 ```
-C:\Users\<username>\AppData\Local\Programs\napari\python\python.exe -m pip install numpy==1.19.3
+pip install numpy==1.19.3
 ```
+
+## Usage
+This short tutorial demonstrates how to generate code using the pyclersperanto-assistant. The whole procedure can be downloaded [as video](docs/images/pyclesperanto_assistant_screencast.mp4).
+
+### Start up the assistant
+Open a command line and start up the assistant and pass the image file you want to process. The shown example image can be found [online](https://github.com/clEsperanto/napari_pyclesperanto_assistant/blob/master/napari_pyclesperanto_assistant/data/CalibZAPWfixed_000154_max-16.tif)
+
+```
+python -m napari_pyclesperanto_assistant C:\structure\code\napari_pyclesperanto_assistant\napari_pyclesperanto_assistant\data\CalibZAPWfixed_000154_max-16.tif
+```
+
+napari will open with the assistant activated:
+
+![](docs/images/screenshot_1.png)
+
+### Set up a workflow
+
+Choose categories of operations in the top right panel, for example start with denoising using a Gaussian Blur with sigma 1 in x and y:
+
+![](docs/images/screenshot_2.png)
+
+Choose more processing steps. Note: You can change the input image/layer for each operation, the operation and its parameters in the bottom right panel.
+For example, continue with these steps
+* Filter (Background Removal): Top hat, radius 5 in x and y
+* Binarization: Threshold Otsu
+* Label: Voronoi labeling 
+* Map: Touching neighbor count map
+* Binarization: Detect label edges, with the result from the second last step as input.
+
+Hide some layers showing intermediate results. Switch the bleinding of the final result layer to "additive" to see through it on the original image.
+
+![](docs/images/screenshot_3.png)
+
+### Code generation
+In the plugins menu, you find two entries which allow you to export your workflow as Python/Jython code.
+![](docs/images/screenshot_4.png)
+
+Export your workflow as Jupyter notebook. Start the notebook from the command line using
+```
+jupyter notebook my_notebook.ipynb
+```
+![](docs/images/screenshot_5.png)
+
+Alternatively, export the workflow as Jython/Python script. This script can be executed from the command line like this
+```
+python my_script.py
+```
+
+It can also be executed in Fiji, in case the [CLIJx-assistant is installed](https://clij.github.io/assistant/installation).
+
+![](docs/images/screenshot_6.png)
+
+Note: Depeending on which layers were visible while exporting the code, different code is exported. 
+Only visible layers are shown. 
+Change layer visibility and export the script again. 
+If Fiji asks you if it should reload the script file, click on "Reload".
+
+![](docs/images/screenshot_7.png)
 
 ## For developers
 
 Getting the recent code from github and locally installing it
 ```
-git clone https://github.com/haesleinhuepf/pyclesperanto_assistant.git
+git clone https://github.com/clesperanto/napari_pyclesperanto_assistant.git
 
-pip install -e ./pyclesperanto_assistant
+pip install -e ./napari_pyclesperanto_assistant
 ```
 
 Optional: Also install pyclesperantos recent source code from github:
@@ -49,7 +108,7 @@ pip install -e ./pyclesperanto_prototype
 
 Starting up napari with the pyclesperanto assistant installed:
 ```
-ipython --gui=qt pyclesperanto_assistant\pyclesperanto_assistant
+ipython --gui=qt napari_pyclesperanto_assistant\napari_pyclesperanto_assistant
 ```
 
 ## Feedback welcome!
