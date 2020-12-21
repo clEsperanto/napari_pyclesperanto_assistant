@@ -32,7 +32,7 @@ def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: 
             denoise.initial_call = False
         else:
             denoise.self.layer.data = output
-            denoise.self.layer.name = operation.__name__
+            denoise.self.layer.name = "Result of " + operation.__name__
             denoise.self.layer.contrast_limits=(0, max_intensity)
 
 @magicgui(
@@ -61,7 +61,7 @@ def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__na
             background_removal.initial_call = False
         else:
             background_removal.self.layer.data = output
-            background_removal.self.layer.name = operation.__name__
+            background_removal.self.layer.name = "Result of " + operation.__name__
             background_removal.self.layer.contrast_limits=(0, max_intensity)
 
 @magicgui(
@@ -90,7 +90,7 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
             filter.initial_call = False
         else:
             filter.self.layer.data = output
-            filter.self.layer.name = operation.__name__
+            filter.self.layer.name = "Result of " + operation.__name__
             filter.self.layer.contrast_limits=(0, max_intensity)
 
 # -----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, 
         else:
             binarize.self.layer.data = output
             binarize.self.layer.contrast_limits = (0, 1)
-            binarize.self.layer.name = operation.__name__
+            binarize.self.layer.name = "Result of " + operation.__name__
 
 # -----------------------------------------------------------------------------
 @magicgui(
@@ -146,7 +146,7 @@ def combine(input1: Image, input2: Image = None, operation_name: str = cle.binar
             combine.initial_call = False
         else:
             combine.self.layer.data = output
-            combine.self.layer.name = operation.__name__
+            combine.self.layer.name = "Result of " + operation.__name__
             combine.self.layer.contrast_limits=(0, max_intensity)
 
 # -----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ def label(input1: Image, operation_name: str = cle.connected_components_labeling
             label.initial_call = False
         else:
             label.self.layer.data = output
-            label.self.layer.name = operation.__name__
+            label.self.layer.name = "Result of " + operation.__name__
 
 # -----------------------------------------------------------------------------
 @magicgui(
@@ -195,7 +195,7 @@ def label_processing(input1: Image, operation_name: str = cle.exclude_labels_on_
             label_processing.initial_call = False
         else:
             label_processing.self.layer.data = output
-            label_processing.self.layer.name = operation.__name__
+            label_processing.self.layer.name = "Result of " + operation.__name__
 
 # -----------------------------------------------------------------------------
 @magicgui(
@@ -223,7 +223,7 @@ def mesh(input1: Image, operation_name : str = cle.draw_mesh_between_touching_la
             mesh.initial_call = False
         else:
             mesh.self.layer.data = output
-            mesh.self.layer.name = operation.__name__
+            mesh.self.layer.name = "Result of " + operation.__name__
             mesh.self.layer.contrast_limits=(min_intensity, max_intensity)
 
 # -----------------------------------------------------------------------------
@@ -251,7 +251,7 @@ def map(input1: Image, operation_name: str = cle.label_pixel_count_map.__name__,
             map.initial_call = False
         else:
             map.self.layer.data = output
-            map.self.layer.name = operation.__name__
+            map.self.layer.name = "Result of " + operation.__name__
             map.self.layer.contrast_limits=(0, max_intensity)
 
 # -----------------------------------------------------------------------------
