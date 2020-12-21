@@ -1,6 +1,6 @@
-from ._PythonGenerator import PythonGenerator
+from ._JythonGenerator import JythonGenerator
 
-class PythonJupyterNotebookGenerator(PythonGenerator):
+class PythonJupyterNotebookGenerator(JythonGenerator):
     def _header(self):
         return "{\n" + \
                 " \"cells\": [\n" + \

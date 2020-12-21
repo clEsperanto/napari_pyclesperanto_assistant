@@ -26,7 +26,13 @@ class JythonGenerator(ScriptGenerator):
         "import pyclesperanto_prototype as cle\n\n"
 
     def _push(self, layer, layer_number):
-        return "image" + str(layer_number) + " = cle.imread('" + layer.filename.replace("\\", "/") + "')\n"
+
+        if hasattr(layer, "filename"):
+            filename = layer.filename.replace("\\", "/")
+        else:
+            filename = layer.name
+
+        return "image" + str(layer_number) + " = cle.imread('" + filename + "')\n"
 
 
     def _execute(self, layer, layer_number):

@@ -9,7 +9,7 @@ class ScriptGenerator():
 
         # search for entry point and generate code from there recusively
         for i, layer in enumerate(self.layers):
-            if hasattr(layer, "filename"):
+            if not hasattr(layer, "dialog"):
                 code = code + self._export_layer(layer, i)
                 break
 
@@ -21,11 +21,11 @@ class ScriptGenerator():
     def _export_layer(self, layer, layer_number):
         code = ""
 
-        if hasattr(layer, "filename"):
-            code = code + self._push(layer, layer_number)
-
         if hasattr(layer, "dialog"):
             code = code + self._execute(layer, layer_number)
+        else:
+            code = code + self._push(layer, layer_number)
+
 
         if (layer.visible):
             code = code + self._pull(layer, layer_number)

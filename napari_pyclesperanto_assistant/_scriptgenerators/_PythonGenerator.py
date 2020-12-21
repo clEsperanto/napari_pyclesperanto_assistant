@@ -21,8 +21,14 @@ class PythonGenerator(ScriptGenerator):
                 "from skimage.io import imread, imshow\n\n"
 
     def _push(self, layer, layer_number):
+
+        if hasattr(layer, "filename"):
+            filename = layer.filename.replace("\\", "/")
+        else:
+            filename = layer.name
+
         return \
-            "image = imread('" + layer.filename.replace("\\", "/") + "')\n" + \
+            "image = imread('" + filename + "')\n" + \
             "image" + str(layer_number) + " = cle.push_zyx(image)\n"
 
     def _execute(self, layer, layer_number):
