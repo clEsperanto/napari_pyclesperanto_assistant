@@ -40,8 +40,7 @@ def main():
     with napari.gui_qt():
         # create a viewer and add some image
         viewer = napari.Viewer()
-        layer = viewer.add_image(image)
-        layer.filename = filename
+        layer = viewer.add_image(image, metadata={'filename': filename})
 
         from napari_pyclesperanto_assistant import napari_plugin
         napari_plugin(viewer)

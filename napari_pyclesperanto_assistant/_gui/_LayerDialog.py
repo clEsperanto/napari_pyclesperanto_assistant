@@ -15,8 +15,10 @@ class LayerDialog():
 
         former_active_layer = self.viewer.active_layer
         try:
-            former_active_layer.dialog._deselected(None)
+            former_active_layer.metadata['dialog']._deselected(None)
         except AttributeError:
+            pass
+        except KeyError:
             pass
 
         self.operation.initial_call = True
@@ -28,7 +30,7 @@ class LayerDialog():
             time.sleep(0.1) # dirty workaround: wait until napari has set its active_layer
             self.layer = self.viewer.active_layer
 
-        self.layer.dialog = self
+        self.layer.metadata['dialog'] = self
 
         self.layer.events.data.connect(self._updated)
         self.layer.events.select.connect(self._selected)
@@ -74,10 +76,11 @@ class LayerDialog():
         """
         for layer in self.viewer.layers:
             try:
-                if layer.dialog.filter_gui.get_widget('input1').currentData() == self.layer:
-                    layer.dialog.refresh()
-                if layer.dialog.filter_gui.get_widget('input2').currentData() == self.layer:
-                    layer.dialog.refresh()
+                if layer.metadata['dialog'].filter_gui.get_widget('input1').currentData() == self.layer:
+                    layer.metadata['dialog'].refresh()
+                if layer.metadata['dialog'].filter_gui.get_widget('input2').currentData() == self.layer:
+                    layer.metadata['dialog'].refresh()
             except AttributeError:
                 pass
-
+            except KeyError:
+                pass

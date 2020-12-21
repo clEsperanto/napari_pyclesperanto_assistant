@@ -22,8 +22,8 @@ class PythonGenerator(ScriptGenerator):
 
     def _push(self, layer, layer_number):
 
-        if hasattr(layer, "filename"):
-            filename = layer.filename.replace("\\", "/")
+        if hasattr(layer, 'metadata') and 'filename' in layer.metadata:
+            filename = layer.metadata['filename'].replace("\\", "/")
         else:
             filename = layer.name
 
@@ -32,7 +32,7 @@ class PythonGenerator(ScriptGenerator):
             "image" + str(layer_number) + " = cle.push_zyx(image)\n"
 
     def _execute(self, layer, layer_number):
-        method = cle.operation(layer.dialog.filter_gui.get_widget("operation_name").currentData())
+        method = cle.operation(layer.metadata['dialog'].filter_gui.get_widget("operation_name").currentData())
         method_name = method.__name__
         method_name = "cle." + method_name
         method_name = method_name.replace("please_select", "copy")
@@ -41,14 +41,14 @@ class PythonGenerator(ScriptGenerator):
         parameter_names = method.fullargspec.args
 
         put_comma = False
-        for i, parameter_name in enumerate(layer.dialog.filter_gui.param_names):
+        for i, parameter_name in enumerate(layer.metadata['dialog'].filter_gui.param_names):
             if (i < len(parameter_names)):
                 comma = ""
                 if put_comma:
                     comma = ", "
                 put_comma = True
 
-                widget = layer.dialog.filter_gui.get_widget(parameter_name)
+                widget = layer.metadata['dialog'].filter_gui.get_widget(parameter_name)
 
                 if isinstance(widget, QDoubleSpinBox) or isinstance(widget, QSpinBox):
                     value = widget.value()

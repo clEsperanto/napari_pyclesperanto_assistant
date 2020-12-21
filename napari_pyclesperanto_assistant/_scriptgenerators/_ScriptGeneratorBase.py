@@ -9,7 +9,7 @@ class ScriptGenerator():
 
         # search for entry point and generate code from there recusively
         for i, layer in enumerate(self.layers):
-            if not hasattr(layer, "dialog"):
+            if not hasattr(layer, 'metadata') or not 'dialog' in layer.metadata:
                 code = code + self._export_layer(layer, i)
                 break
 
@@ -21,7 +21,7 @@ class ScriptGenerator():
     def _export_layer(self, layer, layer_number):
         code = ""
 
-        if hasattr(layer, "dialog"):
+        if hasattr(layer, 'metadata') and 'dialog' in layer.metadata:
             code = code + self._execute(layer, layer_number)
         else:
             code = code + self._push(layer, layer_number)
@@ -33,10 +33,10 @@ class ScriptGenerator():
         for i, other_layer in enumerate(self.layers):
             parse_layer = False
             try:
-                if other_layer.dialog is not None:
-                    if (other_layer.dialog.filter_gui.get_widget("input1").currentData() == layer):
+                if hasattr(other_layer, 'metadata') and 'dialog' in other_layer.metadata:
+                    if (other_layer.metadata['dialog'].filter_gui.get_widget("input1").currentData() == layer):
                         parse_layer = True
-                    if (other_layer.dialog.filter_gui.get_widget("input2").currentData() == layer):
+                    if (other_layer.metadata['dialog'].filter_gui.get_widget("input2").currentData() == layer):
                         parse_layer = True
             except AttributeError:
                 pass
