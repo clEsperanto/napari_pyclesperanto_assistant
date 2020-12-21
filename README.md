@@ -6,10 +6,16 @@ It is part of the [clEsperanto](http://clesperanto.net) project.
 
 ## Installation
 
-Download and install [napari](https://github.com/napari/napari/releases/). 
-After that, windows user should follow the instructions in the section below.
+Download and install `napari-pyclesperanto-assitant` uing `pip`. Windows user should follow the instructions in the section below in case of trouble.
 
-... more details coming soon ...
+```
+pip install napari-pyclesperanto-assistant
+```
+
+Afterwards, you can start the assistant using the following command. Replace the url with an image file of your choice:
+```
+python -m napari_pyclesperanto_assistant https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/napari_pyclesperanto_assistant/data/CalibZAPWfixed_000154_max-16.tif
+```
 
 ### Installation on windows
 On windows some additional steps are necessary. Download a pre-compiled wheel of [pyopencl](https://documen.tician.de/pyopencl/) e.g. from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyopencl). 
