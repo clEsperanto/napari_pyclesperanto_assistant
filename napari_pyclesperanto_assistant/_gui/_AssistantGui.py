@@ -53,9 +53,9 @@ class AssistantGUI(QWidget):
         self.setLayout(self.layout)
 
         # Add a menu
-        action = QAction('Export Python code', self.viewer.window._qt_window)
-        action.triggered.connect(self._export_python_code)
-        self.viewer.window.plugins_menu.addAction(action)
+        #action = QAction('Export Python code', self.viewer.window._qt_window)
+        #action.triggered.connect(self._export_python_code)
+        #self.viewer.window.plugins_menu.addAction(action)
 
         action = QAction('Export Jython/Python code', self.viewer.window._qt_window)
         action.triggered.connect(self._export_jython_code)
