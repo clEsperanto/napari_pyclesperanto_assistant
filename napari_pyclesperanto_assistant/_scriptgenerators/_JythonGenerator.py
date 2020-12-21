@@ -27,7 +27,7 @@ class JythonGenerator(ScriptGenerator):
 
     def _push(self, layer, layer_number):
 
-        if hasattr(layer, 'metadata') and 'filename' in layer.metadata:
+        if 'filename' in layer.metadata:
             filename = layer.metadata['filename'].replace("\\", "/")
         else:
             filename = layer.name

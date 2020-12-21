@@ -191,7 +191,7 @@ def label_processing(input1: Image, operation_name: str = cle.exclude_labels_on_
 
         # show result in napari
         if (label_processing.initial_call):
-            label_processing.self.viewer.add_labels(output, metadata={})
+            label_processing.self.viewer.add_labels(output)
             label_processing.initial_call = False
         else:
             label_processing.self.layer.data = output

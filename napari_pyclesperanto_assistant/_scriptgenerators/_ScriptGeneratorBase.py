@@ -9,7 +9,7 @@ class ScriptGenerator():
 
         # search for entry point and generate code from there recusively
         for i, layer in enumerate(self.layers):
-            if not hasattr(layer, 'metadata') or not 'dialog' in layer.metadata:
+            if 'dialog' not in layer.metadata:
                 code = code + self._export_layer(layer, i)
                 break
 
@@ -33,7 +33,7 @@ class ScriptGenerator():
         for i, other_layer in enumerate(self.layers):
             parse_layer = False
             try:
-                if hasattr(other_layer, 'metadata') and 'dialog' in other_layer.metadata:
+                if 'dialog' in other_layer.metadata:
                     if (other_layer.metadata['dialog'].filter_gui.get_widget("input1").currentData() == layer):
                         parse_layer = True
                     if (other_layer.metadata['dialog'].filter_gui.get_widget("input2").currentData() == layer):
