@@ -1,4 +1,5 @@
 from PyQt5 import QtGui
+from PyQt5.QtWidgets import QLabel
 from magicgui._qt.widgets import QDataComboBox
 
 
@@ -38,14 +39,16 @@ class LayerDialog():
 
         self.filter_gui = self.operation.Gui()
         self.dock_widget = viewer.window.add_dock_widget(self.filter_gui, area='right')
-        #self.dock_widget.setMaximumWidth(300)
+        self.dock_widget.setMaximumWidth(300)
         self.filter_gui.set_widget('input1', former_active_layer)
 
         for i in reversed(range(self.filter_gui.layout().count())):
             widget = self.filter_gui.layout().itemAt(i).widget()
             widget.setFont(QtGui.QFont('Arial', 12))
-            #if isinstance(widget, QDataComboBox):
-            #    widget.setMaximumWidth(200)
+            if isinstance(widget, QDataComboBox):
+                widget.setMaximumWidth(200)
+            if isinstance(widget, QLabel):
+                widget.setMaximumWidth(100)
 
     def _updated(self, event):
         self.refresh_all_followers()

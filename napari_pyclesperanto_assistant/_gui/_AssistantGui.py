@@ -51,6 +51,7 @@ class AssistantGUI(QWidget):
         self.layout.addStretch()
 
         self.setLayout(self.layout)
+        self.setMaximumWidth(300)
 
         # Add a menu
         #action = QAction('Export Python code', self.viewer.window._qt_window)
