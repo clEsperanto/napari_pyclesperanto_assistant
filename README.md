@@ -24,9 +24,9 @@ python -m napari_pyclesperanto_assistant https://github.com/clEsperanto/napari_p
 On windows some additional steps are necessary. Download a pre-compiled wheel of [pyopencl](https://documen.tician.de/pyopencl/) e.g. from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyopencl). 
 It is recommended to install `pyopencl-...+cl21-cp38-cp38-win_amd64` - the `cl12` and `cp38` are important when choosing the right download. They stand for OpenCL 1.2 and Python 3.8.
 
-Enter your username and the correct `pyopencl-...` filename in the following line and execute it from the command line:
+Enter the correct pyopencl filename and execute this from the command line:
 ```
-C:\Users\<username>\AppData\Local\Programs\napari\python\python.exe -m pip install pyopencl-2020.2.2+cl12-cp38-cp38-win_amd64.whl
+pip install pyopencl-2020.2.2+cl12-cp38-cp38-win_amd64.whl
 ```
 
 In case napari doesn't start up with an error mentioning numpy ([see also](https://github.com/napari/napari/issues/2022)), execute this from the command line:
