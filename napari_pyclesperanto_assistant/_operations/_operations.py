@@ -100,13 +100,13 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
     operation_name={'choices':cle.operations(must_have_categories=['binarize', 'in assistant'], must_not_have_categories=['combine']).keys()},
     constant={'minimum':-1000, 'maximum':1000}
 )
-def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, constant : int = 0):
+def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, radius_x : int = 1, radius_y : int = 1, radius_z : int = 0):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push_zyx(input1.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
-        operation(cle_input1, output, constant)
+        operation(cle_input1, output, radius_x, radius_y, radius_y)
         output = cle.pull_zyx(output)
 
         # show result in napari
