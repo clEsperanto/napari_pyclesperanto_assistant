@@ -16,7 +16,7 @@ class JythonGenerator(ScriptGenerator):
         "# Read more: \n" + \
         "# https://clesperanto.net\n" + \
         "# \n" + \
-        "# To make this script run in Fiji, please activate the clij, " + \
+        "# To make this script run in Fiji, please activate the clij, \n" + \
         "# clij2 and clijx-assistant update sites in your Fiji. \n" + \
         "# Read more: \n" + \
         "# https://clij.github.io/assistant\n" + \
