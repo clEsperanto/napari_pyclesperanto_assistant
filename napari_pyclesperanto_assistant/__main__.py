@@ -33,9 +33,9 @@ def main():
     #filename = 'data/Lund_000500_resampled-cropped.tif'
     #filename = str(Path(__file__).parent) + '/data/CalibZAPWfixed_000154_max-16.tif'
 
-    print(cle.available_device_names())
-    cle.select_device("p520")
-    print(cle.get_device())
+    print("Available GPUs: " + str(cle.available_device_names()))
+    cle.select_device("rtx")
+    print("Used GPU: " + str(cle.get_device()))
 
     with napari.gui_qt():
         # create a viewer and add some image
