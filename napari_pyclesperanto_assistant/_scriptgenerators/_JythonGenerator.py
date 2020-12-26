@@ -40,7 +40,7 @@ class JythonGenerator(ScriptGenerator):
         method_name = method.__name__
         method_name = "cle." + method_name
         method_name = method_name.replace("please_select", "copy")
-        command = method_name + "("
+        command = "image" + str(layer_number) + " = " + method_name + "("
 
         parameter_names = method.fullargspec.args
 
