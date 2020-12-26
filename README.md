@@ -47,6 +47,20 @@ Open a command line and start up the assistant and pass the image file you want 
 python -m napari_pyclesperanto_assistant C:\structure\code\napari_pyclesperanto_assistant\napari_pyclesperanto_assistant\data\CalibZAPWfixed_000154_max-16.tif
 ```
 
+Alternatively, you can attach the assistant to your napari from within your python code like this:
+```
+import napari
+
+# create Qt GUI context
+with napari.gui_qt():
+    # start napari
+    viewer = napari.Viewer()
+
+    # attach the assistant
+    import napari_pyclesperanto_assistant
+    napari_pyclesperanto_assistant.napari_plugin(viewer)
+```
+
 napari will open with the assistant activated:
 
 ![](docs/images/screenshot_1.png)
