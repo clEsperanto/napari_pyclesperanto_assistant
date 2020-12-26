@@ -62,6 +62,10 @@ class AssistantGUI(QWidget):
         action.triggered.connect(self._export_jython_code)
         self.viewer.window.plugins_menu.addAction(action)
 
+        action = QAction('Export Jython/Python code to clipboard', self.viewer.window._qt_window)
+        action.triggered.connect(self._export_jython_code_to_clipboard)
+        self.viewer.window.plugins_menu.addAction(action)
+
         action = QAction('Export Jupyter Notebook', self.viewer.window._qt_window)
         action.triggered.connect(self._export_notebook)
         self.viewer.window.plugins_menu.addAction(action)
@@ -135,6 +139,12 @@ class AssistantGUI(QWidget):
         generator = JythonGenerator(self.viewer.layers)
         code = generator.generate()
         self._save_code(code, default_fileending=generator.file_ending())
+
+    def _export_jython_code_to_clipboard(self):
+        generator = JythonGenerator(self.viewer.layers)
+        code = generator.generate()
+        import pyperclip
+        pyperclip.copy(code)
 
     def _export_notebook(self):
         generator = PythonJupyterNotebookGenerator(self.viewer.layers)
