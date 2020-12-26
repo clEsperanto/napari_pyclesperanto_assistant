@@ -35,7 +35,10 @@ pip install numpy==1.19.3
 ```
 
 ## Usage
-This short tutorial demonstrates how to generate code using the pyclersperanto-assistant. The whole procedure can be downloaded [as video](docs/images/pyclesperanto_assistant_screencast.mp4).
+This short tutorial demonstrates how to generate code using the pyclersperanto-assistant. 
+
+<iframe src="docs/images/pyclesperanto_assistant_screencast.mp4" width="600" height="300"></iframe>
+[Download workflow as video](docs/images/pyclesperanto_assistant_screencast.mp4)
 
 ### Start up the assistant
 Open a command line and start up the assistant and pass the image file you want to process. The shown example image can be found [online](https://github.com/clEsperanto/napari_pyclesperanto_assistant/blob/master/napari_pyclesperanto_assistant/data/CalibZAPWfixed_000154_max-16.tif)
