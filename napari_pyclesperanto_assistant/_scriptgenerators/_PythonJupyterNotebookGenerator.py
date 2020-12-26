@@ -10,7 +10,7 @@ class PythonJupyterNotebookGenerator(JythonGenerator):
         return self._code_cell(super()._push(layer, layer_number))
 
     def _execute(self, layer, layer_number):
-        return self._markdown_cell(layer.name) + \
+        return self._markdown_cell("## " + layer.name.replace("Result of ", "")) + \
             self._code_cell(super()._execute(layer, layer_number))
 
     def _pull(self, layer, layer_number):
