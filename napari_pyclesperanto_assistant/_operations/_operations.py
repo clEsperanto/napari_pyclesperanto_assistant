@@ -159,9 +159,8 @@ def label(input1: Image, operation_name: str = cle.connected_components_labeling
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push_zyx(input1.data)
-        output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
-        operation(cle_input1, output)
+        output = operation(cle_input1)
         output = cle.pull_zyx(output)
 
         # show result in napari
