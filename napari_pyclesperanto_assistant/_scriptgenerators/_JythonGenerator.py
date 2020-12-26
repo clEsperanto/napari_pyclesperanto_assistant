@@ -95,8 +95,12 @@ class JythonGenerator(ScriptGenerator):
             is_labels = "False"
             intensity_config = ", " + str(layer.contrast_limits[0]) + ", " + str(layer.contrast_limits[1])
 
+        what_to_show = "image" + str(layer_number)
+        if len(layer.data.shape) > 2:
+            what_to_show = "cle.maximum_z_projection(" + what_to_show + ")"
+
         code = self._comment(" show result") + "\n" + \
-               "cle.imshow(image" + str(layer_number) + ", '" + layer.name + "', " + is_labels + intensity_config + ")\n\n"
+               "cle.imshow(" + what_to_show + ", '" + layer.name + "', " + is_labels + intensity_config + ")\n\n"
 
         return code
 
