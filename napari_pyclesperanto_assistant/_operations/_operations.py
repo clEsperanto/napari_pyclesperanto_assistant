@@ -98,7 +98,9 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
     auto_call=True,
     layout='vertical',
     operation_name={'choices':cle.operations(must_have_categories=['binarize', 'in assistant'], must_not_have_categories=['combine']).keys()},
-    constant={'minimum':-1000, 'maximum':1000}
+    radius_x={'minimum':-1000, 'maximum':1000},
+    radius_y={'minimum':-1000, 'maximum':1000},
+    radius_z={'minimum':-1000, 'maximum':1000}
 )
 def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, radius_x : int = 1, radius_y : int = 1, radius_z : int = 0):
     if input1 is not None:
