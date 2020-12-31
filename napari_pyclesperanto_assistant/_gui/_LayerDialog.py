@@ -58,10 +58,12 @@ class LayerDialog():
         self.dock_widget = self.viewer.window.add_dock_widget(self.filter_gui, area='right')
 
     def _deselected(self, event):
-        self.viewer.window.remove_dock_widget(self.dock_widget)
+        if hasattr(self, 'dock_widget'):
+            self.viewer.window.remove_dock_widget(self.dock_widget)
 
     def _removed(self):
-        self.viewer.window.remove_dock_widget(self.dock_widget)
+        if hasattr(self, 'dock_widget'):
+            self.viewer.window.remove_dock_widget(self.dock_widget)
 
     def refresh(self):
         """

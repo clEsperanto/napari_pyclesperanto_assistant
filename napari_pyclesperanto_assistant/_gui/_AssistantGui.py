@@ -38,16 +38,16 @@ class AssistantGUI(QWidget):
 
         from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure
 
-        self._add_button("Filter (Noise removal)", denoise)
-        self._add_button("Filter (Background removal)", background_removal)
-        self._add_button("Filter", filter)
-        self._add_button("Binarize", binarize)
-        self._add_button("Combine", combine)
-        self._add_button("Label", label)
-        self._add_button("Label Processing", label_processing)
-        self._add_button("Map", map)
-        self._add_button("Mesh",mesh)
-        self._add_button("Measure", measure)
+        self.add_button("Filter (Noise removal)", denoise)
+        self.add_button("Filter (Background removal)", background_removal)
+        self.add_button("Filter", filter)
+        self.add_button("Binarize", binarize)
+        self.add_button("Combine", combine)
+        self.add_button("Label", label)
+        self.add_button("Label Processing", label_processing)
+        self.add_button("Map", map)
+        self.add_button("Mesh", mesh)
+        self.add_button("Measure", measure)
 
         self.layout.addStretch()
 
@@ -83,7 +83,7 @@ class AssistantGUI(QWidget):
 
         self.viewer.layers.events.removed.connect(_on_removed)
 
-    def _add_button(self, title : str, handler : callable):
+    def add_button(self, title : str, handler : callable):
         # text
         btn = QPushButton(title, self)
         btn.setFont(QtGui.QFont('Arial', 12))
