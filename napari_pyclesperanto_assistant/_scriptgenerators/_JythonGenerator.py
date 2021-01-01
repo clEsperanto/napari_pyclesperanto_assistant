@@ -36,7 +36,12 @@ class JythonGenerator(ScriptGenerator):
 
 
     def _execute(self, layer, layer_number):
-        method = cle.operation(layer.metadata['dialog'].filter_gui.get_widget("operation_name").currentData())
+        try:
+            method = cle.operation(layer.metadata['dialog'].filter_gui.get_widget("operation_name").currentData())
+        except KeyError:
+            method = "# METHOD NOT FOUND: " + layer.metadata['dialog'].filter_gui.get_widget("operation_name")
+        except AttributeError:
+            method = "# METHOD NOT DEFINED"
         method_name = method.__name__
         method_name = "cle." + method_name
         method_name = method_name.replace("please_select", "copy")
