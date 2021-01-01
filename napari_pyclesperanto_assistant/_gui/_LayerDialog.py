@@ -84,12 +84,14 @@ class LayerDialog():
         Then, refresh those layers.
         """
         for layer in self.viewer.layers:
-            try:
-                if layer.metadata['dialog'].filter_gui.get_widget('input1').currentData() == self.layer:
-                    layer.metadata['dialog'].refresh()
-                if layer.metadata['dialog'].filter_gui.get_widget('input2').currentData() == self.layer:
-                    layer.metadata['dialog'].refresh()
-            except AttributeError:
-                pass
-            except KeyError:
-                pass
+            if layer != self.layer:
+                try:
+                    if layer.metadata['dialog'].filter_gui.get_widget('input1').currentData() == self.layer:
+                        print(self.layer.name + " refreshes " + layer.name)
+                        layer.metadata['dialog'].refresh()
+                    if layer.metadata['dialog'].filter_gui.get_widget('input2').currentData() == self.layer:
+                        layer.metadata['dialog'].refresh()
+                except AttributeError:
+                    pass
+                except KeyError:
+                    pass
