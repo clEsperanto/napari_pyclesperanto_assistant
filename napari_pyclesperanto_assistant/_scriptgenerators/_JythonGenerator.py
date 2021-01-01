@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
+from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
 from magicgui._qt.widgets import QDataComboBox
 from napari.layers import Image, Labels
 import pyclesperanto_prototype as cle
@@ -36,18 +36,21 @@ class JythonGenerator(ScriptGenerator):
 
 
     def _execute(self, layer, layer_number):
+        command = ""
         try:
             method = cle.operation(layer.metadata['dialog'].filter_gui.get_widget("operation_name").currentData())
-        except KeyError:
-            method = "# METHOD NOT FOUND: " + layer.metadata['dialog'].filter_gui.get_widget("operation_name")
+            parameter_names = method.fullargspec.args
+            method_name = "cle." + method.__name__
+            method_name = method_name.replace("please_select", "copy")
         except AttributeError:
-            method = "# METHOD NOT DEFINED"
-        method_name = method.__name__
-        method_name = "cle." + method_name
-        method_name = method_name.replace("please_select", "copy")
-        command = "image" + str(layer_number) + " = " + method_name + "("
+            method = layer.metadata['dialog'].filter_gui.func
+            import inspect
+            parameter_names = inspect.getfullargspec(method).args
+            method_name = method.__name__
 
-        parameter_names = method.fullargspec.args
+            command = command + "from " + method.__module__ + " import " + method.__qualname__ + "\n"
+
+        command = command + "image" + str(layer_number) + " = " + method_name + "("
 
         first_image_parameter = None
 
@@ -65,6 +68,8 @@ class JythonGenerator(ScriptGenerator):
                     value = widget.value()
                 elif isinstance(widget, QDataComboBox):
                     value = widget.currentData()
+                elif isinstance(widget, QLineEdit):
+                    value = widget.text()
                 else:
                     value = None
 
@@ -81,8 +86,11 @@ class JythonGenerator(ScriptGenerator):
                 else:
                     command = command + comma + str(value)
 
+
         command = command + ")\n"
-        command = "image" + str(layer_number) + " = cle.create_like(" + first_image_parameter + ")\n" + \
+
+        if first_image_parameter is not None:
+            command = "image" + str(layer_number) + " = cle.create_like(" + first_image_parameter + ")\n" + \
                                                 command
 
         command = self._comment(" Layer " + layer.name) + "\n" + command
