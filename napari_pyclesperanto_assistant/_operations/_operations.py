@@ -28,12 +28,13 @@ def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: 
 
         # show result in napari
         if (denoise.initial_call):
-            denoise.self.viewer.add_image(output, colormap=input1.colormap)
+            denoise.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
             denoise.initial_call = False
         else:
             denoise.self.layer.data = output
             denoise.self.layer.name = "Result of " + operation.__name__
             denoise.self.layer.contrast_limits=(0, max_intensity)
+            denoise.self.layer.translate = input1.translate
 
 @magicgui(
     auto_call=True,
@@ -57,12 +58,13 @@ def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__na
 
         # show result in napari
         if (background_removal.initial_call):
-            background_removal.self.viewer.add_image(output, colormap=input1.colormap)
+            background_removal.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
             background_removal.initial_call = False
         else:
             background_removal.self.layer.data = output
             background_removal.self.layer.name = "Result of " + operation.__name__
             background_removal.self.layer.contrast_limits=(0, max_intensity)
+            background_removal.self.layer.translate = input1.translate
 
 @magicgui(
     auto_call=True,
@@ -86,12 +88,13 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
 
         # show result in napari
         if (filter.initial_call):
-            filter.self.viewer.add_image(output, colormap=input1.colormap)
+            filter.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
             filter.initial_call = False
         else:
             filter.self.layer.data = output
             filter.self.layer.name = "Result of " + operation.__name__
             filter.self.layer.contrast_limits=(0, max_intensity)
+            filter.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
 @magicgui(
@@ -113,12 +116,13 @@ def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, 
 
         # show result in napari
         if (binarize.initial_call):
-            binarize.self.viewer.add_labels(output)
+            binarize.self.viewer.add_labels(output, translate=input1.translate)
             binarize.initial_call = False
         else:
             binarize.self.layer.data = output
             binarize.self.layer.contrast_limits = (0, 1)
             binarize.self.layer.name = "Result of " + operation.__name__
+            binarize.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
 @magicgui(
@@ -144,12 +148,13 @@ def combine(input1: Image, input2: Image = None, operation_name: str = cle.binar
 
         # show result in napari
         if (combine.initial_call):
-            combine.self.viewer.add_image(output, colormap=input1.colormap)
+            combine.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
             combine.initial_call = False
         else:
             combine.self.layer.data = output
             combine.self.layer.name = "Result of " + operation.__name__
             combine.self.layer.contrast_limits=(0, max_intensity)
+            combine.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
 @magicgui(
@@ -167,11 +172,12 @@ def label(input1: Image, operation_name: str = cle.connected_components_labeling
 
         # show result in napari
         if (label.initial_call):
-            label.self.viewer.add_labels(output)
+            label.self.viewer.add_labels(output, translate=input1.translate)
             label.initial_call = False
         else:
             label.self.layer.data = output
             label.self.layer.name = "Result of " + operation.__name__
+            label.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
 @magicgui(
@@ -192,11 +198,12 @@ def label_processing(input1: Image, operation_name: str = cle.exclude_labels_on_
 
         # show result in napari
         if (label_processing.initial_call):
-            label_processing.self.viewer.add_labels(output)
+            label_processing.self.viewer.add_labels(output, translate=input1.translate)
             label_processing.initial_call = False
         else:
             label_processing.self.layer.data = output
             label_processing.self.layer.name = "Result of " + operation.__name__
+            label_processing.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
 @magicgui(
@@ -220,12 +227,13 @@ def mesh(input1: Image, operation_name : str = cle.draw_mesh_between_touching_la
 
         # show result in napari
         if (mesh.initial_call):
-            mesh.self.viewer.add_image(output, colormap='green', blending='additive')
+            mesh.self.viewer.add_image(output, colormap='green', blending='additive', translate=input1.translate)
             mesh.initial_call = False
         else:
             mesh.self.layer.data = output
             mesh.self.layer.name = "Result of " + operation.__name__
             mesh.self.layer.contrast_limits=(min_intensity, max_intensity)
+            mesh.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
 @magicgui(
@@ -248,12 +256,13 @@ def map(input1: Image, operation_name: str = cle.label_pixel_count_map.__name__,
 
         # show result in napari
         if (map.initial_call):
-            map.self.viewer.add_image(output, colormap='magenta')
+            map.self.viewer.add_image(output, colormap='magenta', translate=input1.translate)
             map.initial_call = False
         else:
             map.self.layer.data = output
             map.self.layer.name = "Result of " + operation.__name__
             map.self.layer.contrast_limits=(0, max_intensity)
+            map.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
 # A special case of ooperation is measurement: it results in a table instead of
