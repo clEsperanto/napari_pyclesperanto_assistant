@@ -40,7 +40,11 @@ class LayerDialog():
         self.filter_gui = self.operation.Gui()
         self.dock_widget = viewer.window.add_dock_widget(self.filter_gui, area='right')
         self.dock_widget.setMaximumWidth(300)
-        self.filter_gui.set_widget('input1', former_active_layer)
+        try:
+            if self.filter_gui.get_widget('input1') is not None:
+                self.filter_gui.set_widget('input1', former_active_layer)
+        except AttributeError:
+            pass
 
         for i in reversed(range(self.filter_gui.layout().count())):
             widget = self.filter_gui.layout().itemAt(i).widget()
