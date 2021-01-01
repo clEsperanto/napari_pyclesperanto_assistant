@@ -113,7 +113,7 @@ def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, 
 
         # show result in napari
         if (binarize.initial_call):
-            binarize.self.viewer.add_image(output)
+            binarize.self.viewer.add_labels(output)
             binarize.initial_call = False
         else:
             binarize.self.layer.data = output
