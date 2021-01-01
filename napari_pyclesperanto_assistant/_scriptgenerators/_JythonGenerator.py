@@ -50,7 +50,7 @@ class JythonGenerator(ScriptGenerator):
 
             command = command + "from " + method.__module__ + " import " + method.__qualname__ + "\n"
 
-        command = command + "image" + str(layer_number) + " = " + method_name + "("
+        command = command + method_name + "("
 
         first_image_parameter = None
 
@@ -109,9 +109,7 @@ class JythonGenerator(ScriptGenerator):
             intensity_config = ", " + str(layer.contrast_limits[0]) + ", " + str(layer.contrast_limits[1])
 
         what_to_show = "image" + str(layer_number)
-        if len(layer.data.shape) > 2:
-            what_to_show = "cle.maximum_z_projection(" + what_to_show + ")"
-
+        
         code = self._comment(" show result") + "\n" + \
                "cle.imshow(" + what_to_show + ", '" + layer.name + "', " + is_labels + intensity_config + ")\n\n"
 
