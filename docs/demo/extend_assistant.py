@@ -15,26 +15,26 @@ with napari.gui_qt():
     from magicgui import magicgui
     from napari.layers import Image
     @magicgui(
-        #auto_call=True,
-        call_button='Run',
+        auto_call=True,
         layout='vertical',
     )
-    def skimage_watershed(image : Image = None, labeled_spots : Image = None, binary_mask: Image = None):
+    def skimage_threshold_yen(input1 : Image = None):
 
-        if image is not None and labeled_spots is not None and binary_mask is not None:
-            from skimage.segmentation import watershed
-            output = watershed(image.data, labeled_spots.data, mask=binary_mask.data)
+        if input1 is not None:
+            from skimage.filters import threshold_yen
+
+            output = input1.data > threshold_yen(input1.data)
 
             # show result in napari
-            if (skimage_watershed.initial_call):
-                skimage_watershed.self.viewer.add_labels(output)
-                skimage_watershed.initial_call = False
+            if (skimage_threshold_yen.initial_call):
+                skimage_threshold_yen.self.viewer.add_labels(output)
+                skimage_threshold_yen.initial_call = False
             else:
-                skimage_watershed.self.layer.data = output
-                skimage_watershed.self.layer.name = "Result of watershed"
+                skimage_threshold_yen.self.layer.data = output
+                skimage_threshold_yen.self.layer.name = "Result of threshold_yen"
 
     # add my custom button
-    assistant_gui.add_button("Scikit-image watershed", skimage_watershed)
+    assistant_gui.add_button("Scikit-image threshold_yen", skimage_threshold_yen)
 
 
 
