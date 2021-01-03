@@ -22,7 +22,7 @@ python -m napari_pyclesperanto_assistant https://github.com/clEsperanto/napari_p
 
 ### Installation on windows
 On windows some additional steps are necessary. Download a pre-compiled wheel of [pyopencl](https://documen.tician.de/pyopencl/) e.g. from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyopencl). 
-It is recommended to install `pyopencl-...+cl21-cp38-cp38-win_amd64` - the `cl12` and `cp38` are important when choosing the right download. They stand for OpenCL 1.2 and Python 3.8.
+It is recommended to install `pyopencl-...+cl12-cp38-cp38-win_amd64` - the `cl12` and `cp38` are important when choosing the right download. They stand for OpenCL 1.2 and Python 3.8.
 
 Enter the correct pyopencl filename and execute this from the command line:
 ```
