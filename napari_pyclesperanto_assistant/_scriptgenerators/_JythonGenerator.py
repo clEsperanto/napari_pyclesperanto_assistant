@@ -93,7 +93,7 @@ class JythonGenerator(ScriptGenerator):
             command = "image" + str(layer_number) + " = cle.create_like(" + first_image_parameter + ")\n" + \
                                                 command
 
-        command = self._comment(" Layer " + layer.name) + "\n" + command
+        command = "\n" + self._comment(" Layer " + layer.name) + "\n" + command
 
         return command
 
@@ -111,7 +111,7 @@ class JythonGenerator(ScriptGenerator):
         what_to_show = "image" + str(layer_number)
         
         code = self._comment(" show result") + "\n" + \
-               "cle.imshow(" + what_to_show + ", '" + layer.name + "', " + is_labels + intensity_config + ")\n\n"
+               "cle.imshow(" + what_to_show + ", '" + layer.name + "', " + is_labels + intensity_config + ")\n"
 
         return code
 
