@@ -4,5 +4,5 @@ def napari_plugin(viewer) -> AssistantGUI:
 
     # add the _gui to the viewer as a dock widget
     gui = AssistantGUI(viewer)
-    viewer.window.add_dock_widget(gui, area='right')
+    viewer.window.add_dock_widget(gui, name='Add layer', area='right')
     return gui

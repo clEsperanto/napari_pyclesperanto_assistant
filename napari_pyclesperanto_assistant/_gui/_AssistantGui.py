@@ -1,8 +1,9 @@
 from pathlib import Path
 
 from PyQt5 import QtGui
-from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, QFileDialog
+from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, QFileDialog, QGridLayout
 
 from .._gui._LayerDialog import LayerDialog
 from .._scriptgenerators import JythonGenerator, PythonJupyterNotebookGenerator
@@ -16,9 +17,11 @@ class AssistantGUI(QWidget):
     def __init__(self, viewer):
         super().__init__()
 
+        self.font = QtGui.QFont('Arial', 8)
+
         self.viewer = viewer
 
-        self.layout = QVBoxLayout()
+        self.layout = QGridLayout()
 
         self._init_gui()
 
@@ -31,28 +34,28 @@ class AssistantGUI(QWidget):
         for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(None)
 
-        label = QLabel("Add layer")
-        label.setFont(QtGui.QFont('Arial', 12))
-        label.setFixedSize(QSize(300, 30))
-        self.layout.addWidget(label)
-
         from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure
 
-        self.add_button("Filter (Noise removal)", denoise)
-        self.add_button("Filter (Background removal)", background_removal)
-        self.add_button("Filter", filter)
-        self.add_button("Binarize", binarize)
-        self.add_button("Combine", combine)
-        self.add_button("Label", label)
-        self.add_button("Label Processing", label_processing)
-        self.add_button("Map", map)
-        self.add_button("Mesh", mesh)
-        self.add_button("Measure", measure)
+        self.add_button("Filter (Noise removal)", denoise, 1, 0)
+        self.add_button("Filter (Background removal)", background_removal, 1, 1)
+        self.add_button("Filter", filter, 1, 2)
+        self.add_button("Binarize", binarize, 2, 0)
+        self.add_button("Combine", combine, 1, 4)
+        self.add_button("Label", label, 2, 1)
+        self.add_button("Label Processing", label_processing, 2, 2)
+        self.add_button("Map", map, 3, 0)
+        self.add_button("Mesh", mesh, 3, 1)
+        self.add_button("Measure", measure, 3, 2)
 
-        self.layout.addStretch()
+        # spacer
+        label = QLabel("")
+        label.setFont(self.font)
+        self.layout.addWidget(label, 4, 5)
+
+        #self.layout.addStretch()
 
         self.setLayout(self.layout)
-        self.setMaximumWidth(300)
+        #self.setMaximumWidth(300)
 
         # Add a menu
         action = QAction('Export Jython/Python code', self.viewer.window._qt_window)
@@ -79,22 +82,41 @@ class AssistantGUI(QWidget):
 
         self.viewer.layers.events.removed.connect(_on_removed)
 
-    def add_button(self, title : str, handler : callable):
+    def add_button(self, title : str, handler : callable, x : int = None, y : int = None):
         # text
-        btn = QPushButton(title, self)
-        btn.setFont(QtGui.QFont('Arial', 12))
+        btn = QPushButton('', self)
+        btn.setFont(self.font)
+        btn.setFixedSize(QSize(75, 75))
 
         # icon
-        btn.setIcon(QtGui.QIcon(str(Path(__file__).parent) + "/icons/" + title.lower().replace(" ", "_").replace("(", "").replace(")", "") + ".png"))
-        btn.setIconSize(QSize(20, 20))
-        btn.setStyleSheet("text-align:left;")
+
+        #btn.setStyleSheet("text-align:center;")
+
+        btn.setLayout(QGridLayout())
+
+        icon_label = QLabel()
+        icon_label.setAlignment(Qt.AlignCenter)
+        pixmap = QPixmap()
+        pixmap.load(str(Path(__file__).parent) + "/icons/" + title.lower().replace(" ", "_").replace("(", "").replace(")", "") + ".png")
+        pixmap = pixmap.scaled(QSize(50, 50), Qt.KeepAspectRatio)
+        icon_label.setPixmap(pixmap)
+        btn.layout().addWidget(icon_label)
+
+        text_label = QLabel(title)
+        text_label.setAlignment(Qt.AlignCenter)
+        text_label.setWordWrap(True)
+        text_label.setFont(self.font)
+        btn.layout().addWidget(text_label)
 
         def trigger():
             self._activate(handler)
 
         # action
         btn.clicked.connect(trigger)
-        self.layout.addWidget(btn)
+        if x is None or y is None:
+            self.layout.addWidget(btn)
+        else:
+            self.layout.addWidget(btn, x, y)
 
     def _activate(self, magicgui):
         LayerDialog(self.viewer, magicgui)
