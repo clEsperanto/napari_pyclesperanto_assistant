@@ -7,7 +7,7 @@ class ScriptGenerator():
     def generate(self):
         code = self._header()
 
-        # search for entry point and generate code from there recusively
+        # generate code from layers in given order
         for i, layer in enumerate(self.layers):
             code = code + self._export_layer(layer, i)
 
