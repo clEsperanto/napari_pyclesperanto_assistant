@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from PyQt5 import QtGui
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, QFileDialog, QGridLayout
+from qtpy import QtGui
+from qtpy.QtCore import QSize, Qt
+from qtpy.QtGui import QPixmap
+from qtpy.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, QFileDialog, QGridLayout
 
 from .._gui._LayerDialog import LayerDialog
 from .._scriptgenerators import JythonGenerator, PythonJupyterNotebookGenerator
