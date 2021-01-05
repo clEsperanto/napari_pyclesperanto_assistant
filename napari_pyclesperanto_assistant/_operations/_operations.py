@@ -1,7 +1,7 @@
 
 # -----------------------------------------------------------------------------
 # The user interface of the _operations is build by magicgui
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
+from qtpy.QtWidgets import QTableWidget, QTableWidgetItem
 from magicgui import magicgui
 from napari.layers import Image
 import pyclesperanto_prototype as cle

@@ -1,5 +1,5 @@
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QLabel
+from qtpy import QtGui
+from qtpy.QtWidgets import QLabel
 from magicgui._qt.widgets import QDataComboBox
 
 
