@@ -39,7 +39,7 @@ class LayerDialog():
 
         self.filter_gui = self.operation.Gui()
         self.dock_widget = viewer.window.add_dock_widget(self.filter_gui, area='right')
-        self.dock_widget.setMaximumWidth(300)
+        self.dock_widget.setMaximumWidth(400)
         try:
             if self.filter_gui.get_widget('input1') is not None:
                 self.filter_gui.set_widget('input1', former_active_layer)
@@ -50,7 +50,7 @@ class LayerDialog():
             widget = self.filter_gui.layout().itemAt(i).widget()
             widget.setFont(QtGui.QFont('Arial', 12))
             if isinstance(widget, QDataComboBox):
-                widget.setMaximumWidth(200)
+                widget.setMaximumWidth(300)
             if isinstance(widget, QLabel):
                 widget.setMaximumWidth(100)
 
