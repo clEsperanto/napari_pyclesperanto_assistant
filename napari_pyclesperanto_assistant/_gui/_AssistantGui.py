@@ -40,7 +40,7 @@ class AssistantGUI(QWidget):
         self.add_button("Filter (Background removal)", background_removal, 1, 1)
         self.add_button("Filter", filter, 1, 2)
         self.add_button("Binarize", binarize, 2, 0)
-        self.add_button("Combine", combine, 1, 4)
+        self.add_button("Combine", combine, 1, 3)
         self.add_button("Label", label, 2, 1)
         self.add_button("Label Processing", label_processing, 2, 2)
         self.add_button("Map", map, 3, 0)
@@ -50,7 +50,7 @@ class AssistantGUI(QWidget):
         # spacer
         label = QLabel("")
         label.setFont(self.font)
-        self.layout.addWidget(label, 4, 5)
+        self.layout.addWidget(label, 4, 4)
 
         #self.layout.addStretch()
 
