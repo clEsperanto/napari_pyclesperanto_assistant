@@ -91,7 +91,7 @@ class JythonGenerator(ScriptGenerator):
 
         if first_image_parameter is not None:
             command = "image" + str(layer_number) + " = cle.create_like(" + first_image_parameter + ")\n" + \
-                                                command
+                      "image" + str(layer_number) + " = " + command
 
         command = "\n" + self._comment(" Layer " + layer.name) + "\n" + command
 
