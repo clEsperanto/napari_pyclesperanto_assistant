@@ -36,22 +36,22 @@ class AssistantGUI(QWidget):
 
         from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements
 
-        self.add_button("Filter (Noise removal)", denoise, 1, 0)
-        self.add_button("Filter (Background removal)", background_removal, 1, 1)
+        self.add_button("Noise removal", denoise, 1, 0)
+        self.add_button("Background removal", background_removal, 1, 1)
         self.add_button("Filter", filter, 1, 2)
         self.add_button("Binarize", binarize, 2, 0)
-        self.add_button("Combine", combine, 1, 3)
-        self.add_button("Label", label, 2, 1)
-        self.add_button("Label processing", label_processing, 2, 2)
-        self.add_button("Label measurements", label_measurements, 2, 3)
-        self.add_button("Map", map, 3, 0)
-        self.add_button("Mesh", mesh, 3, 1)
-        self.add_button("Measure", measure, 3, 2)
+        self.add_button("Combine", combine, 2, 1)
+        self.add_button("Label", label, 3, 0)
+        self.add_button("Label processing", label_processing, 3, 1)
+        self.add_button("Label measurements", label_measurements, 4, 0)
+        self.add_button("Map", map, 4, 1)
+        self.add_button("Mesh", mesh, 4, 2)
+        self.add_button("Measure", measure, 5, 0)
 
         # spacer
         label = QLabel("")
         label.setFont(self.font)
-        self.layout.addWidget(label, 4, 4)
+        self.layout.addWidget(label, 6, 4)
 
         #self.layout.addStretch()
 
@@ -87,7 +87,7 @@ class AssistantGUI(QWidget):
         # text
         btn = QPushButton('', self)
         btn.setFont(self.font)
-        btn.setFixedSize(QSize(75, 75))
+        btn.setFixedSize(QSize(80, 100))
 
         # icon
 
