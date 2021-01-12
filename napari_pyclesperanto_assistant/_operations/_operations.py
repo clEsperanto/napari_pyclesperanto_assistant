@@ -8,6 +8,18 @@ import pyclesperanto_prototype as cle
 
 plus_minus_1k = {'min': -1000, 'max': 1000}
 
+def _call_operation_ignoring_to_many_arguments(operation, arguments):
+    """
+    This function is used to call an operation with three positional parameters even though it just takes two. Thus,
+    we may ignore parameters entered in the GUI.
+    """
+
+    import inspect
+    sig = inspect.signature(operation)
+    if len(sig.parameters) < len(arguments):
+        arguments = arguments[:len(sig.parameters)]
+    operation(*arguments)
+
 @magicgui(
     auto_call=True,
     layout='vertical',
@@ -23,7 +35,7 @@ def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: 
         cle_input = cle.push_zyx(input1.data)
         output = cle.create_like(cle_input)
         operation = cle.operation(operation_name)
-        operation(cle_input, output, x, y, z)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input, output, x, y, z])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
             max_intensity = 1 # prevent division by zero in vispy
@@ -54,7 +66,7 @@ def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__na
         cle_input = cle.push_zyx(input1.data)
         output = cle.create_like(cle_input)
         operation = cle.operation(operation_name)
-        operation(cle_input, output, x, y, z)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input, output, x, y, z])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
             max_intensity = 1 # prevent division by zero in vispy
@@ -85,7 +97,7 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
         cle_input = cle.push_zyx(input1.data)
         output = cle.create_like(cle_input)
         operation = cle.operation(operation_name)
-        operation(cle_input, output, x, y, z)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input, output, x, y, z])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
             max_intensity = 1 # prevent division by zero in vispy
@@ -117,7 +129,7 @@ def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, 
         cle_input1 = cle.push_zyx(input1.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
-        operation(cle_input1, output, radius_x, radius_y, radius_y)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, radius_x, radius_y, radius_y])
         output = cle.pull_zyx(output)
 
         # show result in napari
@@ -148,7 +160,7 @@ def combine(input1: Image, input2: Image = None, operation_name: str = cle.binar
         cle_input2 = cle.push_zyx(input2.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
-        operation(cle_input1, cle_input2, output)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input1, cle_input2, output])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
             max_intensity = 1 # prevent division by zero in vispy
@@ -171,12 +183,13 @@ def combine(input1: Image, input2: Image = None, operation_name: str = cle.binar
     input1={'label':'Image'},
     operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['label', 'in assistant']).keys()}
 )
-def label(input1: Image, operation_name: str = cle.connected_components_labeling_box.__name__):
+def label(input1: Image, operation_name: str = cle.connected_components_labeling_box.__name__, sigma1 : float = 1, sigma2 : float = 1):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push_zyx(input1.data)
         operation = cle.operation(operation_name)
-        output = operation(cle_input1)
+        output = cle.create_like(cle_input1)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, sigma1, sigma2])
         output = cle.pull_zyx(output)
 
         # show result in napari
@@ -203,7 +216,7 @@ def label_processing(input1: Labels, operation_name: str = cle.exclude_labels_on
         cle_input1 = cle.push_zyx(input1.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
-        operation(cle_input1, output, min, max)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, min, max])
         output = cle.pull_zyx(output)
 
         # show result in napari
@@ -233,7 +246,7 @@ def label_measurements(input1: Image, input2: Labels = None, operation_name: str
         cle_input2 = cle.push_zyx(input2.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
-        operation(cle_input1, cle_input2, output, n)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input1, cle_input2, output, n])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
             max_intensity = 1 # prevent division by zero in vispy
@@ -264,7 +277,7 @@ def mesh(input1: Image, operation_name : str = cle.draw_mesh_between_touching_la
         cle_input1 = cle.push_zyx(input1.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
-        operation(cle_input1, output, n)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, n])
         min_intensity = cle.minimum_of_all_pixels(output)
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity - min_intensity == 0:
@@ -295,7 +308,7 @@ def map(input1: Image, operation_name: str = cle.label_pixel_count_map.__name__,
         cle_input1 = cle.push_zyx(input1.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
-        operation(cle_input1, output, n)
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, n])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
             max_intensity = 1 # prevent division by zero in vispy

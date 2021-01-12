@@ -51,17 +51,24 @@ class LayerDialog():
         #        widget.native.setMaximumWidth(100)
 
     def _updated(self, event):
+        print("updated")
         self.refresh_all_followers()
 
     def _selected(self, event):
+        print("selected")
         self.filter_gui.self = self    # sigh
-        self.dock_widget = self.viewer.window.add_dock_widget(self.filter_gui, area='right')
+        self.dock_widget = self.viewer.window.add_dock_widget(self.filter_gui, area='bottom')
 
     def _deselected(self, event):
+        print("deselected")
         if hasattr(self, 'dock_widget'):
-            self.viewer.window.remove_dock_widget(self.dock_widget)
+            try:
+                self.viewer.window.remove_dock_widget(self.dock_widget)
+            except KeyError:
+                pass
 
     def _removed(self):
+        print("removed")
         if hasattr(self, 'dock_widget'):
             self.viewer.window.remove_dock_widget(self.dock_widget)
 
@@ -85,10 +92,19 @@ class LayerDialog():
                 continue
             dialog = layer.metadata.get('dialog')
             if not dialog:
+                print("layer", layer, " has no dialog")
                 continue
             gui = dialog.filter_gui
+
+            print(gui, gui)
+            print("has attr", hasattr(gui, 'input1'))
+            print("input", gui.input1)
+            print("value", gui.input1.value)
+            print("self.layer", self.layer)
+
             if hasattr(gui, 'input1') and gui.input1.value == self.layer:
                 print(self.layer.name + " refreshes " + layer.name)
                 dialog.refresh()
             if hasattr(gui, 'input2') and gui.input2.value == self.layer:
                 dialog.refresh()
+
