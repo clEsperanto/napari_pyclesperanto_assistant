@@ -1,6 +1,5 @@
 from magicgui.widgets import ComboBox
 from qtpy.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
-from magicgui._qt.widgets import QDataComboBox
 from napari.layers import Image, Labels
 import pyclesperanto_prototype as cle
 
