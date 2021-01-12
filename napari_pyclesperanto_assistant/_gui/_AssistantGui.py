@@ -34,7 +34,7 @@ class AssistantGUI(QWidget):
         for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(None)
 
-        from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure
+        from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements
 
         self.add_button("Filter (Noise removal)", denoise, 1, 0)
         self.add_button("Filter (Background removal)", background_removal, 1, 1)
@@ -42,7 +42,8 @@ class AssistantGUI(QWidget):
         self.add_button("Binarize", binarize, 2, 0)
         self.add_button("Combine", combine, 1, 3)
         self.add_button("Label", label, 2, 1)
-        self.add_button("Label Processing", label_processing, 2, 2)
+        self.add_button("Label processing", label_processing, 2, 2)
+        self.add_button("Label measurements", label_measurements, 2, 3)
         self.add_button("Map", map, 3, 0)
         self.add_button("Mesh", mesh, 3, 1)
         self.add_button("Measure", measure, 3, 2)

@@ -209,6 +209,41 @@ def label_processing(input1: Image, operation_name: str = cle.exclude_labels_on_
 @magicgui(
     auto_call=True,
     layout='vertical',
+    input1={'label':'intensity'},
+    input2={'label':'labels'},
+    operation_name={'choices':cle.operations(must_have_categories=['combine', 'map', 'in assistant']).keys()}
+)
+def label_measurements(input1: Image, input2: Image = None, operation_name: str = cle.label_mean_intensity_map.__name__, n : float = 1):
+    if input1 is not None:
+        if (input2 is None):
+            input2 = input1
+
+        # execute operation
+        cle_input1 = cle.push_zyx(input1.data)
+        cle_input2 = cle.push_zyx(input2.data)
+        output = cle.create_like(cle_input1)
+        operation = cle.operation(operation_name)
+        operation(cle_input1, cle_input2, output, n)
+        max_intensity = cle.maximum_of_all_pixels(output)
+        if max_intensity == 0:
+            max_intensity = 1 # prevent division by zero in vispy
+        output = cle.pull_zyx(output)
+
+        # show result in napari
+        if (label_measurements.initial_call):
+            label_measurements.self.viewer.add_image(output, colormap='turbo', interpolation='nearest', translate=input1.translate)
+            label_measurements.initial_call = False
+        else:
+            label_measurements.self.layer.data = output
+            label_measurements.self.layer.name = "Result of " + operation.__name__
+            label_measurements.self.layer.contrast_limits=(0, max_intensity)
+            label_measurements.self.layer.translate = input1.translate
+
+
+# -----------------------------------------------------------------------------
+@magicgui(
+    auto_call=True,
+    layout='vertical',
     operation_name={'choices':cle.operations(must_have_categories=['label measurement', 'mesh', 'in assistant'], must_not_have_categories=["combine"]).keys()},
     n = {'minimum': 0, 'maximum': 1000}
 )
@@ -256,7 +291,7 @@ def map(input1: Image, operation_name: str = cle.label_pixel_count_map.__name__,
 
         # show result in napari
         if (map.initial_call):
-            map.self.viewer.add_image(output, colormap='magenta', translate=input1.translate)
+            map.self.viewer.add_image(output, colormap='turbo', interpolation='nearest', translate=input1.translate)
             map.initial_call = False
         else:
             map.self.layer.data = output
