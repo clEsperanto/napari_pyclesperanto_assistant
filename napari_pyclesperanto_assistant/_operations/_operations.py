@@ -42,9 +42,8 @@ def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: 
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (denoise.initial_call):
+        if denoise.call_count == 0:
             denoise.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
-            denoise.initial_call = False
         else:
             denoise.self.layer.data = output
             denoise.self.layer.name = "Result of " + operation.__name__
@@ -73,9 +72,8 @@ def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__na
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (background_removal.initial_call):
+        if background_removal.call_count == 0:
             background_removal.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
-            background_removal.initial_call = False
         else:
             background_removal.self.layer.data = output
             background_removal.self.layer.name = "Result of " + operation.__name__
@@ -104,9 +102,8 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (filter.initial_call):
+        if filter.call_count == 0:
             filter.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
-            filter.initial_call = False
         else:
             filter.self.layer.data = output
             filter.self.layer.name = "Result of " + operation.__name__
@@ -133,9 +130,8 @@ def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, 
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (binarize.initial_call):
+        if binarize.call_count == 0:
             binarize.self.viewer.add_labels(output, translate=input1.translate)
-            binarize.initial_call = False
         else:
             binarize.self.layer.data = output
             binarize.self.layer.contrast_limits = (0, 1)
@@ -167,9 +163,8 @@ def combine(input1: Image, input2: Image = None, operation_name: str = cle.binar
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (combine.initial_call):
+        if combine.call_count == 0:
             combine.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
-            combine.initial_call = False
         else:
             combine.self.layer.data = output
             combine.self.layer.name = "Result of " + operation.__name__
@@ -189,13 +184,15 @@ def label(input1: Image, operation_name: str = cle.connected_components_labeling
         cle_input1 = cle.push_zyx(input1.data)
         operation = cle.operation(operation_name)
         output = cle.create_like(cle_input1)
-        _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, sigma1, sigma2])
+        if 'voronoi_otsu' in operation_name: # special case workaround
+            _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, sigma1, sigma2])
+        else:
+            _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output])
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (label.initial_call):
+        if label.call_count == 0:
             label.self.viewer.add_labels(output, translate=input1.translate)
-            label.initial_call = False
         else:
             label.self.layer.data = output
             label.self.layer.name = "Result of " + operation.__name__
@@ -220,9 +217,8 @@ def label_processing(input1: Labels, operation_name: str = cle.exclude_labels_on
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (label_processing.initial_call):
+        if label_processing.call_count == 0:
             label_processing.self.viewer.add_labels(output, translate=input1.translate)
-            label_processing.initial_call = False
         else:
             label_processing.self.layer.data = output
             label_processing.self.layer.name = "Result of " + operation.__name__
@@ -253,9 +249,8 @@ def label_measurements(input1: Image, input2: Labels = None, operation_name: str
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (label_measurements.initial_call):
+        if label_measurements.call_count == 0:
             label_measurements.self.viewer.add_image(output, colormap='turbo', interpolation='nearest', translate=input1.translate)
-            label_measurements.initial_call = False
         else:
             label_measurements.self.layer.data = output
             label_measurements.self.layer.name = "Result of " + operation.__name__
@@ -285,9 +280,8 @@ def mesh(input1: Image, operation_name : str = cle.draw_mesh_between_touching_la
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (mesh.initial_call):
+        if mesh.call_count == 0:
             mesh.self.viewer.add_image(output, colormap='green', blending='additive', translate=input1.translate)
-            mesh.initial_call = False
         else:
             mesh.self.layer.data = output
             mesh.self.layer.name = "Result of " + operation.__name__
@@ -315,9 +309,8 @@ def map(input1: Image, operation_name: str = cle.label_pixel_count_map.__name__,
         output = cle.pull_zyx(output)
 
         # show result in napari
-        if (map.initial_call):
+        if map.call_count == 0:
             map.self.viewer.add_image(output, colormap='turbo', interpolation='nearest', translate=input1.translate)
-            map.initial_call = False
         else:
             map.self.layer.data = output
             map.self.layer.name = "Result of " + operation.__name__
