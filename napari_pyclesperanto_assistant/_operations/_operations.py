@@ -3,7 +3,7 @@
 # The user interface of the _operations is build by magicgui
 from qtpy.QtWidgets import QTableWidget, QTableWidgetItem
 from magicgui import magicgui
-from napari.layers import Image
+from napari.layers import Image, Labels
 import pyclesperanto_prototype as cle
 
 plus_minus_1k = {'min': -1000, 'max': 1000}
@@ -11,7 +11,8 @@ plus_minus_1k = {'min': -1000, 'max': 1000}
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['filter', 'denoise','in assistant'], must_not_have_categories=['combine']).keys()},
+    input1={'label':'Image'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['filter', 'denoise','in assistant'], must_not_have_categories=['combine']).keys()},
     x=plus_minus_1k,
     y=plus_minus_1k,
     z=plus_minus_1k,
@@ -41,7 +42,8 @@ def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: 
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['filter', 'background removal','in assistant'], must_not_have_categories=['combine']).keys()},
+    input1={'label':'Image'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['filter', 'background removal','in assistant'], must_not_have_categories=['combine']).keys()},
     x=plus_minus_1k,
     y=plus_minus_1k,
     z=plus_minus_1k,
@@ -71,7 +73,8 @@ def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__na
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['filter', 'in assistant'], must_not_have_categories=['combine', 'denoise', 'background removal']).keys()},
+    input1={'label':'Image'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['filter', 'in assistant'], must_not_have_categories=['combine', 'denoise', 'background removal']).keys()},
     x=plus_minus_1k,
     y=plus_minus_1k,
     z=plus_minus_1k,
@@ -102,7 +105,8 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['binarize', 'in assistant'], must_not_have_categories=['combine']).keys()},
+    input1={'label':'Image'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['binarize', 'in assistant'], must_not_have_categories=['combine']).keys()},
     radius_x=plus_minus_1k,
     radius_y=plus_minus_1k,
     radius_z=plus_minus_1k
@@ -130,7 +134,9 @@ def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, 
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['combine', 'in assistant']).keys()}
+    input1={'label':'Image 1'},
+    input2={'label':'Image 2'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['combine', 'in assistant']).keys()}
 )
 def combine(input1: Image, input2: Image = None, operation_name: str = cle.binary_and.__name__):
     if input1 is not None:
@@ -162,7 +168,8 @@ def combine(input1: Image, input2: Image = None, operation_name: str = cle.binar
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['label', 'in assistant']).keys()}
+    input1={'label':'Image'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['label', 'in assistant']).keys()}
 )
 def label(input1: Image, operation_name: str = cle.connected_components_labeling_box.__name__):
     if input1 is not None:
@@ -185,11 +192,12 @@ def label(input1: Image, operation_name: str = cle.connected_components_labeling
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['label processing', 'in assistant']).keys()},
+    input1={'label':'Labels'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['label processing', 'in assistant']).keys()},
     min = plus_minus_1k,
     max = plus_minus_1k
 )
-def label_processing(input1: Image, operation_name: str = cle.exclude_labels_on_edges.__name__, min: float=0, max:float=100):
+def label_processing(input1: Labels, operation_name: str = cle.exclude_labels_on_edges.__name__, min: float=0, max:float=100):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push_zyx(input1.data)
@@ -211,11 +219,11 @@ def label_processing(input1: Image, operation_name: str = cle.exclude_labels_on_
 @magicgui(
     auto_call=True,
     layout='vertical',
-    input1={'label':'intensity'},
-    input2={'label':'labels'},
-    operation_name={'choices':cle.operations(must_have_categories=['combine', 'map', 'in assistant']).keys()}
+    input1={'label':'Image'},
+    input2={'label':'Labels'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['combine', 'map', 'in assistant']).keys()}
 )
-def label_measurements(input1: Image, input2: Image = None, operation_name: str = cle.label_mean_intensity_map.__name__, n : float = 1):
+def label_measurements(input1: Image, input2: Labels = None, operation_name: str = cle.label_mean_intensity_map.__name__, n : float = 1):
     if input1 is not None:
         if (input2 is None):
             input2 = input1
@@ -246,7 +254,8 @@ def label_measurements(input1: Image, input2: Image = None, operation_name: str 
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['label measurement', 'mesh', 'in assistant'], must_not_have_categories=["combine"]).keys()},
+    input1={'label': 'Labels'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['label measurement', 'mesh', 'in assistant'], must_not_have_categories=["combine"]).keys()},
     n = {'min': 0, 'max': 1000}
 )
 def mesh(input1: Image, operation_name : str = cle.draw_mesh_between_touching_labels.__name__, n : float = 1):
@@ -276,7 +285,8 @@ def mesh(input1: Image, operation_name : str = cle.draw_mesh_between_touching_la
 @magicgui(
     auto_call=True,
     layout='vertical',
-    operation_name={'choices':cle.operations(must_have_categories=['label measurement', 'map', 'in assistant'], must_not_have_categories=["combine"]).keys()},
+    input1={'label':'Labels'},
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['label measurement', 'map', 'in assistant'], must_not_have_categories=["combine"]).keys()},
     n = {'min': 0, 'max': 1000}
 )
 def map(input1: Image, operation_name: str = cle.label_pixel_count_map.__name__, n : float = 1):
@@ -304,8 +314,12 @@ def map(input1: Image, operation_name: str = cle.label_pixel_count_map.__name__,
 # -----------------------------------------------------------------------------
 # A special case of ooperation is measurement: it results in a table instead of
 # an image
-@magicgui(layout='vertical', call_button="Measure")
-def measure(input1: Image = None, labels : Image = None):
+@magicgui(
+    layout='vertical',
+    input1={'label': 'Image'},
+    labels={'label': 'Labels'},
+    call_button="Measure")
+def measure(input1: Image = None, labels : Labels = None):
     if input1 is not None and labels is not None:
         from skimage.measure import regionprops_table
         table = regionprops_table(labels.data.astype(int), intensity_image=input1.data, properties=('area', 'centroid', 'mean_intensity'))
