@@ -1,7 +1,6 @@
 from magicgui.widgets import ComboBox
 from qtpy import QtGui
 from qtpy.QtWidgets import QLabel
-from magicgui._qt.widgets import QDataComboBox
 from magicgui.function_gui import FunctionGui
 
 class LayerDialog():
@@ -38,18 +37,18 @@ class LayerDialog():
         self.layer.events.select.connect(self._selected)
         self.layer.events.deselect.connect(self._deselected)
 
-        self.dock_widget = viewer.window.add_dock_widget(self.filter_gui, area='right')
-        self.dock_widget.setMaximumWidth(300)
+        self.dock_widget = viewer.window.add_dock_widget(self.filter_gui, area='bottom')
+        #self.dock_widget.setMaximumWidth(300)
         if hasattr(self.filter_gui, 'input1'):
             print("setting former active")
             self.filter_gui.input1.value = former_active_layer
 
-        for widget in self.filter_gui:
-            widget.native.setFont(QtGui.QFont('Arial', 12))
-            if isinstance(widget.native, ComboBox):
-                widget.native.setMaximumWidth(200)
-            if isinstance(widget.native, QLabel):
-                widget.native.setMaximumWidth(100)
+        #for widget in self.filter_gui:
+        #    widget.native.setFont(QtGui.QFont('Arial', 12))
+        #    if isinstance(widget.native, ComboBox):
+        #        widget.native.setMaximumWidth(200)
+        #    if isinstance(widget.native, QLabel):
+        #        widget.native.setMaximumWidth(100)
 
     def _updated(self, event):
         self.refresh_all_followers()
