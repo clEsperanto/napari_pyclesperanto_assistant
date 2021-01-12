@@ -6,13 +6,15 @@ from magicgui import magicgui
 from napari.layers import Image
 import pyclesperanto_prototype as cle
 
+plus_minus_1k = {'min': -1000, 'max': 1000}
+
 @magicgui(
     auto_call=True,
     layout='vertical',
     operation_name={'choices':cle.operations(must_have_categories=['filter', 'denoise','in assistant'], must_not_have_categories=['combine']).keys()},
-    x={'minimum': -1000, 'maximum': 1000},
-    y={'minimum': -1000, 'maximum': 1000},
-    z={'minimum': -1000, 'maximum': 1000},
+    x=plus_minus_1k,
+    y=plus_minus_1k,
+    z=plus_minus_1k,
 )
 def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: float = 1, y: float = 1, z: float = 0):
     if input1:
@@ -40,9 +42,9 @@ def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: 
     auto_call=True,
     layout='vertical',
     operation_name={'choices':cle.operations(must_have_categories=['filter', 'background removal','in assistant'], must_not_have_categories=['combine']).keys()},
-    x={'minimum': -1000, 'maximum': 1000},
-    y={'minimum': -1000, 'maximum': 1000},
-    z={'minimum': -1000, 'maximum': 1000},
+    x=plus_minus_1k,
+    y=plus_minus_1k,
+    z=plus_minus_1k,
 )
 def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__name__, x: float = 10, y: float = 10, z: float = 0):
     if input1:
@@ -70,9 +72,9 @@ def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__na
     auto_call=True,
     layout='vertical',
     operation_name={'choices':cle.operations(must_have_categories=['filter', 'in assistant'], must_not_have_categories=['combine', 'denoise', 'background removal']).keys()},
-    x={'minimum': -1000, 'maximum': 1000},
-    y={'minimum': -1000, 'maximum': 1000},
-    z={'minimum': -1000, 'maximum': 1000},
+    x=plus_minus_1k,
+    y=plus_minus_1k,
+    z=plus_minus_1k,
 )
 def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x: float = 1, y: float = 1, z: float = 0):
     if input1:
@@ -101,9 +103,9 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
     auto_call=True,
     layout='vertical',
     operation_name={'choices':cle.operations(must_have_categories=['binarize', 'in assistant'], must_not_have_categories=['combine']).keys()},
-    radius_x={'minimum':-1000, 'maximum':1000},
-    radius_y={'minimum':-1000, 'maximum':1000},
-    radius_z={'minimum':-1000, 'maximum':1000}
+    radius_x=plus_minus_1k,
+    radius_y=plus_minus_1k,
+    radius_z=plus_minus_1k
 )
 def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, radius_x : int = 1, radius_y : int = 1, radius_z : int = 0):
     if input1 is not None:
@@ -184,8 +186,8 @@ def label(input1: Image, operation_name: str = cle.connected_components_labeling
     auto_call=True,
     layout='vertical',
     operation_name={'choices':cle.operations(must_have_categories=['label processing', 'in assistant']).keys()},
-    min = {'minimum': -1000, 'maximum': 1000},
-    max = {'minimum': -1000, 'maximum': 1000}
+    min = plus_minus_1k,
+    max = plus_minus_1k
 )
 def label_processing(input1: Image, operation_name: str = cle.exclude_labels_on_edges.__name__, min: float=0, max:float=100):
     if input1 is not None:
@@ -245,7 +247,7 @@ def label_measurements(input1: Image, input2: Image = None, operation_name: str 
     auto_call=True,
     layout='vertical',
     operation_name={'choices':cle.operations(must_have_categories=['label measurement', 'mesh', 'in assistant'], must_not_have_categories=["combine"]).keys()},
-    n = {'minimum': 0, 'maximum': 1000}
+    n = {'min': 0, 'max': 1000}
 )
 def mesh(input1: Image, operation_name : str = cle.draw_mesh_between_touching_labels.__name__, n : float = 1):
     if input1 is not None:
@@ -275,7 +277,7 @@ def mesh(input1: Image, operation_name : str = cle.draw_mesh_between_touching_la
     auto_call=True,
     layout='vertical',
     operation_name={'choices':cle.operations(must_have_categories=['label measurement', 'map', 'in assistant'], must_not_have_categories=["combine"]).keys()},
-    n = {'minimum': 0, 'maximum': 1000}
+    n = {'min': 0, 'max': 1000}
 )
 def map(input1: Image, operation_name: str = cle.label_pixel_count_map.__name__, n : float = 1):
     if input1 is not None:
