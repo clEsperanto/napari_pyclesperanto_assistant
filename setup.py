@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/clesperanto/napari_pyclesperanto_assistant",
     packages=setuptools.find_packages(),
     include_package_data=True,
-    install_requires=["numpy", "pyopencl", "toolz", "scikit-image", "napari==0.4.2", "napari_plugin_engine", "pyclesperanto_prototype==0.6.0", "magicgui==0.1.6", "numpy==1.19.3", "pyperclip"],
+    install_requires=["numpy", "pyopencl", "toolz", "scikit-image", "napari==0.4.2", "napari_plugin_engine", "pyclesperanto_prototype==0.6.0", "magicgui==0.1.6", "numpy!=1.19.4", "pyperclip"],
     python_requires='>=3.6',
     classifiers=[
         "Programming Language :: Python :: 3",
