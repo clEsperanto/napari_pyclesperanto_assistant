@@ -87,7 +87,7 @@ class AssistantGUI(QWidget):
         # text
         btn = QPushButton('', self)
         btn.setFont(self.font)
-        btn.setFixedSize(QSize(80, 100))
+        btn.setFixedSize(QSize(80, 80))
 
         # icon
 
