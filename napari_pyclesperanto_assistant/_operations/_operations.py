@@ -178,16 +178,13 @@ def combine(input1: Image, input2: Image = None, operation_name: str = cle.binar
     input1={'label':'Image'},
     operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['label', 'in assistant']).keys()}
 )
-def label(input1: Image, operation_name: str = cle.connected_components_labeling_box.__name__, sigma1 : float = 1, sigma2 : float = 1):
+def label(input1: Image, operation_name: str = cle.connected_components_labeling_box.__name__):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push_zyx(input1.data)
         operation = cle.operation(operation_name)
         output = cle.create_like(cle_input1)
-        if 'voronoi_otsu' in operation_name: # special case workaround
-            _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, sigma1, sigma2])
-        else:
-            _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output])
+        _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output])
         output = cle.pull_zyx(output)
 
         # show result in napari
