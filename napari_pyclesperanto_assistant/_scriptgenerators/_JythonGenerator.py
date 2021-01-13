@@ -1,4 +1,4 @@
-from magicgui.widgets import ComboBox
+from magicgui.widgets import ComboBox, SpinBox, LineEdit
 from qtpy.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
 from napari.layers import Image, Labels
 import pyclesperanto_prototype as cle
@@ -28,7 +28,11 @@ class JythonGenerator(ScriptGenerator):
     def _push(self, layer, layer_number):
 
         if 'filename' in layer.metadata:
-            filename = layer.metadata['filename'].replace("\\", "/")
+            import os
+            filename = layer.metadata['filename']
+            filename = os.path.abspath(filename)
+            # windows path fix
+            filename = filename.replace("\\", "/")
         else:
             filename = layer.name
 
@@ -64,17 +68,9 @@ class JythonGenerator(ScriptGenerator):
                     comma = ", "
                 put_comma = True
 
-                widget = layer.metadata['dialog'].filter_gui.parameter_name
+                widget = layer.metadata['dialog'].filter_gui[parameter_name]
 
-                # better way
-                if isinstance(widget.native, QDoubleSpinBox) or isinstance(widget, QSpinBox):
-                    value = widget.native.value()
-                elif isinstance(widget.native, ComboBox):
-                    value = widget.native.currentData()
-                elif isinstance(widget.native, QLineEdit):
-                    value = widget.native.text()
-                else:
-                    value = None
+                value = widget.value
 
                 if isinstance(value, Image) or isinstance(value, Labels):
                     image_str = "image" + str(self._get_index_of_layer(value))
@@ -88,7 +84,6 @@ class JythonGenerator(ScriptGenerator):
                         command = command + comma + "image" + str(layer_number)
                 else:
                     command = command + comma + str(value)
-
 
         command = command + ")\n"
 
