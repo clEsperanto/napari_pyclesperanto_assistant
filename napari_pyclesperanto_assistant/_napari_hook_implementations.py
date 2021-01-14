@@ -7,5 +7,4 @@ from napari_pyclesperanto_assistant import Assistant
 
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
-    print("hello world")
     return Assistant
