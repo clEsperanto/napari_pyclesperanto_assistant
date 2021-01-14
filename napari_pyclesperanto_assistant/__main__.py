@@ -12,7 +12,7 @@ def main():
     import napari
     from skimage.io import imread
     import pyclesperanto_prototype as cle
-    from napari_pyclesperanto_assistant._gui._AssistantGui import AssistantGUI
+    from napari_pyclesperanto_assistant._gui._Assistant import Assistant
 
     import sys
 
