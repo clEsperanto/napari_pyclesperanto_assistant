@@ -10,5 +10,5 @@ with napari.gui_qt():
     layer[0].metadata['filename'] = filename
 
     # attach the assistant
-    import napari_pyclesperanto_assistant
-    assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
+    #import napari_pyclesperanto_assistant
+    #assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
