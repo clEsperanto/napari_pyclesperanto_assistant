@@ -14,12 +14,12 @@ class AssistantGUI(QWidget):
     It adds some buttons for categories of _operations.
     """
 
-    def __init__(self, viewer):
+    def __init__(self, napari_viewer):
         super().__init__()
 
         self.font = QtGui.QFont('Arial', 8)
 
-        self.viewer = viewer
+        self.viewer = napari_viewer
 
         self.layout = QGridLayout()
 
