@@ -8,7 +8,7 @@ from qtpy.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, Q
 from .._gui._LayerDialog import LayerDialog
 from .._scriptgenerators import JythonGenerator, PythonJupyterNotebookGenerator
 
-class AssistantGUI(QWidget):
+class Assistant(QWidget):
     """This Gui takes a napari as parameter and infiltrates it.
 
     It adds some buttons for categories of _operations.

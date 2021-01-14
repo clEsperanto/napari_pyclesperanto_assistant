@@ -26,7 +26,7 @@ setuptools.setup(
     ],
     entry_points={
         'napari.plugin': [
-            'pyclesperanto = napari_pyclesperanto_assistant',
+            'clEsperanto = napari_pyclesperanto_assistant',
         ],
     },
 )

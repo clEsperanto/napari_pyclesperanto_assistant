@@ -1,4 +1,4 @@
-from ._gui import AssistantGUI
+from ._gui import Assistant
 from ._gui import napari_plugin
 from ._napari_hook_implementations import napari_experimental_provide_dock_widget
 
