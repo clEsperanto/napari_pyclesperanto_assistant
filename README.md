@@ -42,7 +42,7 @@ It is recommended to install `pyopencl-...+cl12-cp38-cp38-win_amd64` - the `cl12
 
 Enter the correct pyopencl filename and execute this from the command line:
 ```
-pip install pyopencl-2020.2.2+cl12-cp38-cp38-win_amd64.whl
+pip install pyopencl-2020.3.1+cl12-cp38-cp38-win_amd64.whl
 ```
 
 In case napari doesn't start up with an error mentioning numpy ([see also](https://github.com/napari/napari/issues/2022)), execute this from the command line:
