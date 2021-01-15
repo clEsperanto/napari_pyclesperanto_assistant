@@ -5,8 +5,8 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="napari_pyclesperanto_assistant",
-    version="0.7.0",
-    author="haesleinhuepf",
+    version="0.7.1",
+    author="Robert Haase",
     author_email="robert.haase@tu-dresden.de",
     description="OpenCL based GPU-accelerated image processing in napari",
     long_description=long_description,
