@@ -1,14 +1,13 @@
 from magicgui.widgets import ComboBox
 from qtpy import QtGui
 from qtpy.QtWidgets import QLabel
-from magicgui.function_gui import FunctionGui
 
 class LayerDialog():
     """
     The LayerDialog contains a dock-widget that allows configuring parameters of all _operations.
     It uses events emitted by napari to toggle which dock widget is shown.
     """
-    def __init__(self, viewer, operation: FunctionGui):
+    def __init__(self, viewer, operation):
         self.viewer = viewer
 
         self.filter_gui = operation
