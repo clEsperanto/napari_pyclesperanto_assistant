@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="napari_pyclesperanto_assistant",
-    version="0.7.3",
+    version="0.7.4",
     author="Robert Haase",
     author_email="robert.haase@tu-dresden.de",
     description="OpenCL based GPU-accelerated image processing in napari",
@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/clesperanto/napari_pyclesperanto_assistant",
     packages=setuptools.find_packages(),
     include_package_data=True,
-    install_requires=["numpy", "pyopencl", "toolz", "scikit-image", "napari==0.4.5", "napari_plugin_engine", "pyclesperanto_prototype==0.7.3", "magicgui==0.2.5", "numpy!=1.19.4", "pyperclip"],
+    install_requires=["numpy", "pyopencl", "toolz", "scikit-image", "napari==0.4.7", "napari_plugin_engine", "pyclesperanto_prototype==0.7.3", "magicgui==0.2.5", "numpy!=1.19.4", "pyperclip"],
     python_requires='>=3.6',
     classifiers=[
         "Programming Language :: Python :: 3",
