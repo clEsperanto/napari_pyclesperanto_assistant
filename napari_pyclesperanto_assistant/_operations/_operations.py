@@ -3,7 +3,7 @@
 # The user interface of the _operations is build by magicgui
 from qtpy.QtWidgets import QTableWidget, QTableWidgetItem
 from magicgui import magicgui
-from napari.layers import Image, Labels
+from napari.layers import Image, Labels, Layer
 import pyclesperanto_prototype as cle
 
 plus_minus_1k = {'min': -1000, 'max': 1000}
@@ -127,7 +127,7 @@ def binarize(input1: Image, operation_name : str = cle.threshold_otsu.__name__, 
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
         _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, radius_x, radius_y, radius_y])
-        output = cle.pull_zyx(output)
+        output = cle.pull_zyx(output).astype(int)
 
         # show result in napari
         if binarize.call_count == 0:
@@ -178,14 +178,14 @@ def combine(input1: Image, input2: Image = None, operation_name: str = cle.binar
     input1={'label':'Image'},
     operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['label', 'in assistant']).keys()}
 )
-def label(input1: Image, operation_name: str = cle.connected_components_labeling_box.__name__):
+def label(input1: Layer, operation_name: str = cle.connected_components_labeling_box.__name__):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push_zyx(input1.data)
         operation = cle.operation(operation_name)
         output = cle.create_like(cle_input1)
         _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output])
-        output = cle.pull_zyx(output)
+        output = cle.pull_zyx(output).astype(int)
 
         # show result in napari
         if label.call_count == 0:
@@ -211,7 +211,7 @@ def label_processing(input1: Labels, operation_name: str = cle.exclude_labels_on
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
         _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, min, max])
-        output = cle.pull_zyx(output)
+        output = cle.pull_zyx(output).astype(int)
 
         # show result in napari
         if label_processing.call_count == 0:
