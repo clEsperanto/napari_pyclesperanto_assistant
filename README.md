@@ -25,9 +25,11 @@ Restart napari. Afterwards, you should find the Assistant in the plugins menu:
 ### Installation via conda and pip
 If you have no python/conda environment installed yet, please follow the instructions [here](https://mpicbg-scicomp.github.io/ipf_howtoguides/guides/Python_Conda_Environments) first.
 
-Download and install `napari-pyclesperanto-assitant` uing `pip`. Windows users should follow the instructions in the section below in case of trouble.
+Download and install `pyopencl` via `conda`, and `napari` and the `napari-pyclesperanto-assistant` uing `pip`. Windows users can aternatively follow the instructions in the section below in case of trouble.
 
 ```
+conda install -c conda-forge pyopencl
+pip install napari[all]
 pip install napari-pyclesperanto-assistant
 ```
 
