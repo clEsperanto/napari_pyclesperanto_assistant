@@ -22,9 +22,9 @@ def make_test_viewer(qtbot, request):
     for viewer in viewers:
         viewer.close()
 
-def test_complex_workflow(make_test_viewer):
-    return
-    
+def test_complex_workflow():
+
+
     import napari
     import napari_pyclesperanto_assistant
     from pathlib import Path
@@ -42,7 +42,7 @@ def test_complex_workflow(make_test_viewer):
 
     # start napari
     print("b")
-    viewer = make_test_viewer() # napari.Viewer()
+    viewer = napari.Viewer()
 
     print("c")
     layer = viewer.open(filename)
