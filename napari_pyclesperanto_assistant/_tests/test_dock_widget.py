@@ -4,23 +4,9 @@
 def test_whatever():
     pass
 
-import pytest
-
-@pytest.fixture
-def make_test_viewer(qtbot, request):
-    from napari import Viewer
-    viewers = []
-
-    def actual_factory(*model_args, viewer_class=Viewer, **model_kwargs):
-        model_kwargs.setdefault('show', False)
-        viewer = viewer_class(*model_args, **model_kwargs)
-        viewers.append(viewer)
-        return viewer
-
-    yield actual_factory
-
-    for viewer in viewers:
-        viewer.close()
+def test_whatever2():
+    import napari
+    pass
 
 def test_complex_workflow():
     print("x")
@@ -43,7 +29,7 @@ def test_complex_workflow():
 
     # start napari
     print("b")
-    viewer = napari.Viewer()
+    viewer = napari.Viewer(show=False)
 
     print("c")
     layer = viewer.open(filename)
