@@ -7,21 +7,21 @@ def test_whatever():
     pass
 
 
-def test_whatever2(make_test_viewer):
+def test_whatever2(make_napari_viewer):
 
-    viewer = make_test_viewer()
+    viewer = make_napari_viewer()
     pass
 
-def test_whatever3(make_test_viewer):
+def test_whatever3(make_napari_viewer):
 
-    viewer = make_test_viewer()
+    viewer = make_napari_viewer()
 
     import napari_pyclesperanto_assistant
     assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
     pass
 
 
-def test_complex_workflow(make_test_viewer):
+def test_complex_workflow(make_napari_viewer):
     print("x")
 
     import napari_pyclesperanto_assistant
@@ -35,7 +35,7 @@ def test_complex_workflow(make_test_viewer):
 
     # start napari
     print("b")
-    viewer = make_test_viewer()
+    viewer = make_napari_viewer()
 
     print("c")
     layer = viewer.open(filename)
