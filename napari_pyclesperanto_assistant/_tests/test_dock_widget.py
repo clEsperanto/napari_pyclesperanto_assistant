@@ -23,6 +23,8 @@ def make_test_viewer(qtbot, request):
         viewer.close()
 
 def test_complex_workflow(make_test_viewer):
+    return
+    
     import napari
     import napari_pyclesperanto_assistant
     from pathlib import Path
@@ -32,7 +34,7 @@ def test_complex_workflow(make_test_viewer):
     #filename = str(root / 'data' / 'Lund_000500_resampled-cropped.tif')
     filename = str(root / 'data' / 'CalibZAPWfixed_000154_max-16.tif')
 
-    return
+
 
     # create Qt GUI context
     print("a")
