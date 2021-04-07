@@ -1,5 +1,5 @@
+from magicgui.widgets import ComboBox, SpinBox, LineEdit
 from qtpy.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
-from magicgui._qt.widgets import QDataComboBox
 from napari.layers import Image, Labels
 import pyclesperanto_prototype as cle
 
@@ -28,7 +28,11 @@ class JythonGenerator(ScriptGenerator):
     def _push(self, layer, layer_number):
 
         if 'filename' in layer.metadata:
-            filename = layer.metadata['filename'].replace("\\", "/")
+            import os
+            filename = layer.metadata['filename']
+            filename = os.path.abspath(filename)
+            # windows path fix
+            filename = filename.replace("\\", "/")
         else:
             filename = layer.name
 
@@ -38,12 +42,14 @@ class JythonGenerator(ScriptGenerator):
     def _execute(self, layer, layer_number):
         command = ""
         try:
-            method = cle.operation(layer.metadata['dialog'].filter_gui.get_widget("operation_name").currentData())
+            method = cle.operation(layer.metadata['dialog'].filter_gui.operation_name.value)
             parameter_names = method.fullargspec.args
             method_name = "cle." + method.__name__
             method_name = method_name.replace("please_select", "copy")
         except AttributeError:
-            method = layer.metadata['dialog'].filter_gui.func
+            method = layer.metadata['dialog'].filter_gui._function
+
+            # let's chat about this, probably a better way
             import inspect
             parameter_names = inspect.getfullargspec(method).args
             method_name = method.__name__
@@ -55,23 +61,16 @@ class JythonGenerator(ScriptGenerator):
         first_image_parameter = None
 
         put_comma = False
-        for i, parameter_name in enumerate(layer.metadata['dialog'].filter_gui.param_names):
+        for i, parameter_name in enumerate([x.name for x in layer.metadata['dialog'].filter_gui]):
             if (i < len(parameter_names)):
                 comma = ""
                 if put_comma:
                     comma = ", "
                 put_comma = True
 
-                widget = layer.metadata['dialog'].filter_gui.get_widget(parameter_name)
+                widget = layer.metadata['dialog'].filter_gui[parameter_name]
 
-                if isinstance(widget, QDoubleSpinBox) or isinstance(widget, QSpinBox):
-                    value = widget.value()
-                elif isinstance(widget, QDataComboBox):
-                    value = widget.currentData()
-                elif isinstance(widget, QLineEdit):
-                    value = widget.text()
-                else:
-                    value = None
+                value = widget.value
 
                 if isinstance(value, Image) or isinstance(value, Labels):
                     image_str = "image" + str(self._get_index_of_layer(value))
@@ -85,7 +84,6 @@ class JythonGenerator(ScriptGenerator):
                         command = command + comma + "image" + str(layer_number)
                 else:
                     command = command + comma + str(value)
-
 
         command = command + ")\n"
 

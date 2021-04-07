@@ -1,21 +1,47 @@
-import setuptools
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+import os
+import codecs
+from pathlib import Path
 
-setuptools.setup(
+from setuptools import setup, find_packages
+
+
+def read(fname):
+    file_path = os.path.join(os.path.dirname(__file__), fname)
+    return codecs.open(file_path, encoding='utf-8').read()
+
+
+# Add your dependencies in requirements.txt
+# Note: you can add test-specific requirements in tox.ini
+requirements = []
+root = Path(__file__).parent
+filename = str(root / 'requirements.txt')
+with open(filename) as f:
+    for line in f:
+        stripped = line.split("#")[0].strip()
+        if len(stripped) > 0:
+            requirements.append(stripped)
+
+
+# https://github.com/pypa/setuptools_scm
+use_scm = {"write_to": "napari_pyclesperanto_assistant/_version.py"}
+setup(
     name="napari_pyclesperanto_assistant",
-    version="0.2.1",
-    author="haesleinhuepf",
+    version="0.7.5",
+    author="Robert Haase",
     author_email="robert.haase@tu-dresden.de",
     description="OpenCL based GPU-accelerated image processing in napari",
-    long_description=long_description,
+    long_description=read('README.md'),
     long_description_content_type="text/markdown",
     url="https://github.com/clesperanto/napari_pyclesperanto_assistant",
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     include_package_data=True,
-    install_requires=["numpy", "pyopencl", "toolz", "scikit-image", "napari==0.4.2", "napari_plugin_engine", "pyclesperanto_prototype==0.6.0", "magicgui==0.1.6", "numpy!=1.19.4", "pyperclip"],
     python_requires='>=3.6',
+    install_requires=requirements,
+    use_scm_version=use_scm,
+    setup_requires=['setuptools_scm'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
@@ -26,7 +52,7 @@ setuptools.setup(
     ],
     entry_points={
         'napari.plugin': [
-            'pyclesperanto = napari_pyclesperanto_assistant',
+            'clEsperanto = napari_pyclesperanto_assistant',
         ],
     },
 )

@@ -8,18 +8,18 @@ from qtpy.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, Q
 from .._gui._LayerDialog import LayerDialog
 from .._scriptgenerators import JythonGenerator, PythonJupyterNotebookGenerator
 
-class AssistantGUI(QWidget):
+class Assistant(QWidget):
     """This Gui takes a napari as parameter and infiltrates it.
 
     It adds some buttons for categories of _operations.
     """
 
-    def __init__(self, viewer):
+    def __init__(self, napari_viewer):
         super().__init__()
 
         self.font = QtGui.QFont('Arial', 8)
 
-        self.viewer = viewer
+        self.viewer = napari_viewer
 
         self.layout = QGridLayout()
 
@@ -34,24 +34,27 @@ class AssistantGUI(QWidget):
         for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(None)
 
-        from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements
+        from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements, transform, projection
 
-        self.add_button("Filter (Noise removal)", denoise, 1, 0)
-        self.add_button("Filter (Background removal)", background_removal, 1, 1)
+        self.add_button("Noise removal", denoise, 1, 0)
+        self.add_button("Background removal", background_removal, 1, 1)
         self.add_button("Filter", filter, 1, 2)
-        self.add_button("Binarize", binarize, 2, 0)
-        self.add_button("Combine", combine, 1, 3)
-        self.add_button("Label", label, 2, 1)
-        self.add_button("Label processing", label_processing, 2, 2)
-        self.add_button("Label measurements", label_measurements, 2, 3)
-        self.add_button("Map", map, 3, 0)
-        self.add_button("Mesh", mesh, 3, 1)
-        self.add_button("Measure", measure, 3, 2)
+        self.add_button("Combine", combine, 2, 0)
+        self.add_button("Transform", transform, 2, 1)
+        self.add_button("Projection", projection, 2, 2)
+
+        self.add_button("Binarize", binarize, 3, 0)
+        self.add_button("Label", label, 3, 1)
+        self.add_button("Label processing", label_processing, 3, 2)
+        self.add_button("Label measurements", label_measurements, 5, 0)
+        self.add_button("Map", map, 4, 0)
+        self.add_button("Mesh", mesh, 4, 1)
+        self.add_button("Measure", measure, 5, 1)
 
         # spacer
         label = QLabel("")
         label.setFont(self.font)
-        self.layout.addWidget(label, 4, 4)
+        self.layout.addWidget(label, 6, 4)
 
         #self.layout.addStretch()
 
@@ -87,7 +90,7 @@ class AssistantGUI(QWidget):
         # text
         btn = QPushButton('', self)
         btn.setFont(self.font)
-        btn.setFixedSize(QSize(75, 75))
+        btn.setFixedSize(QSize(80, 80))
 
         # icon
 
@@ -99,7 +102,7 @@ class AssistantGUI(QWidget):
         icon_label.setAlignment(Qt.AlignCenter)
         pixmap = QPixmap()
         pixmap.load(str(Path(__file__).parent) + "/icons/" + title.lower().replace(" ", "_").replace("(", "").replace(")", "") + ".png")
-        pixmap = pixmap.scaled(QSize(50, 50), Qt.KeepAspectRatio)
+        pixmap = pixmap.scaled(QSize(40, 40), Qt.KeepAspectRatio)
         icon_label.setPixmap(pixmap)
         btn.layout().addWidget(icon_label)
 

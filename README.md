@@ -1,17 +1,44 @@
 # napari-pyclesperanto-assistant
+[![Image.sc forum](https://img.shields.io/badge/dynamic/json.svg?label=forum&url=https%3A%2F%2Fforum.image.sc%2Ftag%2Fclesperanto.json&query=%24.topic_list.tags.0.topic_count&colorB=brightgreen&suffix=%20topics&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAABPklEQVR42m3SyyqFURTA8Y2BER0TDyExZ+aSPIKUlPIITFzKeQWXwhBlQrmFgUzMMFLKZeguBu5y+//17dP3nc5vuPdee6299gohUYYaDGOyyACq4JmQVoFujOMR77hNfOAGM+hBOQqB9TjHD36xhAa04RCuuXeKOvwHVWIKL9jCK2bRiV284QgL8MwEjAneeo9VNOEaBhzALGtoRy02cIcWhE34jj5YxgW+E5Z4iTPkMYpPLCNY3hdOYEfNbKYdmNngZ1jyEzw7h7AIb3fRTQ95OAZ6yQpGYHMMtOTgouktYwxuXsHgWLLl+4x++Kx1FJrjLTagA77bTPvYgw1rRqY56e+w7GNYsqX6JfPwi7aR+Y5SA+BXtKIRfkfJAYgj14tpOF6+I46c4/cAM3UhM3JxyKsxiOIhH0IO6SH/A1Kb1WBeUjbkAAAAAElFTkSuQmCC)](https://forum.image.sc/tag/clesperanto)
+[![website](https://img.shields.io/website?url=http%3A%2F%2Fclesperanto.net)](http://clesperanto.net)
+[![License](https://img.shields.io/pypi/l/napari-pyclesperanto-assistant.svg?color=green)](https://github.com/haesleinhuepf/napari-pyclesperanto-assistant/raw/master/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/napari-pyclesperanto-assistant.svg?color=green)](https://pypi.org/project/napari-pyclesperanto-assistant)
+[![Python Version](https://img.shields.io/pypi/pyversions/napari-pyclesperanto-assistant.svg?color=green)](https://python.org)
+[![tests](https://github.com/clesperanto/napari_pyclesperanto_assistant/workflows/tests/badge.svg)](https://github.com/clesperanto/napari_pyclesperanto_assistant/actions)
+[![codecov](https://codecov.io/gh/clesperanto/napari_pyclesperanto_assistant/branch/master/graph/badge.svg)](https://codecov.io/gh/clesperanto/napari_pyclesperanto_assistant)
+
 The py-clEsperanto-assistant is a yet experimental [napari](https://github.com/napari/napari) plugin for building GPU-accelerated image processing workflows. 
-It is part of the [clEsperanto](http://clesperanto.net) project. 
-It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) as backend for processing images.
+It is part of the [clEsperanto](http://clesperanto.net) project.
+It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) and with that [pyopencl](https://documen.tician.de/pyopencl/) as backend for processing images.
+This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiecutter) using with napari's [cookiecutter-napari-plugin](https://github.com/napari/cookiecutter-napari-plugin) template.
 
 ![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
 
 ## Installation
+### Installation using the napari installer
 
+Download and install [napari](https://github.com/napari/napari/releases/tag/v0.4.3).
+
+Windows users please download [pyopencl...cl12-cp38-cp38-win_amd64.whl](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyopencl). Use the command line to navigate to the folder where you downloaded it (for example the Downloads folder using `cd Downloads`). From there, run the following line after replacing `<username>` with your username:
+```
+C:\Users\<username>\AppData\Local\Programs\napari\python\python.exe -m pip install pyopencl-2020.2.2+cl12-cp38-cp38-win_amd64.whl
+```
+
+Start napari and navigate to its menu `Plugins > Install/Uninstall Package(s)...`. Select `napari-pyclesperanto-assitant` from the list and install it by clicking the blue button on the right:
+![](docs/images/screenshot_installer.png)
+
+Restart napari. Afterwards, you should find the Assistant in the plugins menu:
+
+![](docs/images/screenshot_menu.png)
+
+### Installation via conda and pip
 If you have no python/conda environment installed yet, please follow the instructions [here](https://mpicbg-scicomp.github.io/ipf_howtoguides/guides/Python_Conda_Environments) first.
 
-Download and install `napari-pyclesperanto-assitant` uing `pip`. Windows users should follow the instructions in the section below in case of trouble.
+Download and install `pyopencl` via `conda`, and `napari` and the `napari-pyclesperanto-assistant` uing `pip`. Windows users can aternatively follow the instructions in the section below in case of trouble.
 
 ```
+conda install -c conda-forge pyopencl
+pip install napari[all]
 pip install napari-pyclesperanto-assistant
 ```
 
@@ -26,7 +53,7 @@ It is recommended to install `pyopencl-...+cl12-cp38-cp38-win_amd64` - the `cl12
 
 Enter the correct pyopencl filename and execute this from the command line:
 ```
-pip install pyopencl-2020.2.2+cl12-cp38-cp38-win_amd64.whl
+pip install pyopencl-2020.3.1+cl12-cp38-cp38-win_amd64.whl
 ```
 
 In case napari doesn't start up with an error mentioning numpy ([see also](https://github.com/napari/napari/issues/2022)), execute this from the command line:
@@ -130,7 +157,8 @@ Starting up napari with the pyclesperanto assistant installed:
 ipython --gui=qt napari_pyclesperanto_assistant\napari_pyclesperanto_assistant
 ```
 
+
 ## Feedback welcome!
-clEsperanto is developed in the open because we believe in the [open source community](https://clij.github.io/clij2-docs/community_guidelines). Feel free to drop feedback as [github issue](https://github.com/clEsperanto/pyclesperanto_prototype/issues) or via [image.sc](https://image.sc)
+clEsperanto is developed in the open because we believe in the open source community. See our [community guidelines](https://clij.github.io/clij2-docs/community_guidelines). Feel free to drop feedback as [github issue](https://github.com/clEsperanto/pyclesperanto_prototype/issues) or via [image.sc](https://image.sc)
 
 [Imprint](https://clesperanto.github.io/imprint)
