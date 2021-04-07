@@ -33,19 +33,29 @@ def test_complex_workflow(make_test_viewer):
     filename = str(root / 'data' / 'CalibZAPWfixed_000154_max-16.tif')
 
     # create Qt GUI context
+    print("a")
     napari.gui_qt()
 
     # start napari
+    print("b")
     viewer = make_test_viewer() # napari.Viewer()
 
+    print("c")
     layer = viewer.open(filename)
     layer[0].metadata['filename'] = filename
 
     # attach the assistant
+    print("d")
     assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
 
+    print("e")
     from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, \
         label_processing, map, mesh, measure, label_measurements, transform, projection
     assistant_gui._activate(denoise)
+    print("f")
+    assistant_gui._activate(background_removal)
+    assistant_gui._activate(filter)
+    assistant_gui._activate(binarize)
 
+    print("g")
     viewer.close()
