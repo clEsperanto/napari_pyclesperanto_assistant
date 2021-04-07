@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import codecs
 from setuptools import setup, find_packages
@@ -16,20 +19,23 @@ with open('requirements.txt') as f:
         stripped = line.split("#")[0].strip()
         if len(stripped) > 0:
             requirements.append(stripped)
-setuptools.setup(
+
+
+# https://github.com/pypa/setuptools_scm
+use_scm = {"write_to": "napari_pyclesperanto_assistant/_version.py"}
+setup(
     name="napari_pyclesperanto_assistant",
     version="0.7.5",
     author="Robert Haase",
     author_email="robert.haase@tu-dresden.de",
-    license='BSD-3',
     description="OpenCL based GPU-accelerated image processing in napari",
-    long_description=long_description,
+    long_description=read('README.md'),
     long_description_content_type="text/markdown",
     url="https://github.com/clesperanto/napari_pyclesperanto_assistant",
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     include_package_data=True,
-    install_requires=["numpy", "pyopencl", "toolz", "scikit-image", "napari==0.4.7", "napari_plugin_engine", "pyclesperanto_prototype==0.7.5", "magicgui", "numpy!=1.19.4", "pyperclip"],
     python_requires='>=3.6',
+    install_requires=requirements,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
