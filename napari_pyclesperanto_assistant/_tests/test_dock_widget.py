@@ -33,16 +33,12 @@ def test_complex_workflow(make_test_viewer):
     filename = str(root / 'data' / 'CalibZAPWfixed_000154_max-16.tif')
 
     # create Qt GUI context
-    #napari.gui_qt()
+    napari.gui_qt()
 
     # start napari
     viewer = make_test_viewer() # napari.Viewer()
 
-    import numpy as np
-    layer = viewer.add_image(np.asarray([
-        [1, 0],
-        [1, 0]
-    ]))
+    layer = viewer.open(filename)
     layer[0].metadata['filename'] = filename
 
     # attach the assistant
