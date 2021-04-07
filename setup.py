@@ -3,6 +3,8 @@
 
 import os
 import codecs
+from pathlib import Path
+
 from setuptools import setup, find_packages
 
 
@@ -14,7 +16,9 @@ def read(fname):
 # Add your dependencies in requirements.txt
 # Note: you can add test-specific requirements in tox.ini
 requirements = []
-with open('requirements.txt') as f:
+root = Path(__file__).parent
+filename = str(root / 'requirements.txt')
+with open(filename) as f:
     for line in f:
         stripped = line.split("#")[0].strip()
         if len(stripped) > 0:
@@ -36,6 +40,8 @@ setup(
     include_package_data=True,
     python_requires='>=3.6',
     install_requires=requirements,
+    use_scm_version=use_scm,
+    setup_requires=['setuptools_scm'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
