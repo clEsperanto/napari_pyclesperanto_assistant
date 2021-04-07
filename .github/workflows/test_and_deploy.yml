@@ -74,9 +74,9 @@ jobs:
           python --version
           conda install -y pyopencl
           python -m pip install --upgrade pip
-          #pip install setuptools tox tox-gh-actions
+          # pip install setuptools tox tox-gh-actions
           pip install setuptools wheel pytest pytest-cov pytest-benchmark
-	  pip install -e .
+          pip install -e .
       # this runs the platform-specific tests declared in tox.ini
       #- name: Install tox-conda
       #  run: pip install tox-conda
