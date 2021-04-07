@@ -60,8 +60,9 @@ jobs:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
-      - name: Install tox-conda
-        pip install tox-conda
+      - name: Conda info
+        shell: bash -l {0}
+        run: conda info
       - name: Install pocl
         if: runner.os == 'Linux'
         shell: bash -l {0}
@@ -72,6 +73,8 @@ jobs:
           pip install setuptools tox tox-gh-actions
 
       # this runs the platform-specific tests declared in tox.ini
+      - name: Install tox-conda
+        pip install tox-conda
       - name: Test with tox
         run: tox
         env:
