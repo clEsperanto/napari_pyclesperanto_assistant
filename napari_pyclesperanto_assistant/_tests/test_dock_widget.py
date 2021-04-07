@@ -9,10 +9,10 @@ def test_whatever2():
     viewer = napari.Viewer(show=False)
     pass
 
-def test_whatever2():
+def test_whatever3():
     import napari
     viewer = napari.Viewer(show=False)
-    
+
     import napari_pyclesperanto_assistant
     assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
     pass
