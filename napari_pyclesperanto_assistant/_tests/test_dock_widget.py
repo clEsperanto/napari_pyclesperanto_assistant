@@ -6,6 +6,15 @@ def test_whatever():
 
 def test_whatever2():
     import napari
+    viewer = napari.Viewer(show=False)
+    pass
+
+def test_whatever2():
+    import napari
+    viewer = napari.Viewer(show=False)
+    
+    import napari_pyclesperanto_assistant
+    assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
     pass
 
 def test_complex_workflow():
