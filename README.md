@@ -3,8 +3,8 @@
 [![License](https://img.shields.io/pypi/l/napari-pyclesperanto-assistant.svg?color=green)](https://github.com/haesleinhuepf/napari-pyclesperanto-assistant/raw/master/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/napari-pyclesperanto-assistant.svg?color=green)](https://pypi.org/project/napari-pyclesperanto-assistant)
 [![Python Version](https://img.shields.io/pypi/pyversions/napari-pyclesperanto-assistant.svg?color=green)](https://python.org)
-[![tests](https://github.com/clesperanto/napari-pyclesperanto-assistant/workflows/tests/badge.svg)](https://github.com/haesleinhuepf/napari-pyclesperanto-assistant/actions)
-[![codecov](https://codecov.io/gh/clesperanto/napari-pyclesperanto-assistant/branch/master/graph/badge.svg)](https://codecov.io/gh/haesleinhuepf/napari-pyclesperanto-assistant)
+[![tests](https://github.com/clesperanto/napari-pyclesperanto-assistant/workflows/tests/badge.svg)](https://github.com/clesperanto/napari-pyclesperanto-assistant/actions)
+[![codecov](https://codecov.io/gh/clesperanto/napari-pyclesperanto-assistant/branch/master/graph/badge.svg)](https://codecov.io/gh/clesperanto/napari-pyclesperanto-assistant)
 
 The py-clEsperanto-assistant is a yet experimental [napari](https://github.com/napari/napari) plugin for building GPU-accelerated image processing workflows. 
 It is part of the [clEsperanto](http://clesperanto.net) project. 
