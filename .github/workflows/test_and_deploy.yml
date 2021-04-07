@@ -74,15 +74,19 @@ jobs:
           python --version
           conda install -y pyopencl
           python -m pip install --upgrade pip
-          pip install setuptools tox tox-gh-actions
-
+          #pip install setuptools tox tox-gh-actions
+          pip install setuptools wheel pytest pytest-cov pytest-benchmark
+	  pip install -e .
       # this runs the platform-specific tests declared in tox.ini
-      - name: Install tox-conda
-        run: pip install tox-conda
-      - name: Test with tox
-        run: tox
-        env:
-          PLATFORM: ${{ matrix.platform }}
+      #- name: Install tox-conda
+      #  run: pip install tox-conda
+      #- name: Test with tox
+      #  run: tox
+      #  env:
+      #    PLATFORM: ${{ matrix.platform }}
+      - name: Test
+        shell: bash -l {0}
+        run: pytest -v --cov=./ --cov-report=xml
 
       - name: Coverage
         uses: codecov/codecov-action@v1
