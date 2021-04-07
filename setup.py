@@ -1,13 +1,27 @@
-import setuptools
+import os
+import codecs
+from setuptools import setup, find_packages
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
 
+def read(fname):
+    file_path = os.path.join(os.path.dirname(__file__), fname)
+    return codecs.open(file_path, encoding='utf-8').read()
+
+
+# Add your dependencies in requirements.txt
+# Note: you can add test-specific requirements in tox.ini
+requirements = []
+with open('requirements.txt') as f:
+    for line in f:
+        stripped = line.split("#")[0].strip()
+        if len(stripped) > 0:
+            requirements.append(stripped)
 setuptools.setup(
     name="napari_pyclesperanto_assistant",
     version="0.7.5",
     author="Robert Haase",
     author_email="robert.haase@tu-dresden.de",
+    license='BSD-3',
     description="OpenCL based GPU-accelerated image processing in napari",
     long_description=long_description,
     long_description_content_type="text/markdown",

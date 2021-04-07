@@ -1,7 +1,15 @@
 # napari-pyclesperanto-assistant
+
+[![License](https://img.shields.io/pypi/l/napari-pyclesperanto-assistant.svg?color=green)](https://github.com/haesleinhuepf/napari-pyclesperanto-assistant/raw/master/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/napari-pyclesperanto-assistant.svg?color=green)](https://pypi.org/project/napari-pyclesperanto-assistant)
+[![Python Version](https://img.shields.io/pypi/pyversions/napari-pyclesperanto-assistant.svg?color=green)](https://python.org)
+[![tests](https://github.com/clesperanto/napari-pyclesperanto-assistant/workflows/tests/badge.svg)](https://github.com/haesleinhuepf/napari-pyclesperanto-assistant/actions)
+[![codecov](https://codecov.io/gh/clesperanto/napari-pyclesperanto-assistant/branch/master/graph/badge.svg)](https://codecov.io/gh/haesleinhuepf/napari-pyclesperanto-assistant)
+
 The py-clEsperanto-assistant is a yet experimental [napari](https://github.com/napari/napari) plugin for building GPU-accelerated image processing workflows. 
 It is part of the [clEsperanto](http://clesperanto.net) project. 
 It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) as backend for processing images.
+This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiecutter) using with napari's [cookiecutter-napari-plugin](https://github.com/napari/cookiecutter-napari-plugin) template.
 
 ![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
 
@@ -148,7 +156,8 @@ Starting up napari with the pyclesperanto assistant installed:
 ipython --gui=qt napari_pyclesperanto_assistant\napari_pyclesperanto_assistant
 ```
 
+
 ## Feedback welcome!
-clEsperanto is developed in the open because we believe in the [open source community](https://clij.github.io/clij2-docs/community_guidelines). Feel free to drop feedback as [github issue](https://github.com/clEsperanto/pyclesperanto_prototype/issues) or via [image.sc](https://image.sc)
+clEsperanto is developed in the open because we believe in the open source community. See our [community guidelines](https://clij.github.io/clij2-docs/community_guidelines). Feel free to drop feedback as [github issue](https://github.com/clEsperanto/pyclesperanto_prototype/issues) or via [image.sc](https://image.sc)
 
 [Imprint](https://clesperanto.github.io/imprint)
