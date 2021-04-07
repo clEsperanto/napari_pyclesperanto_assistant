@@ -1,46 +1,29 @@
 # from napari_pyclesperanto_assistant import napari_experimental_provide_dock_widget
 
+import napari
+
 # add your tests here...
 def test_whatever():
     pass
 
-import pytest
-
-@pytest.fixture
-def make_test_viewer(qtbot, request):
-    from napari import Viewer
-    viewers = []
-
-    def actual_factory(*model_args, viewer_class=Viewer, **model_kwargs):
-        model_kwargs.setdefault('show', False)
-        viewer = viewer_class(*model_args, **model_kwargs)
-        viewers.append(viewer)
-        return viewer
-
-    yield actual_factory
-
-    for viewer in viewers:
-        viewer.close()
-
 
 def test_whatever2(make_test_viewer):
-    import napari
+
     viewer = make_test_viewer()
     pass
 
-def test_whatever3():
-    import napari
-    viewer = napari.Viewer(show=False)
+def test_whatever3(make_test_viewer):
+
+    viewer = make_test_viewer()
 
     import napari_pyclesperanto_assistant
     assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
     pass
 
 
-def test_complex_workflow():
+def test_complex_workflow(make_test_viewer):
     print("x")
 
-    import napari
     import napari_pyclesperanto_assistant
     from pathlib import Path
     print("7")
@@ -50,13 +33,9 @@ def test_complex_workflow():
     filename = str(root / 'data' / 'Lund_000500_resampled-cropped.tif')
     # filename = str(root / 'data' / 'CalibZAPWfixed_000154_max-16.tif')
 
-    # create Qt GUI context
-    print("a")
-    napari.gui_qt()
-
     # start napari
     print("b")
-    viewer = napari.Viewer(show=False)
+    viewer = make_test_viewer()
 
     print("c")
     layer = viewer.open(filename)
@@ -74,6 +53,3 @@ def test_complex_workflow():
     assistant_gui._activate(background_removal)
     assistant_gui._activate(filter)
     assistant_gui._activate(binarize)
-
-    print("g")
-    viewer.close()
