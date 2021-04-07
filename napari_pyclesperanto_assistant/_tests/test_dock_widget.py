@@ -23,11 +23,12 @@ def make_test_viewer(qtbot, request):
         viewer.close()
 
 def test_complex_workflow():
-
+    print("x")
 
     import napari
     import napari_pyclesperanto_assistant
     from pathlib import Path
+    print("7")
 
     root = Path(napari_pyclesperanto_assistant.__file__).parent
 
