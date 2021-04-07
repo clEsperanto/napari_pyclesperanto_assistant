@@ -176,7 +176,7 @@ def binarize(input1: Layer, operation_name : str = cle.threshold_otsu.__name__, 
     layout='vertical',
     input1={'label':'Image 1'},
     input2={'label':'Image 2'},
-    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['combine', 'in assistant']).keys()}
+    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['combine', 'in assistant'], must_not_have_categories=['map']).keys()}
 )
 def combine(input1: Layer, input2: Layer = None, operation_name: str = cle.binary_and.__name__):
     if input1 is not None:
