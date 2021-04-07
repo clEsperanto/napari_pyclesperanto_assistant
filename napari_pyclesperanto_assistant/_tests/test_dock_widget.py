@@ -38,7 +38,11 @@ def test_complex_workflow(make_test_viewer):
     # start napari
     viewer = make_test_viewer() # napari.Viewer()
 
-    layer = viewer.open(filename)
+    import numpy as np
+    layer = viewer.add_image(np.asarray([
+        [1, 0],
+        [1, 0]
+    ]))
     layer[0].metadata['filename'] = filename
 
     # attach the assistant
