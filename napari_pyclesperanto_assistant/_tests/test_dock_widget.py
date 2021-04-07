@@ -4,9 +4,28 @@
 def test_whatever():
     pass
 
-def test_whatever2():
+import pytest
+
+@pytest.fixture
+def make_test_viewer(qtbot, request):
+    from napari import Viewer
+    viewers = []
+
+    def actual_factory(*model_args, viewer_class=Viewer, **model_kwargs):
+        model_kwargs.setdefault('show', False)
+        viewer = viewer_class(*model_args, **model_kwargs)
+        viewers.append(viewer)
+        return viewer
+
+    yield actual_factory
+
+    for viewer in viewers:
+        viewer.close()
+
+
+def test_whatever2(make_test_viewer):
     import napari
-    viewer = napari.Viewer(show=False)
+    viewer = make_test_viewer()
     pass
 
 def test_whatever3():
@@ -16,6 +35,7 @@ def test_whatever3():
     import napari_pyclesperanto_assistant
     assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
     pass
+
 
 def test_complex_workflow():
     print("x")
@@ -27,10 +47,8 @@ def test_complex_workflow():
 
     root = Path(napari_pyclesperanto_assistant.__file__).parent
 
-    #filename = str(root / 'data' / 'Lund_000500_resampled-cropped.tif')
-    filename = str(root / 'data' / 'CalibZAPWfixed_000154_max-16.tif')
-
-
+    filename = str(root / 'data' / 'Lund_000500_resampled-cropped.tif')
+    # filename = str(root / 'data' / 'CalibZAPWfixed_000154_max-16.tif')
 
     # create Qt GUI context
     print("a")
