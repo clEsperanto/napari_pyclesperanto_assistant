@@ -21,7 +21,7 @@ class Assistant(QWidget):
 
         self.viewer = napari_viewer
 
-        self.layout = QGridLayout()
+        self.layout = QGridLayout(self)
 
         self._init_gui()
 
@@ -52,7 +52,7 @@ class Assistant(QWidget):
         self.add_button("Measure", measure, 5, 1)
 
         # spacer
-        label = QLabel("")
+        label = QLabel("", self)
         label.setFont(self.font)
         self.layout.addWidget(label, 6, 4)
 
@@ -98,7 +98,7 @@ class Assistant(QWidget):
 
         btn.setLayout(QGridLayout())
 
-        icon_label = QLabel()
+        icon_label = QLabel(btn)
         icon_label.setAlignment(Qt.AlignCenter)
         pixmap = QPixmap()
         pixmap.load(str(Path(__file__).parent) + "/icons/" + title.lower().replace(" ", "_").replace("(", "").replace(")", "") + ".png")
@@ -106,7 +106,7 @@ class Assistant(QWidget):
         icon_label.setPixmap(pixmap)
         btn.layout().addWidget(icon_label)
 
-        text_label = QLabel(title)
+        text_label = QLabel(title, btn)
         text_label.setAlignment(Qt.AlignCenter)
         text_label.setWordWrap(True)
         text_label.setFont(self.font)
