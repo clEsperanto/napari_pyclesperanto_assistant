@@ -24,11 +24,9 @@ def _finalize_test(initial, viewer):
     debug_output = ''
 
     for element in leaks:
-        debug_output = debug_output + 'Leaking widget:' + str(element)
-        from qtpy.QtWidgets import QFrame
-        if isinstance(element, QFrame):
-            for subelement in element.children():
-                debug_output = debug_output + '\n-->' + str(subelement)
+        if element.parent() is None:
+            debug_output = debug_output + '\nLeaking widget:' + str(element)
+
         # avoid later assert
         element.setParent(viewer.window.qt_viewer)
 
@@ -47,10 +45,10 @@ def test_whatever2(make_napari_viewer):
     filename = str(root / 'data' / 'CalibZAPWfixed_000154_max-16.tif')
     layer = viewer.open(filename)
 
-    #assistant_gui._activate(denoise)
-    #assistant_gui._activate(background_removal)
-    #assistant_gui._activate(filter)
-    #assistant_gui._activate(binarize)
+    assistant_gui._activate(denoise)
+    assistant_gui._activate(background_removal)
+    assistant_gui._activate(filter)
+    assistant_gui._activate(binarize)
 
     _finalize_test(initial, viewer)
 
