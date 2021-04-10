@@ -8,6 +8,8 @@ from magicgui import magicgui
 from napari.layers import Image, Labels, Layer
 import pyclesperanto_prototype as cle
 
+from magicgui import magic_factory
+
 plus_minus_1k = {'min': -1000, 'max': 1000}
 plus_10k = {'min': 0, 'max': 10000}
 
@@ -44,7 +46,7 @@ def label_parameters(operation, parameters):
         parameters[i].label = ""
         parameters[i].text = ""
 
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -76,7 +78,7 @@ def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: 
             denoise.self.layer.contrast_limits=(0, max_intensity)
             denoise.self.layer.translate = input1.translate
 
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -108,7 +110,7 @@ def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__na
             background_removal.self.layer.contrast_limits=(0, max_intensity)
             background_removal.self.layer.translate = input1.translate
 
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -141,7 +143,7 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
             filter.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -171,7 +173,7 @@ def binarize(input1: Layer, operation_name : str = cle.threshold_otsu.__name__, 
             binarize.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image 1'},
@@ -204,7 +206,7 @@ def combine(input1: Layer, input2: Layer = None, operation_name: str = cle.binar
             combine.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -232,7 +234,7 @@ def label(input1: Layer, operation_name: str = cle.connected_components_labeling
             label.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Labels'},
@@ -260,7 +262,7 @@ def label_processing(input1: Labels, operation_name: str = cle.exclude_labels_on
             label_processing.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -296,7 +298,7 @@ def label_measurements(input1: Image, input2: Labels = None, operation_name: str
 
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label': 'Labels'},
@@ -328,7 +330,7 @@ def mesh(input1: Labels, operation_name : str = cle.draw_mesh_between_touching_l
             mesh.self.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Labels'},
@@ -361,7 +363,7 @@ def map(input1: Labels, operation_name: str = cle.label_pixel_count_map.__name__
 # -----------------------------------------------------------------------------
 # A special case of ooperation is measurement: it results in a table instead of
 # an image
-@magicgui(
+@magic_factory(
     layout='vertical',
     input1={'label': 'Image'},
     labels={'label': 'Labels'},
@@ -382,7 +384,7 @@ def table_to_widget(table : dict) -> QTableWidget:
     return view
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -422,7 +424,7 @@ def transform(input1: Layer, operation_name : str = cle.sub_stack.__name__, a : 
             transform.self.layer.translate = translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},

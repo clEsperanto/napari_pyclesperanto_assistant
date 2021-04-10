@@ -122,8 +122,10 @@ class Assistant(QWidget):
         else:
             self.layout.addWidget(btn, x, y)
 
-    def _activate(self, magicgui):
-        LayerDialog(self.viewer, magicgui)
+    def _activate(self, factory):
+        widget = factory()  # create the widget
+        widget.native.setParent(self)   # give it a parent for proper cleanup
+        LayerDialog(self.viewer, widget)
 
     def _export_jython_code(self):
         generator = JythonGenerator(self.viewer.layers)
