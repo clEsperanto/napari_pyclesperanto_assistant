@@ -62,7 +62,7 @@ def test_complex_workflow(make_napari_viewer):
     assistant_gui._activate(transform)
     assistant_gui._activate(projection)
 
-    assistant_gui._export_jython_code_to_clipboard()
+    #assistant_gui._export_jython_code_to_clipboard()
     #assistant_gui._export_notebook(filename="test.ipynb")
 
     _finalize_test(initial, viewer)
