@@ -12,9 +12,21 @@ It is part of the [clEsperanto](http://clesperanto.net) project.
 It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) and with that [pyopencl](https://documen.tician.de/pyopencl/) as backend for processing images.
 This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiecutter) using with napari's [cookiecutter-napari-plugin](https://github.com/napari/cookiecutter-napari-plugin) template.
 
+## Installation
+### Installation using conda
+```
+conda install -c conda-forge pyopencl
+pip install napari[all]
+pip install napari-pyclesperanto-assistant
+```
+Afterwards, start napari from the command line:
+```
+napari
+```
+You will then find the assistant in the `Plugins` menu.
+
 ![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
 
-## Installation
 ### Installation using the napari installer
 
 Download and install [napari](https://github.com/napari/napari/releases/tag/v0.4.3).
@@ -30,22 +42,6 @@ Start napari and navigate to its menu `Plugins > Install/Uninstall Package(s)...
 Restart napari. Afterwards, you should find the Assistant in the plugins menu:
 
 ![](docs/images/screenshot_menu.png)
-
-### Installation via conda and pip
-If you have no python/conda environment installed yet, please follow the instructions [here](https://mpicbg-scicomp.github.io/ipf_howtoguides/guides/Python_Conda_Environments) first.
-
-Download and install `pyopencl` via `conda`, and `napari` and the `napari-pyclesperanto-assistant` uing `pip`. Windows users can aternatively follow the instructions in the section below in case of trouble.
-
-```
-conda install -c conda-forge pyopencl
-pip install napari[all]
-pip install napari-pyclesperanto-assistant
-```
-
-Afterwards, you can start the assistant using the following command. Replace the url with an image file of your choice:
-```
-python -m napari_pyclesperanto_assistant https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/napari_pyclesperanto_assistant/data/CalibZAPWfixed_000154_max-16.tif
-```
 
 ### Installation on windows
 On windows some additional steps are necessary. Download a pre-compiled wheel of [pyopencl](https://documen.tician.de/pyopencl/) e.g. from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyopencl). 
