@@ -59,7 +59,7 @@ class SelfAwareFunctionInstance():
 
 class SelfAwareFunctionFactory():
     """
-    This factory allows to specify a megic-factory annotated function. Whenever `get()` is called, a new instance
+    This factory allows to specify a magic-factory annotated function. Whenever `get()` is called, a new instance
     is created so that these functions can independently store parameters.
     """
     def __init__(self, factory):
