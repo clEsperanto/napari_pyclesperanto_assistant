@@ -3,7 +3,7 @@ from pathlib import Path
 from qtpy import QtGui
 from qtpy.QtCore import QSize, Qt
 from qtpy.QtGui import QPixmap
-from qtpy.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, QFileDialog, QGridLayout
+from qtpy.QtWidgets import QWidget, QLabel, QAction, QPushButton, QFileDialog, QGridLayout
 
 from .._gui._LayerDialog import LayerDialog
 from .._scriptgenerators import JythonGenerator, PythonJupyterNotebookGenerator
@@ -15,13 +15,13 @@ class Assistant(QWidget):
     """
 
     def __init__(self, napari_viewer):
-        super().__init__()
+        super().__init__(napari_viewer.window.qt_viewer)
 
         self.font = QtGui.QFont('Arial', 8)
 
         self.viewer = napari_viewer
 
-        self.layout = QGridLayout()
+        self.layout = QGridLayout(self)
 
         self._init_gui()
 
@@ -52,7 +52,7 @@ class Assistant(QWidget):
         self.add_button("Measure", measure, 5, 1)
 
         # spacer
-        label = QLabel("")
+        label = QLabel("", self)
         label.setFont(self.font)
         self.layout.addWidget(label, 6, 4)
 
@@ -96,9 +96,9 @@ class Assistant(QWidget):
 
         #btn.setStyleSheet("text-align:center;")
 
-        btn.setLayout(QGridLayout())
+        btn.setLayout(QGridLayout(btn))
 
-        icon_label = QLabel()
+        icon_label = QLabel(btn)
         icon_label.setAlignment(Qt.AlignCenter)
         pixmap = QPixmap()
         pixmap.load(str(Path(__file__).parent) + "/icons/" + title.lower().replace(" ", "_").replace("(", "").replace(")", "") + ".png")
@@ -106,7 +106,7 @@ class Assistant(QWidget):
         icon_label.setPixmap(pixmap)
         btn.layout().addWidget(icon_label)
 
-        text_label = QLabel(title)
+        text_label = QLabel(title, btn)
         text_label.setAlignment(Qt.AlignCenter)
         text_label.setWordWrap(True)
         text_label.setFont(self.font)
@@ -136,10 +136,11 @@ class Assistant(QWidget):
         import pyperclip
         pyperclip.copy(code)
 
-    def _export_notebook(self):
+    def _export_notebook(self, filename=None):
         generator = PythonJupyterNotebookGenerator(self.viewer.layers)
         code = generator.generate()
-        filename = self._save_code(code, default_fileending=generator.file_ending())
+        if filename is None:
+            filename = self._save_code(code, default_fileending=generator.file_ending())
         if filename is not None:
             import os
             os.system('jupyter nbconvert --to notebook --inplace --execute ' + filename)

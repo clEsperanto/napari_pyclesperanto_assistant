@@ -1,7 +1,3 @@
-from magicgui.widgets import ComboBox
-from qtpy import QtGui
-from qtpy.QtWidgets import QLabel
-
 class LayerDialog():
     """
     The LayerDialog contains a dock-widget that allows configuring parameters of all _operations.
