@@ -43,19 +43,19 @@ def test_complex_workflow(make_napari_viewer):
     layer = viewer.open(filename)
 
     assistant_gui._activate(StatefulFunctionFactory(denoise))
-    assistant_gui._activate(StatefulFunctionFactory(background_removal))
-    assistant_gui._activate(StatefulFunctionFactory(filter))
-    assistant_gui._activate(StatefulFunctionFactory(binarize))
-    assistant_gui._activate(StatefulFunctionFactory(label))
-    assistant_gui._activate(StatefulFunctionFactory(label_processing))
-    assistant_gui._activate(StatefulFunctionFactory(map))
-    assistant_gui._activate(StatefulFunctionFactory(combine))
+    #assistant_gui._activate(StatefulFunctionFactory(background_removal))
+    #assistant_gui._activate(StatefulFunctionFactory(filter))
+    #assistant_gui._activate(StatefulFunctionFactory(binarize))
+    #assistant_gui._activate(StatefulFunctionFactory(label))
+    #assistant_gui._activate(StatefulFunctionFactory(label_processing))
+    #assistant_gui._activate(StatefulFunctionFactory(map))
+    #assistant_gui._activate(StatefulFunctionFactory(combine))
 
-    assistant_gui._activate(StatefulFunctionFactory(transform))
-    assistant_gui._activate(StatefulFunctionFactory(projection))
+    #assistant_gui._activate(StatefulFunctionFactory(transform))
+    #assistant_gui._activate(StatefulFunctionFactory(projection))
 
     #assistant_gui._export_jython_code_to_clipboard()
-    assistant_gui._export_notebook(filename="test.ipynb")
+    #assistant_gui._export_notebook(filename="test.ipynb")
 
     _finalize_test(initial, viewer)
 
