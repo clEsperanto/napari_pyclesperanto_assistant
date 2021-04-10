@@ -136,10 +136,11 @@ class Assistant(QWidget):
         import pyperclip
         pyperclip.copy(code)
 
-    def _export_notebook(self):
+    def _export_notebook(self, filename=None):
         generator = PythonJupyterNotebookGenerator(self.viewer.layers)
         code = generator.generate()
-        filename = self._save_code(code, default_fileending=generator.file_ending())
+        if filename is None:
+            filename = self._save_code(code, default_fileending=generator.file_ending())
         if filename is not None:
             import os
             os.system('jupyter nbconvert --to notebook --inplace --execute ' + filename)

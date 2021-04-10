@@ -33,7 +33,7 @@ def _finalize_test(initial, viewer):
     if len(debug_output) > 0:
         warnings.warn(debug_output)
 
-def test_whatever2(make_napari_viewer):
+def test_complex_workflow(make_napari_viewer):
 
     viewer = make_napari_viewer()
 
@@ -42,13 +42,27 @@ def test_whatever2(make_napari_viewer):
     assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
 
     root = Path(napari_pyclesperanto_assistant.__file__).parent
-    filename = str(root / 'data' / 'CalibZAPWfixed_000154_max-16.tif')
+    filename = str(root / 'data' / 'Lund_000500_resampled-cropped.tif')
     layer = viewer.open(filename)
 
     assistant_gui._activate(denoise)
     assistant_gui._activate(background_removal)
     assistant_gui._activate(filter)
     assistant_gui._activate(binarize)
+    assistant_gui._activate(label)
+    assistant_gui._activate(label_processing)
+    assistant_gui._activate(map)
+    assistant_gui._activate(combine)
+
+    assistant_gui._activate(label)
+    assistant_gui._activate(mesh)
+    assistant_gui._activate(measure)
+    assistant_gui._activate(label_measurements)
+    assistant_gui._activate(transform)
+    assistant_gui._activate(projection)
+
+    assistant_gui._export_jython_code_to_clipboard()
+    assistant_gui._export_notebook(filename="test.ipynb")
 
     _finalize_test(initial, viewer)
 
