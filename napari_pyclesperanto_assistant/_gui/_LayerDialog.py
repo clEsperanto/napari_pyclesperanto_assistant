@@ -3,15 +3,13 @@ class LayerDialog():
     The LayerDialog contains a dock-widget that allows configuring parameters of all _operations.
     It uses events emitted by napari to toggle which dock widget is shown.
     """
-    def __init__(self, viewer, operation):
+    def __init__(self, viewer, self_aware_function_factory):
         self.viewer = viewer
-        self.op_object = operation.get()
-        self.op_object.viewer = viewer
+        self.self_aware_function = self_aware_function_factory.get()
+        self.self_aware_function.viewer = viewer
 
-        operation = self.op_object.get()
-        operation.native.setParent(viewer.window.qt_viewer)
-
-        self.filter_gui = operation
+        self.filter_gui = self.self_aware_function.get()
+        self.filter_gui.native.setParent(viewer.window.qt_viewer)
 
         former_active_layer = self.viewer.active_layer
         try:
@@ -23,8 +21,8 @@ class LayerDialog():
 
         self.filter_gui(self.viewer.active_layer)
         self.layer = self.viewer.active_layer
-        if self.op_object is not None:
-            self.op_object.layer = self.layer
+        if self.self_aware_function is not None:
+            self.self_aware_function.layer = self.layer
 
         if(self.layer is None):
             import time
