@@ -15,7 +15,7 @@ class Assistant(QWidget):
     """
 
     def __init__(self, napari_viewer):
-        super().__init__()
+        super().__init__(napari_viewer.window.qt_viewer)
 
         self.font = QtGui.QFont('Arial', 8)
 
@@ -96,7 +96,7 @@ class Assistant(QWidget):
 
         #btn.setStyleSheet("text-align:center;")
 
-        btn.setLayout(QGridLayout())
+        btn.setLayout(QGridLayout(btn))
 
         icon_label = QLabel(btn)
         icon_label.setAlignment(Qt.AlignCenter)
