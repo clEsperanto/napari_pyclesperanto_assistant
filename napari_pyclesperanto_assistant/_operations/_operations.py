@@ -44,7 +44,7 @@ def label_parameters(operation, parameters):
         parameters[i].label = ""
         parameters[i].text = ""
 
-class SelfAwareFunctionInstance():
+class StatefulFunction():
     """
     Objects of this class serve as container for the below magic-factory annotated functions. These functions should
     have a 'myself' parameter where they can store anything and where they have access to the viewer and the layer
@@ -57,7 +57,7 @@ class SelfAwareFunctionInstance():
     def get(self):
         return self.gui
 
-class SelfAwareFunctionFactory():
+class StatefulFunctionFactory():
     """
     This factory allows to specify a magic-factory annotated function. Whenever `get()` is called, a new instance
     is created so that these functions can independently store parameters.
@@ -66,7 +66,7 @@ class SelfAwareFunctionFactory():
         self.factory = factory
 
     def get(self):
-        return SelfAwareFunctionInstance(self.factory)
+        return StatefulFunction(self.factory)
 
 @magic_factory(auto_call=True,
                 layout='vertical',

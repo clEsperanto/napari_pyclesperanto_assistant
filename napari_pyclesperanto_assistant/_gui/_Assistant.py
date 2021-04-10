@@ -34,22 +34,22 @@ class Assistant(QWidget):
         for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(None)
 
-        from .._operations._operations import SelfAwareFunctionFactory, denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements, transform, projection
+        from .._operations._operations import StatefulFunctionFactory, denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements, transform, projection
 
-        self.add_button("Noise removal", SelfAwareFunctionFactory(denoise), 1, 0)
-        self.add_button("Background removal", SelfAwareFunctionFactory(background_removal), 1, 1)
-        self.add_button("Filter", SelfAwareFunctionFactory(filter), 1, 2)
-        self.add_button("Combine", SelfAwareFunctionFactory(combine), 2, 0)
-        self.add_button("Transform", SelfAwareFunctionFactory(transform), 2, 1)
-        self.add_button("Projection", SelfAwareFunctionFactory(projection), 2, 2)
+        self.add_button("Noise removal", StatefulFunctionFactory(denoise), 1, 0)
+        self.add_button("Background removal", StatefulFunctionFactory(background_removal), 1, 1)
+        self.add_button("Filter", StatefulFunctionFactory(filter), 1, 2)
+        self.add_button("Combine", StatefulFunctionFactory(combine), 2, 0)
+        self.add_button("Transform", StatefulFunctionFactory(transform), 2, 1)
+        self.add_button("Projection", StatefulFunctionFactory(projection), 2, 2)
 
-        self.add_button("Binarize", SelfAwareFunctionFactory(binarize), 3, 0)
-        self.add_button("Label", SelfAwareFunctionFactory(label), 3, 1)
-        self.add_button("Label processing", SelfAwareFunctionFactory(label_processing), 3, 2)
-        self.add_button("Label measurements", SelfAwareFunctionFactory(label_measurements), 5, 0)
-        self.add_button("Map", SelfAwareFunctionFactory(map), 4, 0)
-        self.add_button("Mesh", SelfAwareFunctionFactory(mesh), 4, 1)
-        self.add_button("Measure", SelfAwareFunctionFactory(measure), 5, 1)
+        self.add_button("Binarize", StatefulFunctionFactory(binarize), 3, 0)
+        self.add_button("Label", StatefulFunctionFactory(label), 3, 1)
+        self.add_button("Label processing", StatefulFunctionFactory(label_processing), 3, 2)
+        self.add_button("Label measurements", StatefulFunctionFactory(label_measurements), 5, 0)
+        self.add_button("Map", StatefulFunctionFactory(map), 4, 0)
+        self.add_button("Mesh", StatefulFunctionFactory(mesh), 4, 1)
+        self.add_button("Measure", StatefulFunctionFactory(measure), 5, 1)
 
         # spacer
         label = QLabel("", self)
