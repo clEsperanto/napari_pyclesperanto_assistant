@@ -3,7 +3,7 @@ from pathlib import Path
 from qtpy import QtGui
 from qtpy.QtCore import QSize, Qt
 from qtpy.QtGui import QPixmap
-from qtpy.QtWidgets import QWidget, QVBoxLayout, QLabel, QAction, QPushButton, QFileDialog, QGridLayout
+from qtpy.QtWidgets import QWidget, QLabel, QAction, QPushButton, QFileDialog, QGridLayout
 
 from .._gui._LayerDialog import LayerDialog
 from .._scriptgenerators import JythonGenerator, PythonJupyterNotebookGenerator
