@@ -54,12 +54,12 @@ def test_complex_workflow(make_napari_viewer):
     assistant_gui._activate(map)
     assistant_gui._activate(combine)
 
-    assistant_gui._activate(label)
-    assistant_gui._activate(mesh)
-    assistant_gui._activate(measure)
-    assistant_gui._activate(label_measurements)
-    assistant_gui._activate(transform)
-    assistant_gui._activate(projection)
+    #assistant_gui._activate(label)
+    #assistant_gui._activate(mesh)
+    #assistant_gui._activate(measure)
+    #assistant_gui._activate(label_measurements)
+    #assistant_gui._activate(transform)
+    #assistant_gui._activate(projection)
 
     assistant_gui._export_jython_code_to_clipboard()
     assistant_gui._export_notebook(filename="test.ipynb")
