@@ -1,5 +1,8 @@
 
 # add your tests here...
+import warnings
+
+
 def test_whatever():
     pass
 
@@ -8,10 +11,35 @@ import napari_pyclesperanto_assistant
 from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, \
     label_processing, map, mesh, measure, label_measurements, transform, projection
 
+# workaround for leaking Widgets
+def _init_test():
+    from qtpy.QtWidgets import QApplication
+    return set(QApplication.topLevelWidgets())
+
+def _finalize_test(initial, viewer):
+    from qtpy.QtWidgets import QApplication
+    QApplication.processEvents()
+    leaks = set(QApplication.topLevelWidgets()).difference(initial)
+
+    debug_output = ''
+
+    for element in leaks:
+        debug_output = debug_output + 'Leaking widget:' + str(element)
+        from qtpy.QtWidgets import QFrame
+        if isinstance(element, QFrame):
+            for subelement in element.children():
+                debug_output = debug_output + '\n-->' + str(subelement)
+        # avoid later assert
+        element.setParent(viewer.window.qt_viewer)
+
+    if len(debug_output) > 0:
+        warnings.warn(debug_output)
 
 def test_whatever2(make_napari_viewer):
 
     viewer = make_napari_viewer()
+
+    initial = _init_test()
 
     assistant_gui = napari_pyclesperanto_assistant.napari_plugin(viewer)
 
@@ -23,6 +51,8 @@ def test_whatever2(make_napari_viewer):
     #assistant_gui._activate(background_removal)
     #assistant_gui._activate(filter)
     #assistant_gui._activate(binarize)
+
+    _finalize_test(initial, viewer)
 
 
 #def test_whatever3(make_napari_viewer):
