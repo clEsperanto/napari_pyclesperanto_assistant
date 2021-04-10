@@ -1,10 +1,4 @@
-
-# add your tests here...
 import warnings
-
-
-def test_whatever():
-    pass
 
 from pathlib import Path
 import napari_pyclesperanto_assistant
