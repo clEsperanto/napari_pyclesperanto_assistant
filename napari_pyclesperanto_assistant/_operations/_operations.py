@@ -4,7 +4,7 @@
 from typing import Union
 
 from qtpy.QtWidgets import QTableWidget, QTableWidgetItem
-from magicgui import magicgui
+from magicgui import magicgui, magic_factory
 from napari.layers import Image, Labels, Layer
 import pyclesperanto_prototype as cle
 
@@ -44,39 +44,57 @@ def label_parameters(operation, parameters):
         parameters[i].label = ""
         parameters[i].text = ""
 
-@magicgui(
-    auto_call=True,
-    layout='vertical',
-    input1={'label':'Image'},
-    operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['filter', 'denoise','in assistant'], must_not_have_categories=['combine']).keys()},
-    x=plus_minus_1k,
-    y=plus_minus_1k,
-    z=plus_minus_1k,
-)
-def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: float = 1, y: float = 1, z: float = 0):
+class SelfAwareFunctionInstance():
+    def __init__(self, factory):
+        self.gui = factory()
+        self.gui.myself.bind(self)
+
+
+    def get(self):
+        return self.gui
+
+class SelfAwareFunction():
+    def __init__(self, factory):
+        self.factory = factory
+
+    def get(self):
+        return SelfAwareFunctionInstance(self.factory)
+
+@magic_factory(auto_call=True,
+                layout='vertical',
+                input1={'label':'Image'},
+                operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['filter', 'denoise','in assistant'], must_not_have_categories=['combine']).keys()},
+                x=plus_minus_1k,
+                y=plus_minus_1k,
+                z=plus_minus_1k)
+def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: float = 1, y: float = 1,
+            z: float = 0, myself=None):
     if input1:
         # execute operation
         cle_input = cle.push(input1.data)
         output = cle.create_like(cle_input)
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [denoise.x, denoise.y, denoise.z])
+        label_parameters(operation, [myself.gui.x, myself.gui.y, myself.gui.z])
         _call_operation_ignoring_to_many_arguments(operation, [cle_input, output, x, y, z])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
-            max_intensity = 1 # prevent division by zero in vispy
+            max_intensity = 1  # prevent division by zero in vispy
         output = cle.pull(output)
 
         # show result in napari
-        if not hasattr(denoise.self, 'layer'):
-            denoise.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
         else:
-            denoise.self.layer.data = output
-            denoise.self.layer.name = "Result of " + operation.__name__
-            denoise.self.layer.contrast_limits=(0, max_intensity)
-            denoise.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.contrast_limits = (0, max_intensity)
+            myself.layer.translate = input1.translate
 
-@magicgui(
+
+
+
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -85,14 +103,14 @@ def denoise(input1: Image, operation_name: str = cle.gaussian_blur.__name__, x: 
     y=plus_minus_1k,
     z=plus_minus_1k,
 )
-def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__name__, x: float = 10, y: float = 10, z: float = 0):
+def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__name__, x: float = 10, y: float = 10, z: float = 0, myself = None):
     if input1:
         # execute operation
         cle_input = cle.push(input1.data)
         output = cle.create_like(cle_input)
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [background_removal.x, background_removal.y, background_removal.z])
+        label_parameters(operation, [myself.gui.x, background_removal.y, background_removal.z])
         _call_operation_ignoring_to_many_arguments(operation, [cle_input, output, x, y, z])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
@@ -100,15 +118,15 @@ def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__na
         output = cle.pull(output)
 
         # show result in napari
-        if not hasattr(background_removal.self, 'layer'):
-            background_removal.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
         else:
-            background_removal.self.layer.data = output
-            background_removal.self.layer.name = "Result of " + operation.__name__
-            background_removal.self.layer.contrast_limits=(0, max_intensity)
-            background_removal.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.contrast_limits=(0, max_intensity)
+            myself.layer.translate = input1.translate
 
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -117,14 +135,14 @@ def background_removal(input1: Image, operation_name: str = cle.top_hat_box.__na
     y=plus_minus_1k,
     z=plus_minus_1k,
 )
-def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x: float = 1, y: float = 1, z: float = 0):
+def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x: float = 1, y: float = 1, z: float = 0, myself = None):
     if input1:
         # execute operation
         cle_input = cle.push(input1.data)
         output = cle.create_like(cle_input)
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [filter.x, filter.y, filter.z])
+        label_parameters(operation, [myself.gui.x, myself.gui.y, myself.gui.z])
         _call_operation_ignoring_to_many_arguments(operation, [cle_input, output, x, y, z])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
@@ -132,16 +150,16 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
         output = cle.pull(output)
 
         # show result in napari
-        if not hasattr(filter.self, 'layer'):
-            filter.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
         else:
-            filter.self.layer.data = output
-            filter.self.layer.name = "Result of " + operation.__name__
-            filter.self.layer.contrast_limits=(0, max_intensity)
-            filter.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.contrast_limits=(0, max_intensity)
+            myself.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -150,35 +168,35 @@ def filter(input1: Image, operation_name: str = cle.gamma_correction.__name__, x
     radius_y=plus_minus_1k,
     radius_z=plus_minus_1k
 )
-def binarize(input1: Layer, operation_name : str = cle.threshold_otsu.__name__, radius_x : int = 1, radius_y : int = 1, radius_z : int = 0):
+def binarize(input1: Layer, operation_name : str = cle.threshold_otsu.__name__, radius_x : int = 1, radius_y : int = 1, radius_z : int = 0, myself = None):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push(input1.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [binarize.radius_x, binarize.radius_y, binarize.radius_z])
+        label_parameters(operation, [myself.gui.radius_x, myself.gui.radius_y, myself.gui.radius_z])
         _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, radius_x, radius_y, radius_z])
         output = cle.pull(output).astype(int)
 
         # show result in napari
-        if not hasattr(binarize.self, 'layer'):
-            binarize.self.viewer.add_labels(output, translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_labels(output, translate=input1.translate)
         else:
-            binarize.self.layer.data = output
-            binarize.self.layer.contrast_limits = (0, 1)
-            binarize.self.layer.name = "Result of " + operation.__name__
-            binarize.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.contrast_limits = (0, 1)
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image 1'},
     input2={'label':'Image 2'},
     operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['combine', 'in assistant'], must_not_have_categories=['map']).keys()}
 )
-def combine(input1: Layer, input2: Layer = None, operation_name: str = cle.binary_and.__name__):
+def combine(input1: Layer, input2: Layer = None, operation_name: str = cle.binary_and.__name__, myself = None):
     if input1 is not None:
         if (input2 is None):
             input2 = input1
@@ -195,16 +213,16 @@ def combine(input1: Layer, input2: Layer = None, operation_name: str = cle.binar
         output = cle.pull(output)
 
         # show result in napari
-        if not hasattr(combine.self, 'layer'):
-            combine.self.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_image(output, colormap=input1.colormap, translate=input1.translate)
         else:
-            combine.self.layer.data = output
-            combine.self.layer.name = "Result of " + operation.__name__
-            combine.self.layer.contrast_limits=(0, max_intensity)
-            combine.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.contrast_limits=(0, max_intensity)
+            myself.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -212,27 +230,27 @@ def combine(input1: Layer, input2: Layer = None, operation_name: str = cle.binar
     a=plus_minus_1k,
     b=plus_minus_1k
 )
-def label(input1: Layer, operation_name: str = cle.connected_components_labeling_box.__name__, a : float = 2, b : float = 2):
+def label(input1: Layer, operation_name: str = cle.connected_components_labeling_box.__name__, a : float = 2, b : float = 2, myself = None):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push(input1.data)
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [label.a, label.b])
+        label_parameters(operation, [myself.gui.a, myself.gui.b])
         output = cle.create_like(cle_input1)
         _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, a, b])
         output = cle.pull(output).astype(int)
 
         # show result in napari
-        if not hasattr(label.self, 'layer'):
-            label.self.viewer.add_labels(output, translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_labels(output, translate=input1.translate)
         else:
-            label.self.layer.data = output
-            label.self.layer.name = "Result of " + operation.__name__
-            label.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Labels'},
@@ -240,34 +258,34 @@ def label(input1: Layer, operation_name: str = cle.connected_components_labeling
     min = plus_minus_1k,
     max = plus_minus_1k
 )
-def label_processing(input1: Labels, operation_name: str = cle.exclude_labels_on_edges.__name__, min: float=0, max:float=100):
+def label_processing(input1: Labels, operation_name: str = cle.exclude_labels_on_edges.__name__, min: float=0, max:float=100, myself = None):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push(input1.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [label_processing.min, label_processing.max])
+        label_parameters(operation, [myself.gui.min, myself.gui.max])
         _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, min, max])
         output = cle.pull(output).astype(int)
 
         # show result in napari
-        if not hasattr(label_processing.self, 'layer'):
-            label_processing.self.viewer.add_labels(output, translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_labels(output, translate=input1.translate)
         else:
-            label_processing.self.layer.data = output
-            label_processing.self.layer.name = "Result of " + operation.__name__
-            label_processing.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
     input2={'label':'Labels'},
     operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['combine', 'map', 'in assistant']).keys()}
 )
-def label_measurements(input1: Image, input2: Labels = None, operation_name: str = cle.label_mean_intensity_map.__name__, n : float = 1):
+def label_measurements(input1: Image, input2: Labels = None, operation_name: str = cle.label_mean_intensity_map.__name__, n : float = 1, myself = None):
     if input1 is not None:
         if (input2 is None):
             input2 = input1
@@ -278,7 +296,7 @@ def label_measurements(input1: Image, input2: Labels = None, operation_name: str
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [label_measurements.n])
+        label_parameters(operation, [myself.gui.n])
         _call_operation_ignoring_to_many_arguments(operation, [cle_input1, cle_input2, output, n])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
@@ -286,31 +304,31 @@ def label_measurements(input1: Image, input2: Labels = None, operation_name: str
         output = cle.pull(output)
 
         # show result in napari
-        if not hasattr(label_measurements.self, 'layer'):
-            label_measurements.self.viewer.add_image(output, colormap='turbo', interpolation='nearest', translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_image(output, colormap='turbo', interpolation='nearest', translate=input1.translate)
         else:
-            label_measurements.self.layer.data = output
-            label_measurements.self.layer.name = "Result of " + operation.__name__
-            label_measurements.self.layer.contrast_limits=(0, max_intensity)
-            label_measurements.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.contrast_limits=(0, max_intensity)
+            myself.layer.translate = input1.translate
 
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label': 'Labels'},
     operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['label measurement', 'mesh', 'in assistant'], must_not_have_categories=["combine"]).keys()},
     n = {'min': 0, 'max': 1000}
 )
-def mesh(input1: Labels, operation_name : str = cle.draw_mesh_between_touching_labels.__name__, n : float = 1):
+def mesh(input1: Labels, operation_name : str = cle.draw_mesh_between_touching_labels.__name__, n : float = 1, myself = None):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push(input1.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [mesh.n])
+        label_parameters(operation, [myself.gui.n])
         _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, n])
         min_intensity = cle.minimum_of_all_pixels(output)
         max_intensity = cle.maximum_of_all_pixels(output)
@@ -319,30 +337,30 @@ def mesh(input1: Labels, operation_name : str = cle.draw_mesh_between_touching_l
         output = cle.pull(output)
 
         # show result in napari
-        if not hasattr(mesh.self, 'layer'):
-            mesh.self.viewer.add_image(output, colormap='green', blending='additive', translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_image(output, colormap='green', blending='additive', translate=input1.translate)
         else:
-            mesh.self.layer.data = output
-            mesh.self.layer.name = "Result of " + operation.__name__
-            mesh.self.layer.contrast_limits=(min_intensity, max_intensity)
-            mesh.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.contrast_limits=(min_intensity, max_intensity)
+            myself.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Labels'},
     operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['label measurement', 'map', 'in assistant'], must_not_have_categories=["combine"]).keys()},
     n = {'min': 0, 'max': 1000}
 )
-def map(input1: Labels, operation_name: str = cle.label_pixel_count_map.__name__, n : float = 1):
+def map(input1: Labels, operation_name: str = cle.label_pixel_count_map.__name__, n : float = 1, myself = None):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push(input1.data)
         output = cle.create_like(cle_input1)
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [map.n])
+        label_parameters(operation, [myself.gui.n])
         _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, n])
         max_intensity = cle.maximum_of_all_pixels(output)
         if max_intensity == 0:
@@ -350,23 +368,23 @@ def map(input1: Labels, operation_name: str = cle.label_pixel_count_map.__name__
         output = cle.pull(output)
 
         # show result in napari
-        if not hasattr(map.self, 'layer'):
-            map.self.viewer.add_image(output, colormap='turbo', interpolation='nearest', translate=input1.translate)
+        if not hasattr(myself, 'layer'):
+            myself.viewer.add_image(output, colormap='turbo', interpolation='nearest', translate=input1.translate)
         else:
-            map.self.layer.data = output
-            map.self.layer.name = "Result of " + operation.__name__
-            map.self.layer.contrast_limits=(0, max_intensity)
-            map.self.layer.translate = input1.translate
+            myself.layer.data = output
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.contrast_limits=(0, max_intensity)
+            myself.layer.translate = input1.translate
 
 # -----------------------------------------------------------------------------
 # A special case of ooperation is measurement: it results in a table instead of
 # an image
-@magicgui(
+@magic_factory(
     layout='vertical',
     input1={'label': 'Image'},
     labels={'label': 'Labels'},
     call_button="Measure")
-def measure(input1: Image = None, labels : Labels = None):
+def measure(input1: Image = None, labels : Labels = None, myself = None):
     if input1 is not None and labels is not None:
         from skimage.measure import regionprops_table
         table = regionprops_table(labels.data.astype(int), intensity_image=input1.data, properties=('area', 'centroid', 'mean_intensity'))
@@ -382,7 +400,7 @@ def table_to_widget(table : dict) -> QTableWidget:
     return view
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
@@ -391,7 +409,7 @@ def table_to_widget(table : dict) -> QTableWidget:
     b=plus_minus_1k,
     c=plus_minus_1k
 )
-def transform(input1: Layer, operation_name : str = cle.sub_stack.__name__, a : float = 0, b : float = 0, c : float = 0, d : bool = False, e : bool = False):
+def transform(input1: Layer, operation_name : str = cle.sub_stack.__name__, a : float = 0, b : float = 0, c : float = 0, d : bool = False, e : bool = False, myself = None):
     if input1 is not None:
         # determine shift; todo: to this in a generic way
         import numpy as np
@@ -406,30 +424,30 @@ def transform(input1: Layer, operation_name : str = cle.sub_stack.__name__, a : 
         output = None
         operation = cle.operation(operation_name)
         # update GUI
-        label_parameters(operation, [transform.a, transform.b, transform.c, transform.d, transform.e])
+        label_parameters(operation, [myself.gui.a, myself.gui.b, myself.gui.c, myself.gui.d, myself.gui.e])
         output = _call_operation_ignoring_to_many_arguments(operation, [cle_input1, output, a, b, c, d, e])
         output = cle.pull(output).astype(int)
 
         # show result in napari
-        if not hasattr(transform.self, 'layer'):
+        if not hasattr(myself, 'layer'):
             if isinstance(input1, Labels):
-                transform.self.viewer.add_labels(output, translate=translate)
+                myself.viewer.add_labels(output, translate=translate)
             else:
-                transform.self.viewer.add_image(output, translate=translate)
+                myself.viewer.add_image(output, translate=translate)
         else:
-            transform.self.layer.data = output
-            transform.self.layer.contrast_limits = input1.contrast_limits
-            transform.self.layer.name = "Result of " + operation.__name__
-            transform.self.layer.translate = translate
+            myself.layer.data = output
+            myself.layer.contrast_limits = input1.contrast_limits
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.translate = translate
 
 # -----------------------------------------------------------------------------
-@magicgui(
+@magic_factory(
     auto_call=True,
     layout='vertical',
     input1={'label':'Image'},
     operation_name={'label': 'Operation', 'choices':cle.operations(must_have_categories=['projection', 'in assistant']).keys()}
 )
-def projection(input1: Layer, operation_name : str = cle.maximum_z_projection.__name__):
+def projection(input1: Layer, operation_name : str = cle.maximum_z_projection.__name__, myself = None):
     if input1 is not None:
         # execute operation
         cle_input1 = cle.push(input1.data)
@@ -440,13 +458,13 @@ def projection(input1: Layer, operation_name : str = cle.maximum_z_projection.__
 
 
         # show result in napari
-        if not hasattr(projection.self, 'layer'):
+        if not hasattr(myself, 'layer'):
             if isinstance(input1, Labels):
-                projection.self.viewer.add_labels(output, translate=input1.translate[1:3])
+                myself.viewer.add_labels(output, translate=input1.translate[1:3])
             else:
-                projection.self.viewer.add_image(output, translate=input1.translate[1:3])
+                myself.viewer.add_image(output, translate=input1.translate[1:3])
         else:
-            projection.self.layer.data = output
-            projection.self.layer.contrast_limits = input1.contrast_limits
-            projection.self.layer.name = "Result of " + operation.__name__
-            projection.self.layer.translate = input1.translate[1:3]
+            myself.layer.data = output
+            myself.layer.contrast_limits = input1.contrast_limits
+            myself.layer.name = "Result of " + operation.__name__
+            myself.layer.translate = input1.translate[1:3]

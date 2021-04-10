@@ -5,9 +5,13 @@ class LayerDialog():
     """
     def __init__(self, viewer, operation):
         self.viewer = viewer
+        self.op_object = operation.get()
+        self.op_object.viewer = viewer
+
+        operation = self.op_object.get()
+        operation.native.setParent(viewer.window.qt_viewer)
 
         self.filter_gui = operation
-        self.filter_gui.self = self # arrrrg
 
         former_active_layer = self.viewer.active_layer
         try:
@@ -19,6 +23,9 @@ class LayerDialog():
 
         self.filter_gui(self.viewer.active_layer)
         self.layer = self.viewer.active_layer
+        if self.op_object is not None:
+            self.op_object.layer = self.layer
+
         if(self.layer is None):
             import time
             self.filter_gui(self.viewer.active_layer)
@@ -32,6 +39,7 @@ class LayerDialog():
         self.layer.events.deselect.connect(self._deselected)
 
         self.dock_widget = viewer.window.add_dock_widget(self.filter_gui, area='right')
+        
         #self.dock_widget.setMaximumWidth(300)
         if hasattr(self.filter_gui, 'input1'):
             print("setting former active")
@@ -48,7 +56,6 @@ class LayerDialog():
         self.refresh_all_followers()
 
     def _selected(self, event):
-        self.filter_gui.self = self    # sigh
         if hasattr(self, 'dock_widget'):
             self.dock_widget.show()
         else:
@@ -70,11 +77,9 @@ class LayerDialog():
         """
         Refresh/recompute the current layer
         """
-        former = self.filter_gui.self
-        self.filter_gui.self = self    # sigh
+
         print("calling op")
         self.filter_gui()
-        self.filter_gui.self = former
 
     def refresh_all_followers(self):
         """

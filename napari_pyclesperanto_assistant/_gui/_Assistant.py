@@ -34,22 +34,22 @@ class Assistant(QWidget):
         for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(None)
 
-        from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements, transform, projection
+        from .._operations._operations import SelfAwareFunction, denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements, transform, projection
 
-        self.add_button("Noise removal", denoise, 1, 0)
-        self.add_button("Background removal", background_removal, 1, 1)
-        self.add_button("Filter", filter, 1, 2)
-        self.add_button("Combine", combine, 2, 0)
-        self.add_button("Transform", transform, 2, 1)
-        self.add_button("Projection", projection, 2, 2)
+        self.add_button("Noise removal", SelfAwareFunction(denoise), 1, 0)
+        self.add_button("Background removal", SelfAwareFunction(background_removal), 1, 1)
+        self.add_button("Filter", SelfAwareFunction(filter), 1, 2)
+        self.add_button("Combine", SelfAwareFunction(combine), 2, 0)
+        self.add_button("Transform", SelfAwareFunction(transform), 2, 1)
+        self.add_button("Projection", SelfAwareFunction(projection), 2, 2)
 
-        self.add_button("Binarize", binarize, 3, 0)
-        self.add_button("Label", label, 3, 1)
-        self.add_button("Label processing", label_processing, 3, 2)
-        self.add_button("Label measurements", label_measurements, 5, 0)
-        self.add_button("Map", map, 4, 0)
-        self.add_button("Mesh", mesh, 4, 1)
-        self.add_button("Measure", measure, 5, 1)
+        self.add_button("Binarize", SelfAwareFunction(binarize), 3, 0)
+        self.add_button("Label", SelfAwareFunction(label), 3, 1)
+        self.add_button("Label processing", SelfAwareFunction(label_processing), 3, 2)
+        self.add_button("Label measurements", SelfAwareFunction(label_measurements), 5, 0)
+        self.add_button("Map", SelfAwareFunction(map), 4, 0)
+        self.add_button("Mesh", SelfAwareFunction(mesh), 4, 1)
+        self.add_button("Measure", SelfAwareFunction(measure), 5, 1)
 
         # spacer
         label = QLabel("", self)
@@ -86,7 +86,7 @@ class Assistant(QWidget):
 
         self.viewer.layers.events.removed.connect(_on_removed)
 
-    def add_button(self, title : str, handler : callable, x : int = None, y : int = None):
+    def add_button(self, title : str, handler, x : int = None, y : int = None):
         # text
         btn = QPushButton('', self)
         btn.setFont(self.font)
