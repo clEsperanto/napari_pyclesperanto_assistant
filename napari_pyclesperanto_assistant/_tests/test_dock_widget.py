@@ -2,7 +2,7 @@ import warnings
 
 from pathlib import Path
 import napari_pyclesperanto_assistant
-from .._operations._operations import SelfAwareFunction, denoise, background_removal, filter, binarize, combine, label, \
+from .._operations._operations import SelfAwareFunctionFactory, denoise, background_removal, filter, binarize, combine, label, \
     label_processing, map, mesh, measure, label_measurements, transform, projection
 
 # workaround for leaking Widgets
@@ -42,17 +42,17 @@ def test_complex_workflow(make_napari_viewer):
     filename = str(root / 'data' / 'Lund_000500_resampled-cropped.tif')
     layer = viewer.open(filename)
 
-    assistant_gui._activate(SelfAwareFunction(denoise))
-    assistant_gui._activate(SelfAwareFunction(background_removal))
-    assistant_gui._activate(SelfAwareFunction(filter))
-    assistant_gui._activate(SelfAwareFunction(binarize))
-    assistant_gui._activate(SelfAwareFunction(label))
-    assistant_gui._activate(SelfAwareFunction(label_processing))
-    assistant_gui._activate(SelfAwareFunction(map))
-    assistant_gui._activate(SelfAwareFunction(combine))
+    assistant_gui._activate(SelfAwareFunctionFactory(denoise))
+    assistant_gui._activate(SelfAwareFunctionFactory(background_removal))
+    assistant_gui._activate(SelfAwareFunctionFactory(filter))
+    assistant_gui._activate(SelfAwareFunctionFactory(binarize))
+    assistant_gui._activate(SelfAwareFunctionFactory(label))
+    assistant_gui._activate(SelfAwareFunctionFactory(label_processing))
+    assistant_gui._activate(SelfAwareFunctionFactory(map))
+    assistant_gui._activate(SelfAwareFunctionFactory(combine))
 
-    assistant_gui._activate(SelfAwareFunction(transform))
-    assistant_gui._activate(SelfAwareFunction(projection))
+    assistant_gui._activate(SelfAwareFunctionFactory(transform))
+    assistant_gui._activate(SelfAwareFunctionFactory(projection))
 
     #assistant_gui._export_jython_code_to_clipboard()
     assistant_gui._export_notebook(filename="test.ipynb")

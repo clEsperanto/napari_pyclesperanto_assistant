@@ -39,7 +39,7 @@ class LayerDialog():
         self.layer.events.deselect.connect(self._deselected)
 
         self.dock_widget = viewer.window.add_dock_widget(self.filter_gui, area='right')
-        
+
         #self.dock_widget.setMaximumWidth(300)
         if hasattr(self.filter_gui, 'input1'):
             print("setting former active")
