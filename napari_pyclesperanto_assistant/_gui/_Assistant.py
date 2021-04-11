@@ -1,3 +1,4 @@
+import warnings
 from pathlib import Path
 
 from qtpy import QtGui
@@ -34,22 +35,24 @@ class Assistant(QWidget):
         for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(None)
 
-        from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements, transform, projection
+        from .._operations._operations import StatefulFunctionFactory, magic_denoise, magic_background_removal, \
+            magic_filter, magic_binarize, magic_combine, magic_label, magic_label_processing, magic_map, \
+            magic_mesh, magic_measure, magic_label_measurements, magic_transform, magic_projection
 
-        self.add_button("Noise removal", denoise, 1, 0)
-        self.add_button("Background removal", background_removal, 1, 1)
-        self.add_button("Filter", filter, 1, 2)
-        self.add_button("Combine", combine, 2, 0)
-        self.add_button("Transform", transform, 2, 1)
-        self.add_button("Projection", projection, 2, 2)
+        self.add_button("Noise removal", StatefulFunctionFactory(magic_denoise), 1, 0)
+        self.add_button("Background removal", StatefulFunctionFactory(magic_background_removal), 1, 1)
+        self.add_button("Filter", StatefulFunctionFactory(magic_filter), 1, 2)
+        self.add_button("Combine", StatefulFunctionFactory(magic_combine), 2, 0)
+        self.add_button("Transform", StatefulFunctionFactory(magic_transform), 2, 1)
+        self.add_button("Projection", StatefulFunctionFactory(magic_projection), 2, 2)
 
-        self.add_button("Binarize", binarize, 3, 0)
-        self.add_button("Label", label, 3, 1)
-        self.add_button("Label processing", label_processing, 3, 2)
-        self.add_button("Label measurements", label_measurements, 5, 0)
-        self.add_button("Map", map, 4, 0)
-        self.add_button("Mesh", mesh, 4, 1)
-        self.add_button("Measure", measure, 5, 1)
+        self.add_button("Binarize", StatefulFunctionFactory(magic_binarize), 3, 0)
+        self.add_button("Label", StatefulFunctionFactory(magic_label), 3, 1)
+        self.add_button("Label processing", StatefulFunctionFactory(magic_label_processing), 3, 2)
+        self.add_button("Label measurements", StatefulFunctionFactory(magic_label_measurements), 5, 0)
+        self.add_button("Map", StatefulFunctionFactory(magic_map), 4, 0)
+        self.add_button("Mesh", StatefulFunctionFactory(magic_mesh), 4, 1)
+        self.add_button("Measure", StatefulFunctionFactory(magic_measure), 5, 1)
 
         # spacer
         label = QLabel("", self)
@@ -86,7 +89,7 @@ class Assistant(QWidget):
 
         self.viewer.layers.events.removed.connect(_on_removed)
 
-    def add_button(self, title : str, handler : callable, x : int = None, y : int = None):
+    def add_button(self, title : str, handler, x : int = None, y : int = None):
         # text
         btn = QPushButton('', self)
         btn.setFont(self.font)
@@ -123,6 +126,9 @@ class Assistant(QWidget):
             self.layout.addWidget(btn, x, y)
 
     def _activate(self, magicgui):
+        if self.viewer.active_layer is None:
+            warnings.warn("Select a layer first!")
+            return
         LayerDialog(self.viewer, magicgui)
 
     def _export_jython_code(self):
