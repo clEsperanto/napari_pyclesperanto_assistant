@@ -11,9 +11,6 @@ class LayerDialog():
         self.filter_gui = self.stateful_function.get()
         self.filter_gui.native.setParent(viewer.window.qt_viewer)
 
-        import warnings
-        warnings.warn("are we leaking this?" + str(self.filter_gui.native))
-
         former_active_layer = self.viewer.active_layer
         try:
             former_active_layer.metadata['dialog']._deselected(None)
