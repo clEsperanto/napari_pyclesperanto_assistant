@@ -2,8 +2,10 @@ import warnings
 
 from pathlib import Path
 import napari_pyclesperanto_assistant
-from .._operations._operations import StatefulFunctionFactory, denoise, background_removal, filter, binarize, combine, label, \
-    label_processing, map, mesh, measure, label_measurements, transform, projection
+from .._operations._operations import StatefulFunctionFactory, magic_denoise, magic_background_removal, \
+    magic_filter, magic_binarize, magic_combine, magic_label, \
+    magic_label_processing, magic_map, magic_mesh, magic_measure, magic_label_measurements, \
+    magic_transform, magic_projection
 
 # workaround for leaking Widgets
 def _init_test():
@@ -42,20 +44,20 @@ def test_complex_workflow(make_napari_viewer):
     filename = str(root / 'data' / 'Lund_000500_resampled-cropped.tif')
     layer = viewer.open(filename)
 
-    assistant_gui._activate(StatefulFunctionFactory(denoise))
-    #assistant_gui._activate(StatefulFunctionFactory(background_removal))
-    #assistant_gui._activate(StatefulFunctionFactory(filter))
-    #assistant_gui._activate(StatefulFunctionFactory(binarize))
-    #assistant_gui._activate(StatefulFunctionFactory(label))
-    #assistant_gui._activate(StatefulFunctionFactory(label_processing))
-    #assistant_gui._activate(StatefulFunctionFactory(map))
-    #assistant_gui._activate(StatefulFunctionFactory(combine))
+    assistant_gui._activate(StatefulFunctionFactory(magic_denoise))
+    assistant_gui._activate(StatefulFunctionFactory(magic_background_removal))
+    assistant_gui._activate(StatefulFunctionFactory(magic_filter))
+    assistant_gui._activate(StatefulFunctionFactory(magic_binarize))
+    assistant_gui._activate(StatefulFunctionFactory(magic_label))
+    assistant_gui._activate(StatefulFunctionFactory(magic_label_processing))
+    assistant_gui._activate(StatefulFunctionFactory(magic_map))
+    assistant_gui._activate(StatefulFunctionFactory(magic_combine))
 
-    #assistant_gui._activate(StatefulFunctionFactory(transform))
-    #assistant_gui._activate(StatefulFunctionFactory(projection))
+    assistant_gui._activate(StatefulFunctionFactory(magic_transform))
+    assistant_gui._activate(StatefulFunctionFactory(magic_projection))
 
     #assistant_gui._export_jython_code_to_clipboard()
-    #assistant_gui._export_notebook(filename="test.ipynb")
+    assistant_gui._export_notebook(filename="test.ipynb")
 
     _finalize_test(initial, viewer)
 
