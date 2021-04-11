@@ -1,12 +1,13 @@
 from pathlib import Path
-from PyQt5.QtWidgets import QMenu
+from warnings import warn
 
+from PyQt5.QtWidgets import QMenu
 from qtpy.QtWidgets import QAction, QFileDialog, QVBoxLayout, QWidget
 
 from .._gui._LayerDialog import LayerDialog
+from .._operations import _operations
 from .._scriptgenerators import JythonGenerator, PythonJupyterNotebookGenerator
 from ._button_grid import ButtonGrid
-from .._operations import _operations
 
 
 class Assistant(QWidget):
@@ -49,6 +50,9 @@ class Assistant(QWidget):
             pass
 
     def _on_item_clicked(self, item):
+        if not self.viewer.active_layer:
+            warn('Please select a layer first')
+            return
         self._activate(_operations.OPERATION_NAMES.get(item.text()))
 
     def _activate(self, op_name: str):

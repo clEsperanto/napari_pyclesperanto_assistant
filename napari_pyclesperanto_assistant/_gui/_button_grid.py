@@ -39,7 +39,7 @@ class ButtonGrid(QListWidget):
     def _get_icon(self, name):
         path = ICON_ROOT / f'{name.lower().replace(" ", "_")}.png'
         if not path.exists():
-            raise ValueError(f"No icon found for label {name}")
+            return ""
         return str(path)
 
     def addItem(self, label: str):

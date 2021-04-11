@@ -1,7 +1,7 @@
 class LayerDialog:
     """
-    The LayerDialog contains a dock-widget that allows configuring parameters of all _operations.
-    It uses events emitted by napari to toggle which dock widget is shown.
+    The LayerDialog contains a dock-widget that allows configuring parameters of all
+    _operations. It uses events emitted by napari to toggle which dock widget is shown.
     """
 
     def __init__(self, viewer, operation):
@@ -19,14 +19,13 @@ class LayerDialog:
             pass
 
         self.filter_gui(self.viewer.active_layer)
+
         self.layer = self.viewer.active_layer
         if self.layer is None:
-            import time
+            from napari._qt import get_app
 
+            get_app().processEvents()
             self.filter_gui(self.viewer.active_layer)
-            time.sleep(
-                0.1
-            )  # dirty workaround: wait until napari has set its active_layer
             self.layer = self.viewer.active_layer
 
         self.layer.metadata["dialog"] = self
