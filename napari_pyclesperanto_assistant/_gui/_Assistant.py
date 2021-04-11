@@ -1,3 +1,4 @@
+import warnings
 from pathlib import Path
 
 from qtpy import QtGui
@@ -125,6 +126,9 @@ class Assistant(QWidget):
             self.layout.addWidget(btn, x, y)
 
     def _activate(self, magicgui):
+        if self.viewer.active_layer is None:
+            warnings.warn("Select a layer first!")
+            return
         LayerDialog(self.viewer, magicgui)
 
     def _export_jython_code(self):
