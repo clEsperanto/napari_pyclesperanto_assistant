@@ -2,8 +2,10 @@ import warnings
 
 from pathlib import Path
 import napari_pyclesperanto_assistant
-from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, \
-    label_processing, map, mesh, measure, label_measurements, transform, projection
+from .._operations._operations import StatefulFunctionFactory, magic_denoise, magic_background_removal, \
+    magic_filter, magic_binarize, magic_combine, magic_label, \
+    magic_label_processing, magic_map, magic_mesh, magic_measure, magic_label_measurements, \
+    magic_transform, magic_projection
 
 # workaround for leaking Widgets
 def _init_test():
@@ -12,6 +14,9 @@ def _init_test():
 
 def _finalize_test(initial, viewer):
     from qtpy.QtWidgets import QApplication
+
+    viewer.close()
+
     QApplication.processEvents()
     leaks = set(QApplication.topLevelWidgets()).difference(initial)
 
@@ -39,22 +44,17 @@ def test_complex_workflow(make_napari_viewer):
     filename = str(root / 'data' / 'Lund_000500_resampled-cropped.tif')
     layer = viewer.open(filename)
 
-    assistant_gui._activate(denoise)
-    assistant_gui._activate(background_removal)
-    assistant_gui._activate(filter)
-    assistant_gui._activate(binarize)
-    assistant_gui._activate(label)
-    assistant_gui._activate(label_processing)
-    assistant_gui._activate(map)
-    assistant_gui._activate(combine)
+    assistant_gui._activate(StatefulFunctionFactory(magic_denoise))
+    assistant_gui._activate(StatefulFunctionFactory(magic_background_removal))
+    assistant_gui._activate(StatefulFunctionFactory(magic_filter))
+    assistant_gui._activate(StatefulFunctionFactory(magic_binarize))
+    assistant_gui._activate(StatefulFunctionFactory(magic_label))
+    assistant_gui._activate(StatefulFunctionFactory(magic_label_processing))
+    assistant_gui._activate(StatefulFunctionFactory(magic_map))
+    assistant_gui._activate(StatefulFunctionFactory(magic_combine))
 
-    #assistant_gui._activate(label)
-    #assistant_gui._activate(mesh)
-    #assistant_gui._activate(measure)
-    #assistant_gui._activate(label_measurements)
-
-    assistant_gui._activate(transform)
-    assistant_gui._activate(projection)
+    assistant_gui._activate(StatefulFunctionFactory(magic_transform))
+    assistant_gui._activate(StatefulFunctionFactory(magic_projection))
 
     #assistant_gui._export_jython_code_to_clipboard()
     assistant_gui._export_notebook(filename="test.ipynb")
