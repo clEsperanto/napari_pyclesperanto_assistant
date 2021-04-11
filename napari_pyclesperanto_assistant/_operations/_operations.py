@@ -394,11 +394,12 @@ def table_to_widget(table : dict) -> QTableWidget:
 def transform(input1: Layer, operation_name : str = cle.sub_stack.__name__, a : float = 0, b : float = 0, c : float = 0, d : bool = False, e : bool = False):
     if input1 is not None:
         # determine shift; todo: to this in a generic way
-        translate = input1.translate
+        import numpy as np
+        translate = np.copy(input1.translate)
         if operation_name == cle.sub_stack.__name__:
-            translate = [input1.translate[0] + a, input1.translate[1], input1.translate[2]] # a corresponds to start_z
+            translate[0] += a # a corresponds to start_z
         elif operation_name == cle.reduce_stack.__name__:
-            translate = [input1.translate[0] + b, input1.translate[1], input1.translate[2]] # b corresponds to offset
+            translate[0] += b # b corresponds to offset
 
         # execute operation
         cle_input1 = cle.push(input1.data)
