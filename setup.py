@@ -26,7 +26,7 @@ with open(filename) as f:
 
 
 # https://github.com/pypa/setuptools_scm
-use_scm = {"write_to": "napari_pyclesperanto_assistant/_version.py"}
+#use_scm = {"write_to": "napari_pyclesperanto_assistant/_version.py"}
 setup(
     name="napari_pyclesperanto_assistant",
     version="0.7.6",
@@ -40,7 +40,7 @@ setup(
     include_package_data=True,
     python_requires='>=3.6',
     install_requires=requirements,
-    use_scm_version=use_scm,
+    #use_scm_version=use_scm,
     setup_requires=['setuptools_scm'],
     classifiers=[
         "Programming Language :: Python :: 3",
