@@ -16,14 +16,13 @@ This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiec
 ### Installation using conda
 ```
 conda install -c conda-forge pyopencl
-pip install napari[all]
-pip install napari-pyclesperanto-assistant
+pip install napari[all] napari-pyclesperanto-assistant
 ```
 Afterwards, start napari from the command line:
 ```
-napari
+napari --with clEsperanto
 ```
-You will then find the assistant in the `Plugins` menu.
+(You can also find the assistant in the `Plugins` menu.)
 
 ![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
 
@@ -36,7 +35,7 @@ Windows users please download [pyopencl...cl12-cp38-cp38-win_amd64.whl](https://
 C:\Users\<username>\AppData\Local\Programs\napari\python\python.exe -m pip install pyopencl-2020.2.2+cl12-cp38-cp38-win_amd64.whl
 ```
 
-Start napari and navigate to its menu `Plugins > Install/Uninstall Package(s)...`. Select `napari-pyclesperanto-assitant` from the list and install it by clicking the blue button on the right:
+Start napari and navigate to its menu `Plugins > Install/Uninstall Package(s)...`. Select `napari-pyclesperanto-assistant` from the list and install it by clicking the blue button on the right:
 ![](docs/images/screenshot_installer.png)
 
 Restart napari. Afterwards, you should find the Assistant in the plugins menu:
@@ -71,17 +70,13 @@ python -m napari_pyclesperanto_assistant C:\structure\code\napari_pyclesperanto_
 ```
 
 Alternatively, you can attach the assistant to your napari from within your python code like this:
-```
+```python
 import napari
 
-# create Qt GUI context
-with napari.gui_qt():
-    # start napari
-    viewer = napari.Viewer()
-
-    # attach the assistant
-    import napari_pyclesperanto_assistant
-    napari_pyclesperanto_assistant.napari_plugin(viewer)
+# start napari
+viewer = napari.Viewer()
+viewer.window.add_plugin_dock_widget('clEsperanto')
+napari.run()
 ```
 
 napari will open with the assistant activated:

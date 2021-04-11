@@ -1,12 +1,13 @@
 from pathlib import Path
+from PyQt5.QtWidgets import QMenu
 
-from qtpy import QtGui
-from qtpy.QtCore import QSize, Qt
-from qtpy.QtGui import QPixmap
-from qtpy.QtWidgets import QWidget, QLabel, QAction, QPushButton, QFileDialog, QGridLayout
+from qtpy.QtWidgets import QAction, QFileDialog, QVBoxLayout, QWidget
 
 from .._gui._LayerDialog import LayerDialog
 from .._scriptgenerators import JythonGenerator, PythonJupyterNotebookGenerator
+from ._button_grid import ButtonGrid
+from .._operations import _operations
+
 
 class Assistant(QWidget):
     """This Gui takes a napari as parameter and infiltrates it.
@@ -16,114 +17,53 @@ class Assistant(QWidget):
 
     def __init__(self, napari_viewer):
         super().__init__(napari_viewer.window.qt_viewer)
-
-        self.font = QtGui.QFont('Arial', 8)
-
         self.viewer = napari_viewer
+        self.viewer.layers.events.removed.connect(self._on_layer_removed)
 
-        self.layout = QGridLayout(self)
+        self._grid = ButtonGrid(self)
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(self._grid)
+        self._grid.addItems(_operations.OPERATION_NAMES)
+        self._grid.itemClicked.connect(self._on_item_clicked)
 
-        self._init_gui()
+        # create menu
+        self._cle_menu = QMenu("clEsperanto", self.viewer.window._qt_window)
+        self.viewer.window.plugins_menu.addMenu(self._cle_menu)
+        actions = [
+            ("Export Jython/Python code", self._export_jython_code),
+            ("Export Jython/Python code to clipboard", self._export_jython_code_to_clipboard),
+            ("Export Jupyter Notebook", self._export_notebook),
+        ]
+        for name, cb in actions:
+            action = QAction(name, self)
+            action.triggered.connect(cb)
+            self._cle_menu.addAction(action)
 
-    def _init_gui(self):
-        """Switches the GUI internally between a main menu
-        where you can select categories and a sub menu where
-        you can keep results or cancel processing.
-        """
-        # remove all buttons first
-        for i in reversed(range(self.layout.count())):
-            self.layout.itemAt(i).widget().setParent(None)
+    def _on_layer_removed(self, event):
+        layer = event.value
+        try:
+            layer.metadata["dialog"]._removed()
+        except AttributeError:
+            pass
+        except KeyError:
+            pass
 
-        from .._operations._operations import denoise, background_removal, filter, binarize, combine, label, label_processing, map, mesh, measure, label_measurements, transform, projection
+    def _on_item_clicked(self, item):
+        self._activate(_operations.OPERATION_NAMES.get(item.text()))
 
-        self.add_button("Noise removal", denoise, 1, 0)
-        self.add_button("Background removal", background_removal, 1, 1)
-        self.add_button("Filter", filter, 1, 2)
-        self.add_button("Combine", combine, 2, 0)
-        self.add_button("Transform", transform, 2, 1)
-        self.add_button("Projection", projection, 2, 2)
+    def _activate(self, op_name: str):
+        from magicgui import magicgui
 
-        self.add_button("Binarize", binarize, 3, 0)
-        self.add_button("Label", label, 3, 1)
-        self.add_button("Label processing", label_processing, 3, 2)
-        self.add_button("Label measurements", label_measurements, 5, 0)
-        self.add_button("Map", map, 4, 0)
-        self.add_button("Mesh", mesh, 4, 1)
-        self.add_button("Measure", measure, 5, 1)
+        _k = {"call_button": "Measure"} if op_name == "measure" else {"auto_call": True}
+        widget = magicgui(getattr(_operations, op_name), **_k)
+        LayerDialog(self.viewer, widget)
+        return widget
 
-        # spacer
-        label = QLabel("", self)
-        label.setFont(self.font)
-        self.layout.addWidget(label, 6, 4)
+    def load_sample_data(self, fname="Lund_000500_resampled-cropped.tif"):
+        data_dir = Path(__file__).parent.parent / "data"
+        self.viewer.open(str(data_dir / fname))
 
-        #self.layout.addStretch()
-
-        self.setLayout(self.layout)
-        #self.setMaximumWidth(300)
-
-        # Add a menu
-        action = QAction('Export Jython/Python code', self.viewer.window._qt_window)
-        action.triggered.connect(self._export_jython_code)
-        self.viewer.window.plugins_menu.addAction(action)
-
-        action = QAction('Export Jython/Python code to clipboard', self.viewer.window._qt_window)
-        action.triggered.connect(self._export_jython_code_to_clipboard)
-        self.viewer.window.plugins_menu.addAction(action)
-
-        action = QAction('Export Jupyter Notebook', self.viewer.window._qt_window)
-        action.triggered.connect(self._export_notebook)
-        self.viewer.window.plugins_menu.addAction(action)
-
-
-        def _on_removed(event):
-            layer = event.value
-            try:
-                layer.metadata['dialog']._removed()
-            except AttributeError:
-                pass
-            except KeyError:
-                pass
-
-        self.viewer.layers.events.removed.connect(_on_removed)
-
-    def add_button(self, title : str, handler : callable, x : int = None, y : int = None):
-        # text
-        btn = QPushButton('', self)
-        btn.setFont(self.font)
-        btn.setFixedSize(QSize(80, 80))
-
-        # icon
-
-        #btn.setStyleSheet("text-align:center;")
-
-        btn.setLayout(QGridLayout(btn))
-
-        icon_label = QLabel(btn)
-        icon_label.setAlignment(Qt.AlignCenter)
-        pixmap = QPixmap()
-        pixmap.load(str(Path(__file__).parent) + "/icons/" + title.lower().replace(" ", "_").replace("(", "").replace(")", "") + ".png")
-        pixmap = pixmap.scaled(QSize(40, 40), Qt.KeepAspectRatio)
-        icon_label.setPixmap(pixmap)
-        btn.layout().addWidget(icon_label)
-
-        text_label = QLabel(title, btn)
-        text_label.setAlignment(Qt.AlignCenter)
-        text_label.setWordWrap(True)
-        text_label.setFont(self.font)
-        btn.layout().addWidget(text_label)
-
-        def trigger():
-            self._activate(handler)
-
-        # action
-        btn.clicked.connect(trigger)
-        if x is None or y is None:
-            self.layout.addWidget(btn)
-        else:
-            self.layout.addWidget(btn, x, y)
-
-    def _activate(self, magicgui):
-        LayerDialog(self.viewer, magicgui)
+    # TODO: move code generation to another module
 
     def _export_jython_code(self):
         generator = JythonGenerator(self.viewer.layers)
@@ -134,6 +74,7 @@ class Assistant(QWidget):
         generator = JythonGenerator(self.viewer.layers)
         code = generator.generate()
         import pyperclip
+
         pyperclip.copy(code)
 
     def _export_notebook(self, filename=None):
@@ -143,21 +84,23 @@ class Assistant(QWidget):
             filename = self._save_code(code, default_fileending=generator.file_ending())
         if filename is not None:
             import os
-            os.system('jupyter nbconvert --to notebook --inplace --execute ' + filename)
+
+            # NOTE: probably better to use subprocess.run here?
+            os.system("jupyter nbconvert --to notebook --inplace --execute " + filename)
             # os.system('jupyter notebook ' + filename) # todo: this line freezes napari
 
-    def _save_code(self, code, default_fileending = "*.*", filename = None):
+    def _save_code(self, code, default_fileending="*.*", filename=None):
         if filename is None:
-            filename = QFileDialog.getSaveFileName(self, 'Save code as...', '.', default_fileending)
-        if filename[0] == '':
+            filename = QFileDialog.getSaveFileName(
+                self, "Save code as...", ".", default_fileending
+            )
+        if filename[0] == "":
             return None
 
         filename = filename[0]
         if not filename.endswith(default_fileending):
             filename = filename + default_fileending
 
-        file = open(filename, "w+")
-        file.write(code)
-        file.close()
-
+        with open(filename, "w+") as file:
+            file.write(code)
         return filename
