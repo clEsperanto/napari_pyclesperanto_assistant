@@ -32,9 +32,7 @@ class Assistant(QWidget):
         super().__init__(napari_viewer.window.qt_viewer)
         self.viewer = napari_viewer
         napari_viewer.layers.events.removed.connect(self._on_layer_removed)
-        napari_viewer.layers.selection.events.active.connect(
-            self._on_active_layer_change
-        )
+        napari_viewer.events.active_layer.connect(self._on_active_layer_change)
         self._layers: Dict[Layer, Tuple[QtViewerDockWidget, FunctionGui]] = {}
 
         self._grid = ButtonGrid(self)
@@ -73,14 +71,14 @@ class Assistant(QWidget):
         self._activate(CATEGORIES.get(item.text()))
 
     def _activate(self, category: Category):
-        if not self.viewer.layers.selection.active:
+        if not self.viewer.active_layer:
             warn("Please select a layer first")
             return
 
         # make a new widget
         gui = make_gui_for_category(category)
         # get currently active layer (before adding dock widget)
-        input_layer = self.viewer.layers.selection.active
+        input_layer = self.viewer.active_layer
         # add gui to the viewer
         dw = self.viewer.window.add_dock_widget(gui, area="right", name=category.name)
         # make sure the originally active layer is the input
