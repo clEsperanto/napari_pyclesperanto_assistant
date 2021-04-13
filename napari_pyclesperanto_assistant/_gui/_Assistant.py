@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Dict, Tuple
 from warnings import warn
 
 import pyclesperanto_prototype as cle
-from qtpy.QtWidgets import QAction, QFileDialog, QMenu, QVBoxLayout, QWidget
+from qtpy.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QVBoxLayout, QWidget
 
 from .._categories import CATEGORIES, Category
 from .._pipeline import Pipeline
@@ -32,23 +32,24 @@ class Assistant(QWidget):
         napari_viewer.events.active_layer.connect(self._on_active_layer_change)
         self._layers: Dict[Layer, Tuple[QtViewerDockWidget, FunctionGui]] = {}
 
-        self._grid = ButtonGrid(self)
-        self.setLayout(QVBoxLayout())
-        self.layout().addWidget(self._grid)
-        self._grid.addItems(CATEGORIES)
-        self._grid.itemClicked.connect(self._on_item_clicked)
+        icon_grid = ButtonGrid(self)
+        icon_grid.addItems(CATEGORIES)
+        icon_grid.itemClicked.connect(self._on_item_clicked)
 
+        export_btns = QHBoxLayout()
         # create menu
-        self._cle_menu = QMenu("clEsperanto", self.viewer.window._qt_window)
-        self.viewer.window.plugins_menu.addMenu(self._cle_menu)
         actions = [
-            ("Export Python code", self.to_jython),
-            ("Copy Python code to clipboard", self.to_clipboard),
+            ("Export Python", self.to_jython),
+            ("Copy to clipboard", self.to_clipboard),
         ]
         for name, cb in actions:
-            action = QAction(name, self)
-            action.triggered.connect(cb)
-            self._cle_menu.addAction(action)
+            btn = QPushButton(name, self)
+            btn.clicked.connect(cb)
+            export_btns.addWidget(btn)
+
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(icon_grid)
+        self.layout().addLayout(export_btns)
 
     def _on_active_layer_change(self, event):
         for layer, (dw, gui) in self._layers.items():

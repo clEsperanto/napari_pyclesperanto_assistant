@@ -5,11 +5,17 @@ from napari_plugin_engine import napari_hook_implementation
 from pathlib import Path
 
 from ._gui import Assistant
+from functools import partial
+from ._gui._category_widget import make_gui_for_category
+from ._categories import CATEGORIES
 
 
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
-    return Assistant
+    return [Assistant] + [
+        (partial(make_gui_for_category, category), {"name": name})
+        for name, category in CATEGORIES.items()
+    ]
 
 
 @napari_hook_implementation

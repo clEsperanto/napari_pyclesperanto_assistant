@@ -69,7 +69,7 @@ class Pipeline:
     def to_jython(self, filename=None):
         code = "\n".join(self._generate(JythonGenerator))
         if filename:
-            Path(filename).write_text()
+            Path(filename).write_text(code)
         return code
 
     def __str__(self):
