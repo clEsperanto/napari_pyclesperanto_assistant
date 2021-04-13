@@ -1,22 +1,22 @@
 from __future__ import annotations
-import pyclesperanto_prototype as cle
 
 from pathlib import Path
-from typing import Dict, TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Dict, Tuple
 from warnings import warn
 
+import pyclesperanto_prototype as cle
 from qtpy.QtWidgets import QAction, QFileDialog, QMenu, QVBoxLayout, QWidget
 
 from .._categories import CATEGORIES, Category
-from ._category_widget import make_gui_for_category, OP_ID, VIEWER_PARAM, OP_NAME_PARAM
-
+from .._pipeline import Pipeline
 from ._button_grid import ButtonGrid
+from ._category_widget import OP_ID, OP_NAME_PARAM, VIEWER_PARAM, make_gui_for_category
 
 if TYPE_CHECKING:
+    from magicgui.widgets import FunctionGui
+    from napari._qt.widgets.qt_viewer_dock_widget import QtViewerDockWidget
     from napari.layers import Layer
     from napari.viewer import Viewer
-    from napari._qt.widgets.qt_viewer_dock_widget import QtViewerDockWidget
-    from magicgui.widgets import FunctionGui
 
 
 class Assistant(QWidget):
@@ -38,21 +38,17 @@ class Assistant(QWidget):
         self._grid.addItems(CATEGORIES)
         self._grid.itemClicked.connect(self._on_item_clicked)
 
-        # # create menu
-        # self._cle_menu = QMenu("clEsperanto", self.viewer.window._qt_window)
-        # self.viewer.window.plugins_menu.addMenu(self._cle_menu)
-        # actions = [
-        #     ("Export Jython/Python code", self._export_jython_code),
-        #     (
-        #         "Export Jython/Python code to clipboard",
-        #         self._export_jython_code_to_clipboard,
-        #     ),
-        #     ("Export Jupyter Notebook", self._export_notebook),
-        # ]
-        # for name, cb in actions:
-        #     action = QAction(name, self)
-        #     action.triggered.connect(cb)
-        #     self._cle_menu.addAction(action)
+        # create menu
+        self._cle_menu = QMenu("clEsperanto", self.viewer.window._qt_window)
+        self.viewer.window.plugins_menu.addMenu(self._cle_menu)
+        actions = [
+            ("Export Python code", self.to_jython),
+            ("Copy Python code to clipboard", self.to_clipboard),
+        ]
+        for name, cb in actions:
+            action = QAction(name, self)
+            action.triggered.connect(cb)
+            self._cle_menu.addAction(action)
 
     def _on_active_layer_change(self, event):
         for layer, (dw, gui) in self._layers.items():
@@ -114,7 +110,13 @@ class Assistant(QWidget):
             graph[key] = (op, *args)
         return graph
 
-    def to_jython(self):
-        from .._pipeline import Pipeline
+    def to_jython(self, filename=None):
 
-        return str(Pipeline.from_assistant(self))
+        if not filename:
+            filename, _ = QFileDialog.getSaveFileName(self, "Save code as...", ".")
+        return Pipeline.from_assistant(self).to_jython(filename)
+
+    def to_clipboard(self):
+        import pyperclip
+
+        pyperclip.copy(Pipeline.from_assistant(self).to_jython())
