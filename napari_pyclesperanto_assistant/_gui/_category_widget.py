@@ -140,4 +140,4 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui:
 
     gui_function.__name__ = f'do_{category.name.lower().replace(" ", "_")}'
     gui_function.__signature__ = Signature(params)
-    return magicgui(gui_function, call_button=False)
+    return magicgui(gui_function, call_button=False, auto_call=True)
