@@ -1,6 +1,6 @@
+import pytest
 from napari import Viewer
 from napari_pyclesperanto_assistant._categories import CATEGORIES
-import pytest
 
 
 @pytest.fixture

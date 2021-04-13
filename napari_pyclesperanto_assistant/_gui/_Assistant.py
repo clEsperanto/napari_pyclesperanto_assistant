@@ -126,7 +126,6 @@ class Assistant(QWidget):
         return graph
 
     def to_jython(self, filename=None):
-
         if not filename:
             filename, _ = QFileDialog.getSaveFileName(self, "Save code as...", ".")
         return Pipeline.from_assistant(self).to_jython(filename)
