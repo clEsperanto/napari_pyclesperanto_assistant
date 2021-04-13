@@ -1,5 +1,4 @@
 from __future__ import annotations
-from numpy.lib.arraysetops import isin
 import pyclesperanto_prototype as cle
 
 from pathlib import Path
@@ -10,11 +9,7 @@ from qtpy.QtWidgets import QAction, QFileDialog, QMenu, QVBoxLayout, QWidget
 
 from .._categories import CATEGORIES, Category
 from ._category_widget import make_gui_for_category, OP_ID, VIEWER_PARAM, OP_NAME_PARAM
-from .._export import (
-    export_jython_code,
-    export_jython_code_to_clipboard,
-    export_notebook,
-)
+
 from ._button_grid import ButtonGrid
 
 if TYPE_CHECKING:
@@ -105,7 +100,7 @@ class Assistant(QWidget):
             for w in mgui:
                 if w.name in (VIEWER_PARAM, OP_NAME_PARAM):
                     continue
-                if 'napari.layers' in type(w.value).__module__:
+                if "napari.layers" in type(w.value).__module__:
                     op_id = w.value.metadata.get(OP_ID)
                     if op_id is None:
                         op_id = "some_random_key"
@@ -116,3 +111,8 @@ class Assistant(QWidget):
             op = getattr(cle, getattr(mgui, OP_NAME_PARAM).value)
             graph[key] = (op, *args)
         return graph
+
+    def to_jython(self):
+        from .._pipeline import Pipeline
+
+        return str(Pipeline.from_assistant(self))

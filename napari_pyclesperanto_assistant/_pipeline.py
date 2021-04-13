@@ -5,6 +5,30 @@ from pathlib import Path
 
 class JythonGenerator:
     @staticmethod
+    def header():
+        from napari_pyclesperanto_assistant import __version__
+        from textwrap import dedent
+
+        return dedent(
+            f'''
+        """
+        To make this script run in cpython, install pyclesperanto_prototype:
+        pip install pyclesperanto_prototype
+        Read more: https://clesperanto.net
+
+        To make this script run in Fiji, please activate the clij,
+        clij2 and clijx-assistant update sites in your Fiji.
+
+        Read more: https://clij.github.io/assistant
+        Generator (P) version: {__version__}
+        """
+
+        import pyclesperanto_prototype as cle
+
+        '''
+        )
+
+    @staticmethod
     def operate(step, n) -> str:
         args = tuple(map(repr, step.args))
         if step.input:
@@ -35,6 +59,7 @@ class Pipeline:
     show: bool = True
 
     def _generate(self, vistor):
+        yield vistor.header()
         for n, step in enumerate(self.steps):
             yield vistor.operate(step, n)
             if self.show:
@@ -82,6 +107,4 @@ if __name__ == "__main__":
         is_labels=True,
     )
 
-    pipeline = Pipeline(steps=[s0, s1, s2, s3, s4, s5])
-
-    print("\n".join(pipeline.to_jython()))
+    print(Pipeline(steps=[s0, s1, s2, s3, s4, s5]))
