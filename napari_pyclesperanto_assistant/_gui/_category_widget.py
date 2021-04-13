@@ -23,24 +23,6 @@ def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
     return len([p for p in params.values() if p.annotation in types])
 
 
-# TODO
-# def _label_parameters(operation, parameters):
-#     sig = signature(operation)
-
-#     count = 0
-#     for parameter in sig.parameters:
-#         if (
-#             sig.parameters[parameter].annotation in [int, str, float, bool]
-#             and len(parameters) > count
-#         ):
-#             parameters[count].label = parameter
-#             parameters[count].text = parameter
-#             count += 1
-#     for i in range(count, len(parameters)):
-#         parameters[i].label = ""
-#         parameters[i].text = ""
-
-
 @logger.catch
 def call_op(
     op_name: str, inputs: Sequence[Layer], *args
@@ -140,4 +122,33 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui:
 
     gui_function.__name__ = f'do_{category.name.lower().replace(" ", "_")}'
     gui_function.__signature__ = Signature(params)
-    return magicgui(gui_function, call_button=False)
+
+    widget = magicgui(gui_function, call_button=False)
+    op_name_widget = getattr(widget, OP_NAME_PARAM)
+
+    @op_name_widget.changed.connect
+    def update_positional_labels(*_):
+        new_sig = signature(cle.operation(op_name_widget.value))
+        # get the names of positional parameters in the new operation
+        param_names = [
+            name
+            for name, param in new_sig.parameters.items()
+            if param.annotation in {int, str, float, bool}
+        ]
+
+        # update the labels of each positional-arg subwidget
+        # or, if there are too many, hide them
+        n_params = len(param_names)
+        for n, arg in enumerate(category.args):
+            wdg = getattr(widget, arg[0])
+            if n < n_params:
+                wdg.label = param_names[n]
+                wdg.text = param_names[n]
+                wdg.show()
+            else:
+                wdg.hide()
+
+    # run it once to update the labels
+    update_positional_labels()
+
+    return widget
