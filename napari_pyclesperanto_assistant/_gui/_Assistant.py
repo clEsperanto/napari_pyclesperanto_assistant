@@ -63,6 +63,8 @@ class Assistant(QWidget):
         if layer in self._layers:
             dw = self._layers[layer][0]
             self.viewer.window.remove_dock_widget(dw)
+            # remove layer from internal list
+            self._layers.pop(layer)
 
     def _on_item_clicked(self, item):
         self._activate(CATEGORIES.get(item.text()))
