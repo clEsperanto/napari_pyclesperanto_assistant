@@ -1,13 +1,13 @@
 # Implementation of napari hooks according to
 # https://napari.org/docs/dev/plugins/for_plugin_developers.html#plugins-hook-spec
-
-from napari_plugin_engine import napari_hook_implementation
+from functools import partial
 from pathlib import Path
 
-from ._gui import Assistant
-from functools import partial
-from ._gui._category_widget import make_gui_for_category
+from napari_plugin_engine import napari_hook_implementation
+
 from ._categories import CATEGORIES
+from ._gui import Assistant
+from ._gui._category_widget import make_gui_for_category
 
 
 @napari_hook_implementation
