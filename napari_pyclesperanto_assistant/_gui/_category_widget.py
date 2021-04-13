@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from inspect import Parameter, Signature, signature
-from typing import TYPE_CHECKING, Sequence, Tuple
+from typing import Optional, TYPE_CHECKING, Sequence
 
 import pyclesperanto_prototype as cle
 from loguru import logger
@@ -12,6 +12,7 @@ from .._categories import Category
 
 if TYPE_CHECKING:
     from napari.layers import Layer
+    from napari import Viewer
 
 VIEWER_PARAM = "viewer"
 OP_NAME_PARAM = "op_name"
@@ -24,31 +25,79 @@ def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
 
 
 @logger.catch
-def call_op(
-    op_name: str, inputs: Sequence[Layer], *args
-) -> Tuple[cle.Image, Tuple[float, float]]:
+def call_op(op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
+    """Call cle operation `op_name` with specified inputs and args.
+
+    Takes care of transfering data to GPU and omitting extra positional args
+
+    Parameters
+    ----------
+    op_name : str
+        name of operation to execute.  (must be valid for `cle.operation`)
+    inputs : Sequence[Layer]
+        The napari layer inputs
+
+    Returns
+    -------
+    cle.Image
+        The result (still on the GPU)
+    """
+
     if not inputs or inputs[0] is None:
         return
-    # transfer to gpu
+
+    # transfer data to gpu
     i0 = inputs[0].data
     gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
     gpu_out = cle.create_like(gpu_ins[0])
-    # get cle function
+
+    # call actual cle function ignoring extra positional args
     cle_function = cle.operation(op_name)  # couldn't this just be getattr(cle, ...)?
-    # call function ignoring extra positional args
     nargs = num_positional_args(cle_function)
     logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
     args = ((*gpu_ins, gpu_out) + args)[:nargs]
     cle_function(*args)
+
     # return output
     return gpu_out
 
 
 def _show_result(
-    gpu_out, viewer, name: str, layer_type: str, op_id: int, translate=None, cmap=None
-):
+    gpu_out: cle.Image,
+    viewer: Viewer,
+    name: str,
+    layer_type: str,
+    op_id: int,
+    translate=None,
+    cmap=None,
+) -> Optional[Layer]:
+    """Show `gpu_out` in the napari viewer.
+
+    Parameters
+    ----------
+    gpu_out : cle.Image
+        a cle.Image to show
+    viewer : napari.Viewer
+        The napari viewer instance
+    name : str
+        The name of the layer to create or update.
+    layer_type : str
+        the layer type to create (must be 'labels' or 'image)
+    op_id : int
+        an ID to associate with the newly created layer (will be added to
+        layer.metada['op_id'])
+    translate : [type], optional
+        translate parameter for layer creation, by default None
+    cmap : str, optional
+        a colormap to use for images, by default None
+
+    Returns
+    -------
+    layer : Optional[Layer]
+        The created/udpated layer, or None if no viewer is present.
+    """
     if not viewer:
-        print("NO VIEWER")
+        logger.warning("no viewer, cannot add image")
         return
     # show result in napari
     clims = [cle.minimum_of_all_pixels(gpu_out), cle.maximum_of_all_pixels(gpu_out)]
@@ -60,6 +109,7 @@ def _show_result(
     if layer_type == "labels":
         data = data.astype(int)
     try:
+        # look for an existing layer
         layer = next(x for x in viewer.layers if x.metadata.get(OP_ID) == op_id)
         logger.debug(f"updating existing layer: {layer}, with id: {op_id}")
         layer.data = data
@@ -67,6 +117,7 @@ def _show_result(
         layer.contrast_limits = clims
         # layer.translate = translate
     except StopIteration:
+        # otherwise create a new one
         logger.debug(f"creating new layer for id: {op_id}")
         add_layer = getattr(viewer, f"add_{layer_type}")
         kwargs = dict(name=name, metadata={OP_ID: op_id})
@@ -76,36 +127,56 @@ def _show_result(
     return layer
 
 
-def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui:
+def _generate_signature_for_category(category: Category) -> Signature:
+    """Create an inspect.Signature object representing a cle Category.
 
+    The output of this function can be used to set function.__signature__ so that
+    magicgui can convert it into the appropriate widget.
+    """
     k = Parameter.KEYWORD_ONLY
 
-    # add inputs
-    params = []
-    for n, t in enumerate(category.inputs):
-        params.append(Parameter(name=f"input{n}", kind=k, annotation=t))
-
-    # get valid operations choices
+    # add inputs (we name them inputN ...)
+    params = [
+        Parameter(f"input{n}", k, annotation=t) for n, t in enumerate(category.inputs)
+    ]
+    # Add valid operations choices (will create the combo box)
     choices = list(cle.operations(category.include, category.exclude))
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
     params.append(
-        Parameter(
-            name=OP_NAME_PARAM, kind=k, annotation=op_type, default=category.default_op
-        )
+        Parameter(OP_NAME_PARAM, k, annotation=op_type, default=category.default_op)
     )
-
-    # add args
+    # add the args that will be passed to the cle operation.
     for name, type_, default in category.args:
-        params.append(Parameter(name=name, kind=k, annotation=type_, default=default))
+        params.append(Parameter(name, k, annotation=type_, default=default))
 
-    # add a viewer
+    # add a viewer.  This allows our widget to know if it's in a viewer
     params.append(
-        Parameter(
-            name=VIEWER_PARAM, kind=k, annotation="napari.viewer.Viewer", default=None
-        )
+        Parameter(VIEWER_PARAM, k, annotation="napari.viewer.Viewer", default=None)
     )
+    return Signature(params)
 
-    def gui_function(**kwargs):
+
+def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[Layer]:
+    """Generate a magicgui widget for a Category object
+
+    Parameters
+    ----------
+    category : Category
+        An instance of a _categories.Category. (holds information about the cle operations,
+        input types, and arguments that the widget needs to represent.)
+
+    Returns
+    -------
+    magicgui.widgets.FunctionGui
+        A magicgui widget instance
+    """
+
+    def gui_function(**kwargs) -> Optional[Layer]:
+        """A function that calls a cle operation `call_op` and shows the result.
+
+        This is the function that will be called by our magicgui widget.
+        We modify it's __signature__ below.
+        """
         viewer = kwargs.pop(VIEWER_PARAM, None)
         inputs = [kwargs.pop(k) for k in list(kwargs) if k.startswith("input")]
         op_name = kwargs.pop("op_name")
@@ -121,9 +192,13 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui:
         return None
 
     gui_function.__name__ = f'do_{category.name.lower().replace(" ", "_")}'
-    gui_function.__signature__ = Signature(params)
+    gui_function.__signature__ = _generate_signature_for_category(category)
 
+    # create the widget
     widget = magicgui(gui_function, auto_call=True)
+
+    # when the operation name changes, we want to update the argument labels
+    # to be appropriate for the corresponding cle operation.
     op_name_widget = getattr(widget, OP_NAME_PARAM)
 
     @op_name_widget.changed.connect
