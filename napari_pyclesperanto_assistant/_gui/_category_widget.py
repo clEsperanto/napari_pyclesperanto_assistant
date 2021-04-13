@@ -13,6 +13,10 @@ from .._categories import Category
 if TYPE_CHECKING:
     from napari.layers import Layer
 
+VIEWER_PARAM = "viewer"
+OP_NAME_PARAM = "op_name"
+OP_ID = "op_id"
+
 
 def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
     params = signature(func).parameters
@@ -74,7 +78,7 @@ def _show_result(
     if layer_type == "labels":
         data = data.astype(int)
     try:
-        layer = next(x for x in viewer.layers if x.metadata.get("op_id") == op_id)
+        layer = next(x for x in viewer.layers if x.metadata.get(OP_ID) == op_id)
         logger.debug(f"updating existing layer: {layer}, with id: {op_id}")
         layer.data = data
         layer.name = name
@@ -83,7 +87,7 @@ def _show_result(
     except StopIteration:
         logger.debug(f"creating new layer for id: {op_id}")
         add_layer = getattr(viewer, f"add_{layer_type}")
-        kwargs = dict(name=name, metadata={"op_id": op_id})
+        kwargs = dict(name=name, metadata={OP_ID: op_id})
         if layer_type == "image":
             kwargs["colormap"] = cmap
         layer = add_layer(data, **kwargs)
@@ -104,7 +108,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui:
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
     params.append(
         Parameter(
-            name="op_name", kind=k, annotation=op_type, default=category.default_op
+            name=OP_NAME_PARAM, kind=k, annotation=op_type, default=category.default_op
         )
     )
 
@@ -115,12 +119,12 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui:
     # add a viewer
     params.append(
         Parameter(
-            name="viewer", kind=k, annotation="napari.viewer.Viewer", default=None
+            name=VIEWER_PARAM, kind=k, annotation="napari.viewer.Viewer", default=None
         )
     )
 
     def gui_function(**kwargs):
-        viewer = kwargs.pop("viewer", None)
+        viewer = kwargs.pop(VIEWER_PARAM, None)
         inputs = [kwargs.pop(k) for k in list(kwargs) if k.startswith("input")]
         op_name = kwargs.pop("op_name")
         result = call_op(op_name, inputs, *kwargs.values())

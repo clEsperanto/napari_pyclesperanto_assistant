@@ -1,4 +1,6 @@
 from __future__ import annotations
+from numpy.lib.arraysetops import isin
+import pyclesperanto_prototype as cle
 
 from pathlib import Path
 from typing import Dict, TYPE_CHECKING, Tuple
@@ -7,7 +9,7 @@ from warnings import warn
 from qtpy.QtWidgets import QAction, QFileDialog, QMenu, QVBoxLayout, QWidget
 
 from .._categories import CATEGORIES, Category
-from ._category_widget import make_gui_for_category
+from ._category_widget import make_gui_for_category, OP_ID, VIEWER_PARAM, OP_NAME_PARAM
 from .._export import (
     export_jython_code,
     export_jython_code_to_clipboard,
@@ -94,3 +96,23 @@ class Assistant(QWidget):
     def load_sample_data(self, fname="Lund_000500_resampled-cropped.tif"):
         data_dir = Path(__file__).parent.parent / "data"
         self.viewer.open(str(data_dir / fname))
+
+    def to_dask(self):
+        graph = {}
+        for layer, (dw, mgui) in self._layers.items():
+            key = id(mgui)
+            args = []
+            for w in mgui:
+                if w.name in (VIEWER_PARAM, OP_NAME_PARAM):
+                    continue
+                if 'napari.layers' in type(w.value).__module__:
+                    op_id = w.value.metadata.get(OP_ID)
+                    if op_id is None:
+                        op_id = "some_random_key"
+                        graph[op_id] = (cle.imread, "w.value._source")  # TODO
+                    args.append(op_id)
+                else:
+                    args.append(w.value)
+            op = getattr(cle, getattr(mgui, OP_NAME_PARAM).value)
+            graph[key] = (op, *args)
+        return graph
