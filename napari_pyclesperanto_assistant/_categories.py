@@ -58,6 +58,27 @@ CATEGORIES = {
         include=("combine",),
         exclude=("map",),
     ),
+    "Transform": Category(
+        name="Transform",
+        inputs=(LayerInput,),
+        default_op="sub_stack",
+        output="image",  # can also be labels
+        args=[
+            ("a", OneKFloat, 0),
+            ("b", OneKFloat, 0),
+            ("c", OneKFloat, 0),
+            ("d", bool, False),
+            ("e", bool, False),
+        ],
+        include=("transform",),
+    ),
+    "Projection": Category(
+        name="Projection",
+        inputs=(LayerInput,),
+        default_op="maximum_z_projection",
+        output="image",  # can also be labels
+        include=("projection",),
+    ),
     "Binarize": Category(
         name="Binarize",
         inputs=(LayerInput,),
@@ -108,26 +129,5 @@ CATEGORIES = {
         default_op="draw_mesh_between_touching_labels",
         args=[("n", float, 1)],
         include=("label measurement", "mesh"),
-    ),
-    "Transform": Category(
-        name="Transform",
-        inputs=(LayerInput,),
-        default_op="sub_stack",
-        output="image",  # can also be labels
-        args=[
-            ("a", OneKFloat, 0),
-            ("b", OneKFloat, 0),
-            ("c", OneKFloat, 0),
-            ("d", bool, False),
-            ("e", bool, False),
-        ],
-        include=("transform",),
-    ),
-    "Projection": Category(
-        name="Projection",
-        inputs=(LayerInput,),
-        default_op="maximum_z_projection",
-        output="image",  # can also be labels
-        include=("projection",),
-    ),
+    )
 }
