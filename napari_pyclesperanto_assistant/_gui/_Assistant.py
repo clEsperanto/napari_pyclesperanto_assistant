@@ -20,12 +20,22 @@ if TYPE_CHECKING:
 
 
 class Assistant(QWidget):
-    """This Gui takes a napari as parameter and infiltrates it.
+    """The main cle Assistant widget.
 
-    It adds some buttons for categories of _operations.
+    The widget holds buttons with icons to create widgets for the various
+    cel operation categories.  It tracks which layers are connected to which
+    widgets, and can export the state of the task graph to a dask graph
+    or to jython code.
+
+    Parameters
+    ----------
+    napari_viewer : Viewer
+        This viewer instance will be provided by napari when it gets added
+        as a plugin dock widget.
     """
 
     def __init__(self, napari_viewer: Viewer):
+
         super().__init__(napari_viewer.window.qt_viewer)
         self.viewer = napari_viewer
         napari_viewer.layers.events.removed.connect(self._on_layer_removed)
@@ -73,6 +83,10 @@ class Assistant(QWidget):
 
         # make a new widget
         gui = make_gui_for_category(category)
+        # prevent auto-call when adding to the viewer, to avoid double calls
+        # do this here rather than widget creation for the sake of
+        # non-Assistant-based widgets.
+        gui._auto_call = False
         # get currently active layer (before adding dock widget)
         input_layer = self.viewer.active_layer
         # add gui to the viewer
