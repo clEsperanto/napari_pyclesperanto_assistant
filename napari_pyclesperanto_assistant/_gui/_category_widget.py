@@ -105,9 +105,11 @@ def _show_result(
     if clims[1] == 0:
         clims[1] = 1
 
-    data = cle.pull(gpu_out)
     if layer_type == "labels":
-        data = data.astype(int)
+        data = cle.pull(gpu_out).astype(int)
+    else:
+        data = gpu_out
+
     try:
         # look for an existing layer
         layer = next(x for x in viewer.layers if x.metadata.get(OP_ID) == op_id)
