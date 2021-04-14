@@ -30,7 +30,7 @@ with open(filename) as f:
 setup(
     name="napari_pyclesperanto_assistant",
     version="0.7.6",
-    author="Robert Haase",
+    author="Robert Haase, Talley Lambert",
     author_email="robert.haase@tu-dresden.de",
     description="OpenCL based GPU-accelerated image processing in napari",
     long_description=read("README.md"),
