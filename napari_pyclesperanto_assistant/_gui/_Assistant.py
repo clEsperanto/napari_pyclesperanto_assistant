@@ -115,7 +115,10 @@ class Assistant(QWidget):
         # add gui to the viewer
         dw = self._viewer.window.add_dock_widget(gui, area="right", name=category.name)
         # make sure the originally active layer is the input
-        gui.input0.value = input_layer
+        try:
+            gui.input0.value = input_layer
+        except ValueError:
+            pass # this happens if input0 should be labels but we provide an image
         # call the function widget &
         # track the association between the layer and the gui that generated it
         self._layers[gui()] = (dw, gui)
