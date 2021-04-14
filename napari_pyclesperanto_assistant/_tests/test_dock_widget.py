@@ -1,6 +1,6 @@
 import pytest
 from napari import Viewer
-from napari_pyclesperanto_assistant._categories import CATEGORIES
+from napari_pyclesperanto_assistant._categories import CATEGORIES, LabelsInput
 
 
 @pytest.fixture
@@ -14,5 +14,7 @@ def assistant(qtbot):
 @pytest.mark.parametrize("category", CATEGORIES.values(), ids=lambda c: c.name)
 def test_individual_categories(category, assistant):
     assistant.load_sample_data()
+    if LabelsInput in category.inputs:
+        assistant._activate(CATEGORIES.get("Binarize"))
     assistant._activate(category)
     assistant.to_clipboard()
