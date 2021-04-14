@@ -1,169 +1,159 @@
-import warnings
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING, Dict, Tuple
+from warnings import warn
 
-from qtpy import QtGui
-from qtpy.QtCore import QSize, Qt
-from qtpy.QtGui import QPixmap
-from qtpy.QtWidgets import QWidget, QLabel, QAction, QPushButton, QFileDialog, QGridLayout
+import pyclesperanto_prototype as cle
+from qtpy.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QVBoxLayout, QWidget
 
-from .._gui._LayerDialog import LayerDialog
-from .._scriptgenerators import JythonGenerator, PythonJupyterNotebookGenerator
+from .._categories import CATEGORIES, Category
+from .._pipeline import Pipeline
+from ._button_grid import ButtonGrid
+from ._category_widget import OP_ID, OP_NAME_PARAM, VIEWER_PARAM, make_gui_for_category
+
+
+if TYPE_CHECKING:
+    from magicgui.widgets import FunctionGui
+    from napari._qt.widgets.qt_viewer_dock_widget import QtViewerDockWidget
+    from napari.layers import Layer
+    from napari.viewer import Viewer
+
+from napari import __version__ as napari_version
+from packaging.version import parse as parse_version
+
+npv = parse_version(napari_version)
+NAP048 = (npv.major, npv.minor, npv.micro) >= (0, 4, 8)
+
 
 class Assistant(QWidget):
-    """This Gui takes a napari as parameter and infiltrates it.
+    """The main cle Assistant widget.
 
-    It adds some buttons for categories of _operations.
+    The widget holds buttons with icons to create widgets for the various
+    cel operation categories.  It tracks which layers are connected to which
+    widgets, and can export the state of the task graph to a dask graph
+    or to jython code.
+
+    Parameters
+    ----------
+    napari_viewer : Viewer
+        This viewer instance will be provided by napari when it gets added
+        as a plugin dock widget.
     """
 
-    def __init__(self, napari_viewer):
+    def __init__(self, napari_viewer: Viewer):
+
         super().__init__(napari_viewer.window.qt_viewer)
-
-        self.font = QtGui.QFont('Arial', 8)
-
-        self.viewer = napari_viewer
-
-        self.layout = QGridLayout(self)
-
-        self._init_gui()
-
-    def _init_gui(self):
-        """Switches the GUI internally between a main menu
-        where you can select categories and a sub menu where
-        you can keep results or cancel processing.
-        """
-        # remove all buttons first
-        for i in reversed(range(self.layout.count())):
-            self.layout.itemAt(i).widget().setParent(None)
-
-        from .._operations._operations import StatefulFunctionFactory, magic_denoise, magic_background_removal, \
-            magic_filter, magic_binarize, magic_combine, magic_label, magic_label_processing, magic_map, \
-            magic_mesh, magic_measure, magic_label_measurements, magic_transform, magic_projection
-
-        self.add_button("Noise removal", StatefulFunctionFactory(magic_denoise), 1, 0)
-        self.add_button("Background removal", StatefulFunctionFactory(magic_background_removal), 1, 1)
-        self.add_button("Filter", StatefulFunctionFactory(magic_filter), 1, 2)
-        self.add_button("Combine", StatefulFunctionFactory(magic_combine), 2, 0)
-        self.add_button("Transform", StatefulFunctionFactory(magic_transform), 2, 1)
-        self.add_button("Projection", StatefulFunctionFactory(magic_projection), 2, 2)
-
-        self.add_button("Binarize", StatefulFunctionFactory(magic_binarize), 3, 0)
-        self.add_button("Label", StatefulFunctionFactory(magic_label), 3, 1)
-        self.add_button("Label processing", StatefulFunctionFactory(magic_label_processing), 3, 2)
-        self.add_button("Label measurements", StatefulFunctionFactory(magic_label_measurements), 5, 0)
-        self.add_button("Map", StatefulFunctionFactory(magic_map), 4, 0)
-        self.add_button("Mesh", StatefulFunctionFactory(magic_mesh), 4, 1)
-        self.add_button("Measure", StatefulFunctionFactory(magic_measure), 5, 1)
-
-        # spacer
-        label = QLabel("", self)
-        label.setFont(self.font)
-        self.layout.addWidget(label, 6, 4)
-
-        #self.layout.addStretch()
-
-        self.setLayout(self.layout)
-        #self.setMaximumWidth(300)
-
-        # Add a menu
-        action = QAction('Export Jython/Python code', self.viewer.window._qt_window)
-        action.triggered.connect(self._export_jython_code)
-        self.viewer.window.plugins_menu.addAction(action)
-
-        action = QAction('Export Jython/Python code to clipboard', self.viewer.window._qt_window)
-        action.triggered.connect(self._export_jython_code_to_clipboard)
-        self.viewer.window.plugins_menu.addAction(action)
-
-        action = QAction('Export Jupyter Notebook', self.viewer.window._qt_window)
-        action.triggered.connect(self._export_notebook)
-        self.viewer.window.plugins_menu.addAction(action)
-
-
-        def _on_removed(event):
-            layer = event.value
-            try:
-                layer.metadata['dialog']._removed()
-            except AttributeError:
-                pass
-            except KeyError:
-                pass
-
-        self.viewer.layers.events.removed.connect(_on_removed)
-
-    def add_button(self, title : str, handler, x : int = None, y : int = None):
-        # text
-        btn = QPushButton('', self)
-        btn.setFont(self.font)
-        btn.setFixedSize(QSize(80, 80))
-
-        # icon
-
-        #btn.setStyleSheet("text-align:center;")
-
-        btn.setLayout(QGridLayout(btn))
-
-        icon_label = QLabel(btn)
-        icon_label.setAlignment(Qt.AlignCenter)
-        pixmap = QPixmap()
-        pixmap.load(str(Path(__file__).parent) + "/icons/" + title.lower().replace(" ", "_").replace("(", "").replace(")", "") + ".png")
-        pixmap = pixmap.scaled(QSize(40, 40), Qt.KeepAspectRatio)
-        icon_label.setPixmap(pixmap)
-        btn.layout().addWidget(icon_label)
-
-        text_label = QLabel(title, btn)
-        text_label.setAlignment(Qt.AlignCenter)
-        text_label.setWordWrap(True)
-        text_label.setFont(self.font)
-        btn.layout().addWidget(text_label)
-
-        def trigger():
-            self._activate(handler)
-
-        # action
-        btn.clicked.connect(trigger)
-        if x is None or y is None:
-            self.layout.addWidget(btn)
+        self._viewer = napari_viewer
+        napari_viewer.layers.events.removed.connect(self._on_layer_removed)
+        if NAP048:
+            napari_viewer.layers.selection.events.changed.connect(self._on_selection)
         else:
-            self.layout.addWidget(btn, x, y)
+            napari_viewer.events.active_layer.connect(self._on_active_layer_change)
+        self._layers: Dict[Layer, Tuple[QtViewerDockWidget, FunctionGui]] = {}
 
-    def _activate(self, magicgui):
-        if self.viewer.active_layer is None:
-            warnings.warn("Select a layer first!")
-            return
-        LayerDialog(self.viewer, magicgui)
+        icon_grid = ButtonGrid(self)
+        icon_grid.addItems(CATEGORIES)
+        icon_grid.itemClicked.connect(self._on_item_clicked)
 
-    def _export_jython_code(self):
-        generator = JythonGenerator(self.viewer.layers)
-        code = generator.generate()
-        self._save_code(code, default_fileending=generator.file_ending())
+        export_btns = QHBoxLayout()
+        # create menu
+        actions = [
+            ("Export Python", self.to_jython),
+            ("Copy to clipboard", self.to_clipboard),
+        ]
+        for name, cb in actions:
+            btn = QPushButton(name, self)
+            btn.clicked.connect(cb)
+            export_btns.addWidget(btn)
 
-    def _export_jython_code_to_clipboard(self):
-        generator = JythonGenerator(self.viewer.layers)
-        code = generator.generate()
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(icon_grid)
+        self.layout().addLayout(export_btns)
+
+    def _on_selection(self, event):
+        for layer, (dw, gui) in self._layers.items():
+            if layer in self._viewer.layers.selection:
+                dw.show()
+            else:
+                dw.hide()
+
+    def _on_active_layer_change(self, event):
+        for layer, (dw, gui) in self._layers.items():
+            dw.show() if event.value is layer else dw.hide()
+
+    def _on_layer_removed(self, event):
+        layer = event.value
+        if layer in self._layers:
+            dw = self._layers[layer][0]
+            self._viewer.window.remove_dock_widget(dw)
+            # remove layer from internal list
+            self._layers.pop(layer)
+
+    def _on_item_clicked(self, item):
+        self._activate(CATEGORIES.get(item.text()))
+
+    def _get_active_layer(self):
+        if NAP048:
+            return self._viewer.layers.selection.active
+        else:
+            return self._viewer.active_layer
+
+    def _activate(self, category: Category):
+        # get currently active layer (before adding dock widget)
+        input_layer = self._get_active_layer()
+        if not input_layer:
+            warn("Please select a layer first")
+            return False
+
+        # make a new widget
+        gui = make_gui_for_category(category)
+        # prevent auto-call when adding to the viewer, to avoid double calls
+        # do this here rather than widget creation for the sake of
+        # non-Assistant-based widgets.
+        gui._auto_call = False
+        # add gui to the viewer
+        dw = self._viewer.window.add_dock_widget(gui, area="right", name=category.name)
+        # make sure the originally active layer is the input
+        gui.input0.value = input_layer
+        # call the function widget &
+        # track the association between the layer and the gui that generated it
+        self._layers[gui()] = (dw, gui)
+        # turn on auto_call, and make sure that if the input changes we update
+        gui._auto_call = True
+        # TODO: if the input layer changes this needs to be disconnected
+        input_layer.events.data.connect(lambda x: gui())
+
+    def load_sample_data(self, fname="Lund_000500_resampled-cropped.tif"):
+        data_dir = Path(__file__).parent.parent / "data"
+        self._viewer.open(str(data_dir / fname))
+
+    def to_dask(self):
+        graph = {}
+        for layer, (dw, mgui) in self._layers.items():
+            key = id(mgui)
+            args = []
+            for w in mgui:
+                if w.name in (VIEWER_PARAM, OP_NAME_PARAM):
+                    continue
+                if "napari.layers" in type(w.value).__module__:
+                    op_id = w.value.metadata.get(OP_ID)
+                    if op_id is None:
+                        op_id = "some_random_key"
+                        graph[op_id] = (cle.imread, "w.value._source")  # TODO
+                    args.append(op_id)
+                else:
+                    args.append(w.value)
+            op = getattr(cle, getattr(mgui, OP_NAME_PARAM).value)
+            graph[key] = (op, *args)
+        return graph
+
+    def to_jython(self, filename=None):
+        if not filename:
+            filename, _ = QFileDialog.getSaveFileName(self, "Save code as...", ".")
+        return Pipeline.from_assistant(self).to_jython(filename)
+
+    def to_clipboard(self):
         import pyperclip
-        pyperclip.copy(code)
 
-    def _export_notebook(self, filename=None):
-        generator = PythonJupyterNotebookGenerator(self.viewer.layers)
-        code = generator.generate()
-        if filename is None:
-            filename = self._save_code(code, default_fileending=generator.file_ending())
-        if filename is not None:
-            import os
-            os.system('jupyter nbconvert --to notebook --inplace --execute ' + filename)
-            # os.system('jupyter notebook ' + filename) # todo: this line freezes napari
-
-    def _save_code(self, code, default_fileending = "*.*", filename = None):
-        if filename is None:
-            filename = QFileDialog.getSaveFileName(self, 'Save code as...', '.', default_fileending)
-        if filename[0] == '':
-            return None
-
-        filename = filename[0]
-        if not filename.endswith(default_fileending):
-            filename = filename + default_fileending
-
-        file = open(filename, "w+")
-        file.write(code)
-        file.close()
-
-        return filename
+        pyperclip.copy(Pipeline.from_assistant(self).to_jython())
