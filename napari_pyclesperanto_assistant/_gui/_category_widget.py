@@ -140,7 +140,7 @@ def _generate_signature_for_category(category: Category) -> Signature:
         Parameter(f"input{n}", k, annotation=t) for n, t in enumerate(category.inputs)
     ]
     # Add valid operations choices (will create the combo box)
-    choices = list(cle.operations(category.include, category.exclude))
+    choices = list(cle.operations(['in assistant'] + list(category.include), category.exclude))
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
     params.append(
         Parameter(OP_NAME_PARAM, k, annotation=op_type, default=category.default_op)
