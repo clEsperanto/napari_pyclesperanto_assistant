@@ -132,10 +132,20 @@ class Assistant(QWidget):
         data_dir = Path(__file__).parent.parent / "data"
         self._viewer.open(str(data_dir / fname))
 
+    def _id_to_name(self, id, dict):
+        if id not in dict.keys():
+            new_name = "image" + str(len(dict.keys()))
+            dict[id] = new_name
+        return dict[id]
+
     def to_dask(self):
         graph = {}
+        name_dict = {}
         for layer, (dw, mgui) in self._layers.items():
-            key = id(mgui)
+            key = layer.metadata.get(OP_ID)
+            if not key:
+                key = "some_random_key"
+                
             args = []
             for w in mgui:
                 if w.name in (VIEWER_PARAM, OP_NAME_PARAM):
@@ -144,12 +154,19 @@ class Assistant(QWidget):
                     op_id = w.value.metadata.get(OP_ID)
                     if op_id is None:
                         op_id = "some_random_key"
-                        graph[op_id] = (cle.imread, "w.value._source")  # TODO
-                    args.append(op_id)
+                        graph[self._id_to_name(op_id, name_dict)] = (cle.imread, "w.value._source")  # TODO
+                    args.append(self._id_to_name(op_id, name_dict))
                 else:
                     args.append(w.value)
             op = getattr(cle, getattr(mgui, OP_NAME_PARAM).value)
-            graph[key] = (op, *args)
+            # todo: shorten args array here
+            graph[self._id_to_name(key, name_dict)] = (op, *args)
+
+        for k in name_dict:
+            print(k, ":", name_dict.get(k))
+
+        print(graph)
+
         return graph
 
     def to_jython(self, filename=None):

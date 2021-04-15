@@ -37,10 +37,10 @@ class JythonGenerator:
 
     @staticmethod
     def operate(step, n) -> str:
-        args = tuple(map(repr, step.args))
-        if step.input:
-            args = (f"image{n-1}", f"cle.create_like(image{n-1})") + args
-        return f"image{n} = cle.{step.operation}({', '.join(map(str, args))})"
+        args = list(map(repr, step.args))
+        if len(step.inputs) > 0:
+            args = step.inputs + list(f"cle.create_like({step.inputs[0]})") + args
+        return f"{step.output} = cle.{step.operation}({', '.join(map(str, args))})"
 
     @staticmethod
     def show(step, n):
@@ -79,10 +79,10 @@ class NotebookGenerator:
 class Step:
     operation: str
     args: Sequence[Any] = field(default_factory=tuple)  # kwargs might be better
-    input: Optional[int] = None
+    inputs: Sequence[str] = field(default_factory=list)
+    output: str = "image"
     is_labels: bool = False
     clims: Optional[Tuple[float, float]] = None
-
 
 @dataclass
 class Pipeline:
@@ -149,15 +149,14 @@ class Pipeline:
     @classmethod
     def from_dask(cls, graph):
         import dask
-
         steps = []
         for key in dask.order.order(graph):
             op, *args = graph[key]
-            input = None
+            inputs = []
             for i, a in enumerate(args):
                 if a in graph:
-                    input = args.pop(i)
-            steps.append(Step(operation=op.__name__, input=input, args=args))
+                    inputs.append(args.pop(i))
+            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key))
         return cls(steps=steps)
 
 
