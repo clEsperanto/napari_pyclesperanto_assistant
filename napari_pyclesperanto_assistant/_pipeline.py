@@ -79,7 +79,6 @@ class NotebookGenerator:
 class Step:
     operation: str
     args: Sequence[Any] = field(default_factory=tuple)  # kwargs might be better
-    inputs: Sequence[str] = field(default_factory=list)
     output: str = "image"
     is_labels: bool = False
     clims: Optional[Tuple[float, float]] = None
@@ -151,9 +150,7 @@ class Pipeline:
         steps = []
         for key in graph.keys(): # Robert observed that this didn't work: dask.order.order(graph):
             op, *args = graph[key]
-            inputs = []
-
-            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key))
+            steps.append(Step(operation=op.__name__, args=args, output=key))
         return cls(steps=steps)
 
 
