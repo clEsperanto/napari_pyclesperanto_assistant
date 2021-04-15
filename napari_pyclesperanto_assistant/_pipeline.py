@@ -24,10 +24,16 @@ class JythonGenerator:
         Generator (P) version: {__version__}
         """
 
-        import pyclesperanto_prototype as cle
-
         '''
         )
+
+    @staticmethod
+    def imports():
+        return "import pyclesperanto_prototype as cle"
+
+    @staticmethod
+    def subheader(step, n):
+        return f"# {step.operation}"
 
     @staticmethod
     def operate(step, n) -> str:
@@ -43,6 +49,30 @@ class JythonGenerator:
         if step.clims:
             show_args.extend(map(str, step.clims))
         return f"cle.imshow({', '.join(show_args)})"
+
+# collect notebook cells
+from nbformat.v4 import new_code_cell
+from nbformat.v4 import new_markdown_cell
+class NotebookGenerator:
+    @staticmethod
+    def header():
+        return new_markdown_cell(JythonGenerator.header())
+
+    @staticmethod
+    def imports():
+        return new_code_cell(JythonGenerator.imports())
+
+    @staticmethod
+    def subheader(step, n):
+        return new_markdown_cell(JythonGenerator.subheader(step, n))
+
+    @staticmethod
+    def operate(step, n) -> str:
+        return new_code_cell(JythonGenerator.operate(step, n))
+
+    @staticmethod
+    def show(step, n):
+        return new_code_cell(JythonGenerator.show(step, n))
 
 
 @dataclass
@@ -61,11 +91,13 @@ class Pipeline:
 
     def _generate(self, vistor):
         yield vistor.header()
+        yield vistor.imports()
         for n, step in enumerate(self.steps):
+            yield vistor.subheader(step, n)
             yield vistor.operate(step, n)
             if self.show:
                 yield vistor.show(step, n)
-            yield ""  # newline
+            #yield ""  # newline
 
     def to_jython(self, filename=None):
         code = "\n".join(self._generate(JythonGenerator))
@@ -73,18 +105,11 @@ class Pipeline:
             Path(filename).write_text(code)
         return code
 
-    def to_notebook(self, filename):
-        # collect notebook cells
-        from nbformat.v4 import new_code_cell
-        from nbformat.v4 import new_markdown_cell
-        vistor = JythonGenerator
-
+    def to_notebook(self, filename=None):
+        # Todo: I assume there is a better way of doing the following 3 lines
         cells = []
-        for n, step in enumerate(self.steps):
-            cells.append(new_markdown_cell("# " + step.operation))
-            cells.append(new_code_cell(vistor.operate(step, n)))
-            if self.show:
-                cells.append(new_code_cell(vistor.show(step, n)))
+        for i in self._generate(NotebookGenerator):
+            cells.append(i)
 
         # build notebook
         from nbformat import NotebookNode
@@ -94,22 +119,25 @@ class Pipeline:
         nb["nbformat"] = 4
         nb["nbformat_minor"] = 5
 
-        # write notebook to disc
-        from nbformat import write
-        write(nb, filename)
+        if filename:
+            # write notebook to disc
+            from nbformat import write
+            write(nb, filename)
 
-        # Execute notebook
-        from nbconvert.preprocessors import ExecutePreprocessor
-        from nbclient.exceptions import CellExecutionError
-        ep = ExecutePreprocessor(timeout=600, kernel_name="python3")
-        try:
-            ep.preprocess(nb, {"metadata": {"path": "."}})
-        except CellExecutionError:
-            warnings.warn("Notebook execution failed. See the notebook file for details.")
-            return
+            # Execute notebook
+            from nbconvert.preprocessors import ExecutePreprocessor
+            from nbclient.exceptions import CellExecutionError
+            ep = ExecutePreprocessor(timeout=600, kernel_name="python3")
+            try:
+                ep.preprocess(nb, {"metadata": {"path": "."}})
+            except CellExecutionError:
+                warnings.warn("Notebook execution failed. See the notebook file for details.")
+                return
 
-        # write executed notebook to disc
-        write(nb, filename)
+            # write executed notebook to disc
+            write(nb, filename)
+
+        return nb
 
     def __str__(self):
         return self.to_jython()
