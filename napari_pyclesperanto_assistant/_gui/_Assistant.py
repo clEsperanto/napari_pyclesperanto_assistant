@@ -60,6 +60,7 @@ class Assistant(QWidget):
         # create menu
         actions = [
             ("Export Python", self.to_jython),
+            ("Export Notebook", self.to_notebook),
             ("Copy to clipboard", self.to_clipboard),
         ]
         for name, cb in actions:
@@ -153,8 +154,13 @@ class Assistant(QWidget):
 
     def to_jython(self, filename=None):
         if not filename:
-            filename, _ = QFileDialog.getSaveFileName(self, "Save code as...", ".")
+            filename, _ = QFileDialog.getSaveFileName(self, "Save code as...", ".", "*.py")
         return Pipeline.from_assistant(self).to_jython(filename)
+
+    def to_notebook(self, filename=None):
+        if not filename:
+            filename, _ = QFileDialog.getSaveFileName(self, "Save code as notebook...", ".", "*.ipynb")
+        return Pipeline.from_assistant(self).to_notebook(filename)
 
     def to_clipboard(self):
         import pyperclip

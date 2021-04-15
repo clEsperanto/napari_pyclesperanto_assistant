@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Optional, Sequence, Tuple
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -71,6 +72,44 @@ class Pipeline:
         if filename:
             Path(filename).write_text(code)
         return code
+
+    def to_notebook(self, filename):
+        # collect notebook cells
+        from nbformat.v4 import new_code_cell
+        from nbformat.v4 import new_markdown_cell
+        vistor = JythonGenerator
+
+        cells = []
+        for n, step in enumerate(self.steps):
+            cells.append(new_markdown_cell("# " + step.operation))
+            cells.append(new_code_cell(vistor.operate(step, n)))
+            if self.show:
+                cells.append(new_code_cell(vistor.show(step, n)))
+
+        # build notebook
+        from nbformat import NotebookNode
+        nb = NotebookNode()
+        nb["cells"] = cells
+        nb["metadata"] = {}
+        nb["nbformat"] = 4
+        nb["nbformat_minor"] = 5
+
+        # write notebook to disc
+        from nbformat import write
+        write(nb, filename)
+
+        # Execute notebook
+        from nbconvert.preprocessors import ExecutePreprocessor
+        from nbclient.exceptions import CellExecutionError
+        ep = ExecutePreprocessor(timeout=600, kernel_name="python3")
+        try:
+            ep.preprocess(nb, {"metadata": {"path": "."}})
+        except CellExecutionError:
+            warnings.warn("Notebook execution failed. See the notebook file for details.")
+            return
+
+        # write executed notebook to disc
+        write(nb, filename)
 
     def __str__(self):
         return self.to_jython()
