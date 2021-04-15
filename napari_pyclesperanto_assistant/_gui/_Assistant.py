@@ -168,11 +168,6 @@ class Assistant(QWidget):
 
             graph[self._id_to_name(key, name_dict)] = (op, *args)
 
-        for k in name_dict:
-            print(k, ":", name_dict.get(k))
-
-        print(graph)
-
         return graph
 
     def to_jython(self, filename=None):

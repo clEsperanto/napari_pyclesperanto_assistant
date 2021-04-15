@@ -37,14 +37,9 @@ class JythonGenerator:
 
     @staticmethod
     def operate(step, n) -> str:
-        args = step.args # list(map(repr, step.args))
-        # if len(step.inputs) > 0:
-        # args = step.inputs + [f"cle.create_like({step.inputs[0]})"] + args
-        if args:
-            from napari_pyclesperanto_assistant._gui._category_widget import OUTPUT_PLACEHOLDER
-            args = [f"cle.create_like({step.args[0]})" if x == OUTPUT_PLACEHOLDER else x for x in args]
-
-        print("ARGS: ", args)
+        args = step.args
+        from napari_pyclesperanto_assistant._gui._category_widget import OUTPUT_PLACEHOLDER
+        args = [f"cle.create_like({step.args[0]})" if x == OUTPUT_PLACEHOLDER else x for x in args]
 
         return f"{step.output} = cle.{step.operation}({', '.join(map(str, args))})"
 
@@ -56,7 +51,6 @@ class JythonGenerator:
             show_args.extend(map(str, step.clims))
         return f"cle.imshow({', '.join(show_args)})"
 
-# collect notebook cells
 from nbformat.v4 import new_code_cell
 from nbformat.v4 import new_markdown_cell
 class NotebookGenerator:
@@ -103,7 +97,6 @@ class Pipeline:
             yield vistor.operate(step, n)
             if self.show:
                 yield vistor.show(step, n)
-            #yield ""  # newline
 
     def to_jython(self, filename=None):
         code = "\n".join(self._generate(JythonGenerator))
