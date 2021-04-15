@@ -33,13 +33,19 @@ class JythonGenerator:
 
     @staticmethod
     def subheader(step, n):
-        return f"# {step.operation}"
+        return f"\n# {step.operation}"
 
     @staticmethod
     def operate(step, n) -> str:
-        args = list(map(repr, step.args))
-        if len(step.inputs) > 0:
-            args = step.inputs + list(f"cle.create_like({step.inputs[0]})") + args
+        args = step.args # list(map(repr, step.args))
+        # if len(step.inputs) > 0:
+        # args = step.inputs + [f"cle.create_like({step.inputs[0]})"] + args
+        if args:
+            from napari_pyclesperanto_assistant._gui._category_widget import OUTPUT_PLACEHOLDER
+            args = [f"cle.create_like({step.args[0]})" if x == OUTPUT_PLACEHOLDER else x for x in args]
+
+        print("ARGS: ", args)
+
         return f"{step.output} = cle.{step.operation}({', '.join(map(str, args))})"
 
     @staticmethod
@@ -150,12 +156,10 @@ class Pipeline:
     def from_dask(cls, graph):
         import dask
         steps = []
-        for key in dask.order.order(graph):
+        for key in graph.keys(): # Robert observed that this didn't work: dask.order.order(graph):
             op, *args = graph[key]
             inputs = []
-            for i, a in enumerate(args):
-                if a in graph:
-                    inputs.append(args.pop(i))
+
             steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key))
         return cls(steps=steps)
 

@@ -10,8 +10,8 @@ from qtpy.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QVBoxLayout, Q
 from .._categories import CATEGORIES, Category
 from .._pipeline import Pipeline
 from ._button_grid import ButtonGrid
-from ._category_widget import OP_ID, OP_NAME_PARAM, VIEWER_PARAM, make_gui_for_category
-
+from ._category_widget import OP_ID, OP_NAME_PARAM, VIEWER_PARAM, make_gui_for_category, num_positional_args, \
+    OUTPUT_PLACEHOLDER
 
 if TYPE_CHECKING:
     from magicgui.widgets import FunctionGui
@@ -145,10 +145,11 @@ class Assistant(QWidget):
             key = layer.metadata.get(OP_ID)
             if not key:
                 key = "some_random_key"
-                
+
             args = []
             for w in mgui:
                 if w.name in (VIEWER_PARAM, OP_NAME_PARAM):
+                    args.append(OUTPUT_PLACEHOLDER)
                     continue
                 if "napari.layers" in type(w.value).__module__:
                     op_id = w.value.metadata.get(OP_ID)
@@ -159,7 +160,12 @@ class Assistant(QWidget):
                 else:
                     args.append(w.value)
             op = getattr(cle, getattr(mgui, OP_NAME_PARAM).value)
-            # todo: shorten args array here
+
+            # shorten args by eliminating not-used ones
+            if op:
+                nargs = num_positional_args(op)
+                args = args[:nargs]
+
             graph[self._id_to_name(key, name_dict)] = (op, *args)
 
         for k in name_dict:

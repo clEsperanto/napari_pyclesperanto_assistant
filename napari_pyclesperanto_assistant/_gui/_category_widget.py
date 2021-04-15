@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 VIEWER_PARAM = "viewer"
 OP_NAME_PARAM = "op_name"
 OP_ID = "op_id"
+OUTPUT_PLACEHOLDER = "output_placeholder"
 
 
 def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
