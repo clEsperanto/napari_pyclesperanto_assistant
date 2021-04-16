@@ -62,6 +62,7 @@ class Assistant(QWidget):
             ("Export Python", self.to_jython),
             ("Export Notebook", self.to_notebook),
             ("Copy to clipboard", self.to_clipboard),
+            ("Make napari plugin", self.to_napari_plugin),
         ]
         for name, cb in actions:
             btn = QPushButton(name, self)
@@ -184,3 +185,55 @@ class Assistant(QWidget):
         import pyperclip
 
         pyperclip.copy(Pipeline.from_assistant(self).to_jython())
+
+    def to_napari_plugin(self):
+        pipeline = Pipeline.from_assistant(self)
+        code = pipeline.to_jython()
+
+        code = code.replace("cle.imread(w.value._source)", "data")
+
+        code = "\n" + code + "\nreturn " + pipeline.steps[-1].output
+
+        code = code.replace("\n", "\n    ")
+
+        gui = make_plugin(python_code=code)
+        #gui.code.bind(code)
+        #self._viewer.window.add_dock_widget(gui)
+
+from magicgui import magicgui
+
+def make_plugin(
+        full_name:str = "Developer Name",
+        email:str = "email@domain.com",
+        github_username:str = "githubname",
+        plugin_name:str = "napari_clesperanto_plugin",
+        short_description:str = "description",
+        license:str = "BSD-3",
+        python_parameters:str = "value:int=1",
+        python_code:str = "data > value"
+):
+    from cookiecutter.main import cookiecutter
+
+    cookiecutter(
+        'https://github.com/haesleinhuepf/cookiecutter-napari-plugin',
+        no_input=True,
+        extra_context={
+            "full_name": full_name,
+            "email": email,
+            "github_username": github_username,
+            "plugin_name": plugin_name,
+            "module_name": plugin_name,
+            "short_description": short_description,
+            "include_reader_plugin": "n",
+            "include_writer_plugin": "n",
+            "include_dock_widget_plugin": "n",
+            "include_function_plugin": "y",
+            "docs_tool": "none",
+            "license": license,
+            "python_parameters": python_parameters,
+            "python_code": python_code,
+        }
+    )
+
+    import os
+    os.system("pip install -e ./" + plugin_name)
