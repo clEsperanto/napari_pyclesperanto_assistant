@@ -195,6 +195,7 @@ class Assistant(QWidget):
         code = "\n" + code + "\nreturn " + pipeline.steps[-1].output
 
         code = code.replace("\n", "\n    ")
+        code = code.replace("cle.imshow", "#cle.imshow")
 
         gui = make_plugin(python_code=code)
         #gui.code.bind(code)
