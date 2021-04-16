@@ -7,3 +7,6 @@ pyclesperanto_prototype==0.7.6
 magicgui
 numpy!=1.19.4
 pyperclip
+nbformat
+cookiecutter
+loguru
