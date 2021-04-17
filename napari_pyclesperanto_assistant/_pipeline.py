@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Optional, Sequence, Tuple
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -10,23 +11,32 @@ class JythonGenerator:
         from textwrap import dedent
 
         return dedent(
-            f'''
+            f"""
+        # To make this script run in cpython, install pyclesperanto_prototype:
+        #
+        # ```
+        # pip install pyclesperanto_prototype
+        # ```
+        # Read more: https://clesperanto.net
+        #
+        # To make this script run in Fiji, please activate the clij, clij2 and
+        # clijx-assistant update sites in your Fiji.
+        #
+        # Read more: https://clij.github.io/assistant
+        #
+        # Generator (P) version: {__version__}
+        #
         """
-        To make this script run in cpython, install pyclesperanto_prototype:
-        pip install pyclesperanto_prototype
-        Read more: https://clesperanto.net
+        ).strip()
 
-        To make this script run in Fiji, please activate the clij,
-        clij2 and clijx-assistant update sites in your Fiji.
+    @staticmethod
+    def imports():
+        return "import pyclesperanto_prototype as cle"
 
-        Read more: https://clij.github.io/assistant
-        Generator (P) version: {__version__}
-        """
-
-        import pyclesperanto_prototype as cle
-
-        '''
-        )
+    @staticmethod
+    def subheader(step, n):
+        # jupytext will render "# ##" as an h2 header in ipynb
+        return f"# ## {step.operation.replace('_', ' ')}"
 
     @staticmethod
     def operate(step, n) -> str:
@@ -42,6 +52,9 @@ class JythonGenerator:
         if step.clims:
             show_args.extend(map(str, step.clims))
         return f"cle.imshow({', '.join(show_args)})"
+
+    def newline():
+        return ""
 
 
 @dataclass
@@ -60,17 +73,49 @@ class Pipeline:
 
     def _generate(self, vistor):
         yield vistor.header()
+        yield vistor.newline()
+        yield vistor.imports()
+        yield vistor.newline()
+        yield vistor.newline()
         for n, step in enumerate(self.steps):
+            yield vistor.subheader(step, n)
+            yield vistor.newline()
             yield vistor.operate(step, n)
             if self.show:
                 yield vistor.show(step, n)
-            yield ""  # newline
+            yield vistor.newline()
 
     def to_jython(self, filename=None):
         code = "\n".join(self._generate(JythonGenerator))
         if filename:
-            Path(filename).write_text(code)
+            filename = Path(filename).expanduser().resolve()
+            filename.write_text(code)
         return code
+
+    def to_notebook(self, filename=None, execute=False):
+        import jupytext
+
+        # jython code is created in the jupytext light format
+        # https://jupytext.readthedocs.io/en/latest/formats.html#the-light-format
+
+        jt = jupytext.reads(self.to_jython(), fmt="py:light")
+        nb = jupytext.writes(jt, fmt="ipynb")
+        if filename:
+            filename = Path(filename).expanduser().resolve()
+            filename.write_text(nb)
+            # could use a NamedTemporaryFile to run this even without write
+            if execute:
+                from subprocess import Popen
+                from shutil import which
+
+                if not which("jupyter-notebook"):
+                    raise RuntimeError("Cannot find jupyter-notebook executable")
+
+                try:
+                    Popen(["jupyter-notebook", "-y", str(filename)])
+                except Exception as e:
+                    warnings.warn(f"Failed to execute notebook: {e}")
+        return nb
 
     def __str__(self):
         return self.to_jython()
@@ -95,16 +140,12 @@ class Pipeline:
 
 
 if __name__ == "__main__":
-    s0 = Step(operation="imread", args=("Lund_000500",), clims=(125, 680))
+    lund = Path(__file__).parent / "data" / "Lund_000500_resampled-cropped.tif"
+    s0 = Step(operation="imread", args=(str(lund.resolve()),), clims=(125, 680))
     s1 = Step(operation="gaussian_blur", input=s0, args=(1, 1, 0), clims=(0, 657))
     s2 = Step(operation="top_hat_box", input=s1, args=(10, 10, 0), clims=(0, 378))
     s3 = Step(operation="gamma_correction", input=s2, args=(1,), clims=(0, 378))
     s4 = Step(operation="threshold_otsu", input=s3, is_labels=True)
-    s5 = Step(
-        operation="connected_components_labeling_box",
-        input=s3,
-        args=(2,),
-        is_labels=True,
-    )
+    s5 = Step(operation="connected_components_labeling_box", input=s3, is_labels=True)
 
-    print(Pipeline(steps=[s0, s1, s2, s3, s4, s5]))
+    Pipeline(steps=[s0, s1, s2, s3, s4, s5]).to_notebook("~/Desktop/test.ipynb", True)
