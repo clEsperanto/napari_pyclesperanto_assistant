@@ -40,10 +40,8 @@ class JythonGenerator:
 
     @staticmethod
     def operate(step, n) -> str:
-        args = step.args
-        from napari_pyclesperanto_assistant._gui._category_widget import OUTPUT_PLACEHOLDER
-        args = [f"cle.create_like({step.args[0]})" if x == OUTPUT_PLACEHOLDER else x for x in args]
-
+        # TODO: in case of imread, we may do something special here...
+        args = step.inputs + [f"cle.create_like({step.inputs[0]})"] + step.args
         return f"{step.output} = cle.{step.operation}({', '.join(map(str, args))})"
 
     @staticmethod
@@ -62,6 +60,7 @@ class JythonGenerator:
 class Step:
     operation: str
     args: Sequence[Any] = field(default_factory=tuple)  # kwargs might be better
+    inputs: Sequence[Any] = field(default_factory=tuple)
     output: str = "image"
     is_labels: bool = False
     clims: Optional[Tuple[float, float]] = None
@@ -129,8 +128,8 @@ class Pipeline:
         import dask
         steps = []
         for key in dask.order.order(graph):
-            op, *args = graph[key]
-            steps.append(Step(operation=op.__name__, args=args, output=key))
+            op, inputs, args = graph[key]
+            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key))
         return cls(steps=steps)
 
 

@@ -15,8 +15,7 @@ from ._category_widget import (
     OP_NAME_PARAM,
     VIEWER_PARAM,
     make_gui_for_category,
-    num_positional_args,
-    OUTPUT_PLACEHOLDER,
+    num_positional_args
 )
 
 if TYPE_CHECKING:
@@ -153,26 +152,26 @@ class Assistant(QWidget):
                 key = "some_random_key"
 
             args = []
+            inputs = []
             for w in mgui:
                 if w.name in (VIEWER_PARAM, OP_NAME_PARAM):
-                    args.append(OUTPUT_PLACEHOLDER)
                     continue
                 if "napari.layers" in type(w.value).__module__:
                     op_id = w.value.metadata.get(OP_ID)
                     if op_id is None:
                         op_id = "some_random_key"
-                        graph[self._id_to_name(op_id, name_dict)] = (cle.imread, "w.value._source")  # TODO
-                    args.append(self._id_to_name(op_id, name_dict))
+                        graph[self._id_to_name(op_id, name_dict)] = (cle.imread, ["w.value._source"], [])  # TODO
+                    inputs.append(self._id_to_name(op_id, name_dict))
                 else:
                     args.append(w.value)
             op = getattr(cle, getattr(mgui, OP_NAME_PARAM).value)
 
             # shorten args by eliminating not-used ones
             if op:
-                nargs = num_positional_args(op)
+                nargs = num_positional_args(op) - 1 - len(inputs)
                 args = args[:nargs]
 
-            graph[self._id_to_name(key, name_dict)] = (op, *args)
+            graph[self._id_to_name(key, name_dict)] = (op, inputs, args)
 
         return graph
 
