@@ -34,19 +34,18 @@ class JythonGenerator:
         return "import pyclesperanto_prototype as cle"
 
     @staticmethod
-    def subheader(step, n):
+    def subheader(step):
         # jupytext will render "# ##" as an h2 header in ipynb
         return f"# ## {step.operation.replace('_', ' ')}"
 
     @staticmethod
-    def operate(step, n) -> str:
-        args = tuple(map(repr, step.args))
-        if step.input:
-            args = (f"image{n-1}", f"cle.create_like(image{n-1})") + args
-        return f"image{n} = cle.{step.operation}({', '.join(map(str, args))})"
+    def operate(step) -> str:
+        # TODO: in case of imread, we may do something special here...
+        args = step.inputs + [f"cle.create_like({step.inputs[0]})"] + step.args
+        return f"{step.output} = cle.{step.operation}({', '.join(map(str, args))})"
 
     @staticmethod
-    def show(step, n):
+    def show(step):
         title = f"Result of {step.operation.replace('_', ' ')}"
         show_args = [f"image{n}", repr(title), str(step.is_labels)]
         if step.clims:
@@ -61,10 +60,10 @@ class JythonGenerator:
 class Step:
     operation: str
     args: Sequence[Any] = field(default_factory=tuple)  # kwargs might be better
-    input: Optional[int] = None
+    inputs: Sequence[Any] = field(default_factory=tuple)
+    output: str = "image"
     is_labels: bool = False
     clims: Optional[Tuple[float, float]] = None
-
 
 @dataclass
 class Pipeline:
@@ -77,12 +76,12 @@ class Pipeline:
         yield vistor.imports()
         yield vistor.newline()
         yield vistor.newline()
-        for n, step in enumerate(self.steps):
-            yield vistor.subheader(step, n)
+        for step in self.steps:
+            yield vistor.subheader(step)
             yield vistor.newline()
-            yield vistor.operate(step, n)
+            yield vistor.operate(step)
             if self.show:
-                yield vistor.show(step, n)
+                yield vistor.show(step)
             yield vistor.newline()
 
     def to_jython(self, filename=None):
@@ -127,15 +126,10 @@ class Pipeline:
     @classmethod
     def from_dask(cls, graph):
         import dask
-
         steps = []
         for key in dask.order.order(graph):
-            op, *args = graph[key]
-            input = None
-            for i, a in enumerate(args):
-                if a in graph:
-                    input = args.pop(i)
-            steps.append(Step(operation=op.__name__, input=input, args=args))
+            op, inputs, args = graph[key]
+            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key))
         return cls(steps=steps)
 
 

@@ -18,7 +18,6 @@ VIEWER_PARAM = "viewer"
 OP_NAME_PARAM = "op_name"
 OP_ID = "op_id"
 
-
 def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
     params = signature(func).parameters
     return len([p for p in params.values() if p.annotation in types])
