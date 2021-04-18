@@ -34,18 +34,18 @@ class JythonGenerator:
         return "import pyclesperanto_prototype as cle"
 
     @staticmethod
-    def subheader(step, n):
+    def subheader(step):
         # jupytext will render "# ##" as an h2 header in ipynb
         return f"# ## {step.operation.replace('_', ' ')}"
 
     @staticmethod
-    def operate(step, n) -> str:
+    def operate(step) -> str:
         # TODO: in case of imread, we may do something special here...
         args = step.inputs + [f"cle.create_like({step.inputs[0]})"] + step.args
         return f"{step.output} = cle.{step.operation}({', '.join(map(str, args))})"
 
     @staticmethod
-    def show(step, n):
+    def show(step):
         title = f"Result of {step.operation.replace('_', ' ')}"
         show_args = [f"image{n}", repr(title), str(step.is_labels)]
         if step.clims:
@@ -76,12 +76,12 @@ class Pipeline:
         yield vistor.imports()
         yield vistor.newline()
         yield vistor.newline()
-        for n, step in enumerate(self.steps):
-            yield vistor.subheader(step, n)
+        for step in self.steps:
+            yield vistor.subheader(step)
             yield vistor.newline()
-            yield vistor.operate(step, n)
+            yield vistor.operate(step)
             if self.show:
-                yield vistor.show(step, n)
+                yield vistor.show(step)
             yield vistor.newline()
 
     def to_jython(self, filename=None):
