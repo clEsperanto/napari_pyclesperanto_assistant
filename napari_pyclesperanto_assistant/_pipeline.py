@@ -47,7 +47,7 @@ class JythonGenerator:
     @staticmethod
     def show(step):
         title = f"Result of {step.operation.replace('_', ' ')}"
-        show_args = [f"image{n}", repr(title), str(step.is_labels)]
+        show_args = [f"{step.output}", repr(title), str(step.is_labels)]
         if step.clims:
             show_args.extend(map(str, step.clims))
         return f"cle.imshow({', '.join(show_args)})"
