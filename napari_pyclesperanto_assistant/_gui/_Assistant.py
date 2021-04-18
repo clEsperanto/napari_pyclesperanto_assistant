@@ -92,7 +92,10 @@ class Assistant(QWidget):
         layer = event.value
         if layer in self._layers:
             dw = self._layers[layer][0]
-            self._viewer.window.remove_dock_widget(dw)
+            try:
+                self._viewer.window.remove_dock_widget(dw)
+            except KeyError:
+                pass
             # remove layer from internal list
             self._layers.pop(layer)
 
