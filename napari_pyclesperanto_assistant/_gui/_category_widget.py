@@ -49,14 +49,15 @@ def call_op(op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
     # transfer data to gpu
     i0 = inputs[0].data
     gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
-    gpu_out = cle.create_like(gpu_ins[0])
+    # todo: we could make this a little faster by getting gpu_out from a central manager
+    gpu_out = None
 
     # call actual cle function ignoring extra positional args
     cle_function = cle.operation(op_name)  # couldn't this just be getattr(cle, ...)?
     nargs = num_positional_args(cle_function)
     logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
     args = ((*gpu_ins, gpu_out) + args)[:nargs]
-    cle_function(*args)
+    gpu_out = cle_function(*args)
 
     # return output
     return gpu_out
@@ -105,10 +106,8 @@ def _show_result(
     if clims[1] == 0:
         clims[1] = 1
 
-    if layer_type == "labels":
-        data = cle.pull(gpu_out).astype(int)
-    else:
-        data = gpu_out
+    # conversion will be done inside napari. We can continue working with the OCL-array from here.
+    data = gpu_out
 
     try:
         # look for an existing layer
