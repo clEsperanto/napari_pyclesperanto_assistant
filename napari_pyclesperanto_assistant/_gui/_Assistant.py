@@ -10,8 +10,14 @@ from qtpy.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QVBoxLayout, Q
 from .._categories import CATEGORIES, Category
 from .._pipeline import Pipeline
 from ._button_grid import ButtonGrid
-from ._category_widget import OP_ID, OP_NAME_PARAM, VIEWER_PARAM, make_gui_for_category, num_positional_args, \
-    OUTPUT_PLACEHOLDER
+from ._category_widget import (
+    OP_ID,
+    OP_NAME_PARAM,
+    VIEWER_PARAM,
+    make_gui_for_category,
+    num_positional_args,
+    OUTPUT_PLACEHOLDER,
+)
 
 if TYPE_CHECKING:
     from magicgui.widgets import FunctionGui
