@@ -115,7 +115,8 @@ def _show_result(
         logger.debug(f"updating existing layer: {layer}, with id: {op_id}")
         layer.data = data
         layer.name = name
-        layer.contrast_limits = clims
+        if layer_type != "labels":
+            layer.contrast_limits = clims
         # layer.translate = translate
     except StopIteration:
         # otherwise create a new one
