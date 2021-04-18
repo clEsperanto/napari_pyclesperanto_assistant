@@ -54,6 +54,7 @@ class JythonGenerator:
             show_args.extend(map(str, step.clims))
         return f"cle.imshow({', '.join(show_args)})"
 
+    @staticmethod
     def newline():
         return ""
 
