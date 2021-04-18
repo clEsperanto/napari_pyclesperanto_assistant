@@ -24,6 +24,9 @@ class Category:
     # categories
     include: Sequence[str] = field(default_factory=tuple)
     exclude: Sequence[str] = field(default_factory=tuple)
+    # visualization
+    color_map : str = "gray"
+    blending : str = "translucent"
 
 
 CATEGORIES = {
@@ -66,7 +69,7 @@ CATEGORIES = {
     "Combine": Category(
         name="Combine",
         inputs=(LayerInput, LayerInput),
-        default_op="binary_and",
+        default_op="add_images",
         include=("combine",),
         exclude=("map",),
         args=[
@@ -138,6 +141,8 @@ CATEGORIES = {
             ("n", PositiveFloatRange, 1)
         ],
         include=("combine", "map"),
+        color_map="turbo",
+        blending="additive",
     ),
     "Map": Category(
         name="Map",
@@ -148,6 +153,8 @@ CATEGORIES = {
         ],
         include=("label measurement", "map"),
         exclude=("combine",),
+        color_map="turbo",
+        blending="additive",
     ),
     "Mesh": Category(
         name="Mesh",
@@ -157,5 +164,7 @@ CATEGORIES = {
             ("n", PositiveFloatRange, 1)
         ],
         include=("label measurement", "mesh"),
+        color_map="green",
+        blending="additive",
     )
 }

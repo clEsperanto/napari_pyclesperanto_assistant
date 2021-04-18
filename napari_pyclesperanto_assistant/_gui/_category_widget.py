@@ -70,6 +70,7 @@ def _show_result(
     op_id: int,
     translate=None,
     cmap=None,
+    blending=None,
 ) -> Optional[Layer]:
     """Show `gpu_out` in the napari viewer.
 
@@ -90,6 +91,8 @@ def _show_result(
         translate parameter for layer creation, by default None
     cmap : str, optional
         a colormap to use for images, by default None
+    blending : str, optional
+        blending mode for visualization, by default None
 
     Returns
     -------
@@ -124,6 +127,7 @@ def _show_result(
         kwargs = dict(name=name, metadata={OP_ID: op_id})
         if layer_type == "image":
             kwargs["colormap"] = cmap
+            kwargs["blending"] = blending
         layer = add_layer(data, **kwargs)
     return layer
 
@@ -189,6 +193,8 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
                 name=f"Result of {op_name}",
                 layer_type=category.output,
                 op_id=id(gui_function),
+                cmap=category.color_map,
+                blending=category.blending,
             )
         return None
 
