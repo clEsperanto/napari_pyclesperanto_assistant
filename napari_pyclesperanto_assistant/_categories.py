@@ -142,7 +142,7 @@ CATEGORIES = {
         ],
         include=("combine", "map"),
         color_map="turbo",
-        blending="additive",
+        blending="translucent",
     ),
     "Map": Category(
         name="Map",
@@ -154,7 +154,7 @@ CATEGORIES = {
         include=("label measurement", "map"),
         exclude=("combine",),
         color_map="turbo",
-        blending="additive",
+        blending="translucent",
     ),
     "Mesh": Category(
         name="Mesh",
