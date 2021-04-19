@@ -73,8 +73,8 @@ CATEGORIES = {
         include=("combine",),
         exclude=("map",),
         args=[
-            ("a", FloatRange, 0),
-            ("b", FloatRange, 0),
+            ("a", FloatRange, 1),
+            ("b", FloatRange, 1),
         ]
     ),
     "Transform": Category(
