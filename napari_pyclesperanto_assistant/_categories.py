@@ -149,7 +149,8 @@ CATEGORIES = {
         inputs=(LabelsInput,),
         default_op="label_pixel_count_map",
         args=[
-            ("n", PositiveFloatRange, 1)
+            ("n", PositiveFloatRange, 1),
+            ("m", PositiveFloatRange, 1)
         ],
         include=("label measurement", "map"),
         exclude=("combine",),
