@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from functools import partial
 from types import ModuleType
 from typing import Any, Sequence, Tuple, Type
 
@@ -15,6 +16,11 @@ LabelsInput = Annotated[Labels, {"label": "Labels"}]
 global_magic_opts = {"auto_call": True}
 
 import pyclesperanto_prototype as cle
+
+
+def nop(source):
+    return source
+
 
 @dataclass
 class Category:
@@ -33,6 +39,8 @@ class Category:
     # explicit module / function
     operations : Sequence[str] = None
     module : ModuleType = cle
+    transfer_to : partial = partial(cle.push)
+    transfer_from : partial = partial(nop)
 
 
 CATEGORIES = {
@@ -186,7 +194,9 @@ CATEGORIES["skimage filters"] = Category(
             ("sigma", PositiveFloatRange, 1)
         ],
         operations=["gaussian", "hessian"],
-        module=filters
+        module=filters,
+        transfer_to=partial(np.asarray),
+        transfer_from=partial(nop)
     )
 
 from scipy import ndimage
@@ -199,5 +209,29 @@ CATEGORIES["scipy ndimage filters"] = Category(
             ("size", PositiveIntRange, 1)
         ],
         operations=["maximum_filter", "median_filter", "minimum_filter"],
-        module=ndimage
+        module=ndimage,
+        transfer_to=partial(np.asarray),
+        transfer_from=partial(nop)
     )
+
+try:
+    import cupy
+    from cupyx.scipy import ndimage as cdi
+
+    CATEGORIES["cupy filters"] = Category(
+        name="cupy filters",
+        inputs=(ImageInput,),
+        default_op="median_filter",
+        args=[
+            ("size", PositiveIntRange, 1)
+        ],
+        operations=["maximum_filter", "median_filter", "minimum_filter"],
+        module=cdi,
+        transfer_to=partial(cupy.asarray),
+        transfer_from=partial(cupy.asnumpy)
+    )
+
+except ModuleNotFoundError:
+    print("Cancelled setup cupy; not installed")
+except ImportError:
+    print("Cancelled setup cupy; not installed")
