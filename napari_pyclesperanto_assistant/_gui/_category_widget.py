@@ -24,13 +24,15 @@ def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
 
 
 @logger.catch
-def call_op(op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
+def call_op(module, op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
     """Call cle operation `op_name` with specified inputs and args.
 
     Takes care of transfering data to GPU and omitting extra positional args
 
     Parameters
     ----------
+    module
+        module where the function can be found
     op_name : str
         name of operation to execute.  (must be valid for `cle.operation`)
     inputs : Sequence[Layer]
@@ -51,8 +53,8 @@ def call_op(op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
     # todo: we could make this a little faster by getting gpu_out from a central manager
     gpu_out = None
 
-    # call actual cle function ignoring extra positional args
-    cle_function = cle.operation(op_name)  # couldn't this just be getattr(cle, ...)?
+    # call actual function ignoring extra positional args
+    cle_function = getattr(module, op_name)
     nargs = num_positional_args(cle_function)
     logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
     args = ((*gpu_ins, gpu_out) + args)[:nargs]
@@ -145,7 +147,10 @@ def _generate_signature_for_category(category: Category) -> Signature:
         Parameter(f"input{n}", k, annotation=t) for n, t in enumerate(category.inputs)
     ]
     # Add valid operations choices (will create the combo box)
-    choices = list(cle.operations(['in assistant'] + list(category.include), category.exclude))
+    if category.operations:
+        choices = category.operations
+    else:
+        choices = list(cle.operations(['in assistant'] + list(category.include), category.exclude))
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
     params.append(
         Parameter(OP_NAME_PARAM, k, annotation=op_type, default=category.default_op)
@@ -185,7 +190,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         viewer = kwargs.pop(VIEWER_PARAM, None)
         inputs = [kwargs.pop(k) for k in list(kwargs) if k.startswith("input")]
         op_name = kwargs.pop("op_name")
-        result = call_op(op_name, inputs, *kwargs.values())
+        result = call_op(category.module, op_name, inputs, *kwargs.values())
         if result is not None:
             return _show_result(
                 result,
@@ -210,7 +215,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
 
     @op_name_widget.changed.connect
     def update_positional_labels(*_):
-        new_sig = signature(cle.operation(op_name_widget.value))
+        new_sig = signature(getattr(category.module, op_name_widget.value))
         # get the names of positional parameters in the new operation
         param_names = [
             name

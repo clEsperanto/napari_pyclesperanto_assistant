@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from types import ModuleType
 from typing import Any, Sequence, Tuple, Type
 
 import numpy as np
@@ -12,6 +13,7 @@ LayerInput = Annotated[Layer, {"label": "Image"}]
 LabelsInput = Annotated[Labels, {"label": "Labels"}]
 global_magic_opts = {"auto_call": True}
 
+import pyclesperanto_prototype as cle
 
 @dataclass
 class Category:
@@ -27,6 +29,9 @@ class Category:
     # visualization
     color_map : str = "gray"
     blending : str = "translucent"
+    # explicit module / function
+    operations : Sequence[str] = None
+    module : ModuleType = cle
 
 
 CATEGORIES = {
@@ -169,3 +174,31 @@ CATEGORIES = {
         blending="additive",
     )
 }
+
+from skimage import filters
+
+CATEGORIES["skimage_filters"] = Category(
+        name="skimage filters",
+        inputs=(ImageInput,),
+        default_op="gaussian",
+        args=[
+            ("sigma", PositiveFloatRange, 1)
+        ],
+        operations=["gaussian", "hessian"],
+        module=filters
+    )
+
+
+
+from skimage import filters
+
+CATEGORIES["skimage_filters"] = Category(
+        name="skimage filters",
+        inputs=(ImageInput,),
+        default_op="gaussian",
+        args=[
+            ("sigma", PositiveFloatRange, 1)
+        ],
+        operations=["gaussian", "hessian"],
+        module=filters
+    )
