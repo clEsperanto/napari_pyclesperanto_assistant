@@ -3,10 +3,12 @@ pyopencl
 toolz
 scikit-image
 napari==0.4.7
-pyclesperanto_prototype==0.7.6
+pyclesperanto_prototype==0.8.0
 magicgui
 numpy!=1.19.4
 pyperclip
+loguru
+jupytext
+jupyter
 nbformat
 cookiecutter
-loguru

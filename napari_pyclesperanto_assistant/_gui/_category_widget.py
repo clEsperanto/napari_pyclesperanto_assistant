@@ -17,8 +17,6 @@ if TYPE_CHECKING:
 VIEWER_PARAM = "viewer"
 OP_NAME_PARAM = "op_name"
 OP_ID = "op_id"
-OUTPUT_PLACEHOLDER = "output_placeholder"
-
 
 def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
     params = signature(func).parameters
@@ -50,14 +48,15 @@ def call_op(op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
     # transfer data to gpu
     i0 = inputs[0].data
     gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
-    gpu_out = cle.create_like(gpu_ins[0])
+    # todo: we could make this a little faster by getting gpu_out from a central manager
+    gpu_out = None
 
     # call actual cle function ignoring extra positional args
     cle_function = cle.operation(op_name)  # couldn't this just be getattr(cle, ...)?
     nargs = num_positional_args(cle_function)
     logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
     args = ((*gpu_ins, gpu_out) + args)[:nargs]
-    cle_function(*args)
+    gpu_out = cle_function(*args)
 
     # return output
     return gpu_out
@@ -71,6 +70,7 @@ def _show_result(
     op_id: int,
     translate=None,
     cmap=None,
+    blending=None,
 ) -> Optional[Layer]:
     """Show `gpu_out` in the napari viewer.
 
@@ -91,6 +91,8 @@ def _show_result(
         translate parameter for layer creation, by default None
     cmap : str, optional
         a colormap to use for images, by default None
+    blending : str, optional
+        blending mode for visualization, by default None
 
     Returns
     -------
@@ -106,16 +108,17 @@ def _show_result(
     if clims[1] == 0:
         clims[1] = 1
 
-    data = cle.pull(gpu_out)
-    if layer_type == "labels":
-        data = data.astype(int)
+    # conversion will be done inside napari. We can continue working with the OCL-array from here.
+    data = gpu_out
+
     try:
         # look for an existing layer
         layer = next(x for x in viewer.layers if x.metadata.get(OP_ID) == op_id)
         logger.debug(f"updating existing layer: {layer}, with id: {op_id}")
         layer.data = data
         layer.name = name
-        layer.contrast_limits = clims
+        if layer_type != "labels":
+            layer.contrast_limits = clims
         # layer.translate = translate
     except StopIteration:
         # otherwise create a new one
@@ -124,6 +127,7 @@ def _show_result(
         kwargs = dict(name=name, metadata={OP_ID: op_id})
         if layer_type == "image":
             kwargs["colormap"] = cmap
+            kwargs["blending"] = blending
         layer = add_layer(data, **kwargs)
     return layer
 
@@ -189,6 +193,8 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
                 name=f"Result of {op_name}",
                 layer_type=category.output,
                 op_id=id(gui_function),
+                cmap=category.color_map,
+                blending=category.blending,
             )
         return None
 

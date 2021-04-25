@@ -11,74 +11,57 @@ class JythonGenerator:
         from textwrap import dedent
 
         return dedent(
-            f'''
+            f"""
+        # To make this script run in cpython, install pyclesperanto_prototype:
+        #
+        # ```
+        # pip install pyclesperanto_prototype
+        # ```
+        # Read more: https://clesperanto.net
+        #
+        # To make this script run in Fiji, please activate the clij, clij2 and
+        # clijx-assistant update sites in your Fiji.
+        #
+        # Read more: https://clij.github.io/assistant
+        #
+        # Generator (P) version: {__version__}
+        #
         """
-        To make this script run in cpython, install pyclesperanto_prototype:
-        pip install pyclesperanto_prototype
-        Read more: https://clesperanto.net
-
-        To make this script run in Fiji, please activate the clij,
-        clij2 and clijx-assistant update sites in your Fiji.
-
-        Read more: https://clij.github.io/assistant
-        Generator (P) version: {__version__}
-        """
-
-        '''
-        )
+        ).strip()
 
     @staticmethod
     def imports():
         return "import pyclesperanto_prototype as cle"
 
     @staticmethod
-    def subheader(step, n):
-        return f"\n# {step.operation}"
+    def subheader(step):
+        # jupytext will render "# ##" as an h2 header in ipynb
+        return f"# ## {step.operation.replace('_', ' ')}"
 
     @staticmethod
-    def operate(step, n) -> str:
-        args = step.args
-        from napari_pyclesperanto_assistant._gui._category_widget import OUTPUT_PLACEHOLDER
-        args = [f"cle.create_like({step.args[0]})" if x == OUTPUT_PLACEHOLDER else x for x in args]
-
+    def operate(step) -> str:
+        # TODO: in case of imread, we may do something special here...
+        args = step.inputs + [f"cle.create_like({step.inputs[0]})"] + step.args
         return f"{step.output} = cle.{step.operation}({', '.join(map(str, args))})"
 
     @staticmethod
-    def show(step, n):
+    def show(step):
         title = f"Result of {step.operation.replace('_', ' ')}"
-        show_args = [f"image{n}", repr(title), str(step.is_labels)]
+        show_args = [f"{step.output}", repr(title), str(step.is_labels)]
         if step.clims:
             show_args.extend(map(str, step.clims))
         return f"cle.imshow({', '.join(show_args)})"
 
-from nbformat.v4 import new_code_cell
-from nbformat.v4 import new_markdown_cell
-class NotebookGenerator:
     @staticmethod
-    def header():
-        return new_markdown_cell(JythonGenerator.header())
-
-    @staticmethod
-    def imports():
-        return new_code_cell(JythonGenerator.imports())
-
-    @staticmethod
-    def subheader(step, n):
-        return new_markdown_cell(JythonGenerator.subheader(step, n))
-
-    @staticmethod
-    def operate(step, n) -> str:
-        return new_code_cell(JythonGenerator.operate(step, n))
-
-    @staticmethod
-    def show(step, n):
-        return new_code_cell(JythonGenerator.show(step, n))
+    def newline():
+        return ""
 
 
 @dataclass
 class Step:
     operation: str
     args: Sequence[Any] = field(default_factory=tuple)  # kwargs might be better
+    inputs: Sequence[Any] = field(default_factory=tuple)
     output: str = "image"
     is_labels: bool = False
     clims: Optional[Tuple[float, float]] = None
@@ -90,51 +73,48 @@ class Pipeline:
 
     def _generate(self, vistor):
         yield vistor.header()
+        yield vistor.newline()
         yield vistor.imports()
-        for n, step in enumerate(self.steps):
-            yield vistor.subheader(step, n)
-            yield vistor.operate(step, n)
+        yield vistor.newline()
+        yield vistor.newline()
+        for step in self.steps:
+            yield vistor.subheader(step)
+            yield vistor.newline()
+            yield vistor.operate(step)
             if self.show:
-                yield vistor.show(step, n)
+                yield vistor.show(step)
+            yield vistor.newline()
 
     def to_jython(self, filename=None):
         code = "\n".join(self._generate(JythonGenerator))
         if filename:
-            Path(filename).write_text(code)
+            filename = Path(filename).expanduser().resolve()
+            filename.write_text(code)
         return code
 
-    def to_notebook(self, filename=None):
-        # Todo: I assume there is a better way of doing the following 3 lines
-        cells = []
-        for i in self._generate(NotebookGenerator):
-            cells.append(i)
+    def to_notebook(self, filename=None, execute=False):
+        import jupytext
 
-        # build notebook
-        from nbformat import NotebookNode
-        nb = NotebookNode()
-        nb["cells"] = cells
-        nb["metadata"] = {}
-        nb["nbformat"] = 4
-        nb["nbformat_minor"] = 5
+        # jython code is created in the jupytext light format
+        # https://jupytext.readthedocs.io/en/latest/formats.html#the-light-format
 
+        jt = jupytext.reads(self.to_jython(), fmt="py:light")
+        nb = jupytext.writes(jt, fmt="ipynb")
         if filename:
-            # write notebook to disc
-            from nbformat import write
-            write(nb, filename)
+            filename = Path(filename).expanduser().resolve()
+            filename.write_text(nb)
+            # could use a NamedTemporaryFile to run this even without write
+            if execute:
+                from subprocess import Popen
+                from shutil import which
 
-            # Execute notebook
-            from nbconvert.preprocessors import ExecutePreprocessor
-            from nbclient.exceptions import CellExecutionError
-            ep = ExecutePreprocessor(timeout=600, kernel_name="python3")
-            try:
-                ep.preprocess(nb, {"metadata": {"path": "."}})
-            except CellExecutionError:
-                warnings.warn("Notebook execution failed. See the notebook file for details.")
-                return
+                if not which("jupyter-notebook"):
+                    raise RuntimeError("Cannot find jupyter-notebook executable")
 
-            # write executed notebook to disc
-            write(nb, filename)
-
+                try:
+                    Popen(["jupyter-notebook", "-y", str(filename)])
+                except Exception as e:
+                    warnings.warn(f"Failed to execute notebook: {e}")
         return nb
 
     def __str__(self):
@@ -148,23 +128,19 @@ class Pipeline:
     def from_dask(cls, graph):
         import dask
         steps = []
-        for key in graph.keys(): # Robert observed that this didn't work: dask.order.order(graph):
-            op, *args = graph[key]
-            steps.append(Step(operation=op.__name__, args=args, output=key))
+        for key in dask.order.order(graph):
+            op, inputs, args = graph[key]
+            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key))
         return cls(steps=steps)
 
 
 if __name__ == "__main__":
-    s0 = Step(operation="imread", args=("Lund_000500",), clims=(125, 680))
+    lund = Path(__file__).parent / "data" / "Lund_000500_resampled-cropped.tif"
+    s0 = Step(operation="imread", args=(str(lund.resolve()),), clims=(125, 680))
     s1 = Step(operation="gaussian_blur", input=s0, args=(1, 1, 0), clims=(0, 657))
     s2 = Step(operation="top_hat_box", input=s1, args=(10, 10, 0), clims=(0, 378))
     s3 = Step(operation="gamma_correction", input=s2, args=(1,), clims=(0, 378))
     s4 = Step(operation="threshold_otsu", input=s3, is_labels=True)
-    s5 = Step(
-        operation="connected_components_labeling_box",
-        input=s3,
-        args=(2,),
-        is_labels=True,
-    )
+    s5 = Step(operation="connected_components_labeling_box", input=s3, is_labels=True)
 
-    print(Pipeline(steps=[s0, s1, s2, s3, s4, s5]))
+    Pipeline(steps=[s0, s1, s2, s3, s4, s5]).to_notebook("~/Desktop/test.ipynb", True)
