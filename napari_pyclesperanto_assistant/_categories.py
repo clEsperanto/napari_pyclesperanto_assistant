@@ -187,18 +187,3 @@ CATEGORIES["skimage_filters"] = Category(
         operations=["gaussian", "hessian"],
         module=filters
     )
-
-
-
-from skimage import filters
-
-CATEGORIES["skimage_filters"] = Category(
-        name="skimage filters",
-        inputs=(ImageInput,),
-        default_op="gaussian",
-        args=[
-            ("sigma", PositiveFloatRange, 1)
-        ],
-        operations=["gaussian", "hessian"],
-        module=filters
-    )

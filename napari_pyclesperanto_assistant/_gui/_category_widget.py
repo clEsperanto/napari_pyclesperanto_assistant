@@ -7,6 +7,7 @@ import pyclesperanto_prototype as cle
 from loguru import logger
 from magicgui import magicgui
 from typing_extensions import Annotated
+import numpy as np
 
 from .._categories import Category
 
@@ -49,7 +50,11 @@ def call_op(module, op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
 
     # transfer data to gpu
     i0 = inputs[0].data
-    gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
+    if module == cle:
+        gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
+    else:
+        gpu_ins = [np.asarray(i.data) if i is not None else np.asarray(i0) for i in inputs]
+
     # todo: we could make this a little faster by getting gpu_out from a central manager
     gpu_out = None
 
@@ -57,7 +62,12 @@ def call_op(module, op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
     cle_function = getattr(module, op_name)
     nargs = num_positional_args(cle_function)
     logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
-    args = ((*gpu_ins, gpu_out) + args)[:nargs]
+    args = (*gpu_ins, gpu_out) + args
+    if module == cle:
+        args = args[:nargs]
+    else:
+        args = [x for x in args if x is not None]
+
     gpu_out = cle_function(*args)
 
     # return output
@@ -215,6 +225,8 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
 
     @op_name_widget.changed.connect
     def update_positional_labels(*_):
+        if category.module != cle:
+            return
         new_sig = signature(getattr(category.module, op_name_widget.value))
         # get the names of positional parameters in the new operation
         param_names = [
