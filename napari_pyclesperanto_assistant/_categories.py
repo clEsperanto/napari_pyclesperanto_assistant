@@ -8,6 +8,7 @@ from typing_extensions import Annotated
 
 FloatRange = Annotated[float, {"min": np.finfo(np.float32).min, "max": np.finfo(np.float32).max}]
 PositiveFloatRange = Annotated[float, {"min": 0, "max": np.finfo(np.float32).max}]
+PositiveIntRange = Annotated[int, {"min": 0, "max": 65535}]
 ImageInput = Annotated[Image, {"label": "Image"}]
 LayerInput = Annotated[Layer, {"label": "Image"}]
 LabelsInput = Annotated[Labels, {"label": "Labels"}]
@@ -177,7 +178,7 @@ CATEGORIES = {
 
 from skimage import filters
 
-CATEGORIES["skimage_filters"] = Category(
+CATEGORIES["skimage filters"] = Category(
         name="skimage filters",
         inputs=(ImageInput,),
         default_op="gaussian",
@@ -186,4 +187,17 @@ CATEGORIES["skimage_filters"] = Category(
         ],
         operations=["gaussian", "hessian"],
         module=filters
+    )
+
+from scipy import ndimage
+
+CATEGORIES["scipy ndimage filters"] = Category(
+        name="scipy ndimage filters",
+        inputs=(ImageInput,),
+        default_op="median_filter",
+        args=[
+            ("size", PositiveIntRange, 1)
+        ],
+        operations=["maximum_filter", "median_filter", "minimum_filter"],
+        module=ndimage
     )
