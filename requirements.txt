@@ -10,3 +10,5 @@ pyperclip
 loguru
 jupytext
 jupyter
+nbformat
+cookiecutter
