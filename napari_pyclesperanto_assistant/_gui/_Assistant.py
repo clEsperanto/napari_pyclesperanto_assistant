@@ -164,7 +164,7 @@ class Assistant(QWidget):
                     op_id = w.value.metadata.get(OP_ID)
                     if op_id is None:
                         op_id = "some_random_key"
-                        graph[self._id_to_name(op_id, name_dict)] = (cle.imread, ["w.value._source"], [])  # TODO
+                        graph[self._id_to_name(op_id, name_dict)] = (cle.imread, ["w.value._source"], [], False)  # TODO
                     inputs.append(self._id_to_name(op_id, name_dict))
                 else:
                     args.append(w.value)
@@ -175,7 +175,8 @@ class Assistant(QWidget):
                 nargs = num_positional_args(op) - 1 - len(inputs)
                 args = args[:nargs]
 
-            graph[self._id_to_name(key, name_dict)] = (op, inputs, args)
+            from napari.layers import Labels
+            graph[self._id_to_name(key, name_dict)] = (op, inputs, args, isinstance(layer, Labels))
 
         return graph
 
@@ -198,14 +199,21 @@ class Assistant(QWidget):
         pipeline = Pipeline.from_assistant(self)
         code = pipeline.to_jython()
 
-        code = code.replace("cle.imread(w.value._source)", "data")
+        # replace load step with data parameter of the used function
+        code = code.replace("cle.imread(w.value._source, cle.create_like(w.value._source))", "data")
 
         code = "\n" + code + "\nreturn " + pipeline.steps[-1].output
 
         code = code.replace("\n", "\n    ")
         code = code.replace("cle.imshow", "#cle.imshow")
 
-        gui = make_plugin(python_code=code)
+        if pipeline.steps[-1].is_labels:
+            output_type = "LabelsData"
+        else :
+            output_type = "ImageData"
+
+
+        gui = make_plugin(python_code=code, output_type=output_type)
         #gui.code.bind(code)
         #self._viewer.window.add_dock_widget(gui)
 
@@ -219,7 +227,8 @@ def make_plugin(
         short_description:str = "description",
         license:str = "BSD-3",
         python_parameters:str = "value:int=1",
-        python_code:str = "data > value"
+        python_code:str = "data > value",
+        output_type:str = "LabelsData"
 ):
     from cookiecutter.main import cookiecutter
 
@@ -241,6 +250,7 @@ def make_plugin(
             "license": license,
             "python_parameters": python_parameters,
             "python_code": python_code,
+            "output_type": output_type
         }
     )
 

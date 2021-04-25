@@ -129,8 +129,8 @@ class Pipeline:
         import dask
         steps = []
         for key in dask.order.order(graph):
-            op, inputs, args = graph[key]
-            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key))
+            op, inputs, args, is_labels = graph[key]
+            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key, is_labels=is_labels))
         return cls(steps=steps)
 
 
