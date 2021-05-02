@@ -23,7 +23,7 @@ def test_individual_categories(category, assistant):
         assistant._activate(CATEGORIES.get("Binarize"))
     assistant._activate(category)
     assistant.to_clipboard()
-
+ 
 def test_workflow_processing_labels(viewer):
     import napari_pyclesperanto_assistant
     from pathlib import Path
