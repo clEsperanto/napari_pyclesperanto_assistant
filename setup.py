@@ -7,6 +7,8 @@ from pathlib import Path
 
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 def read(fname):
     file_path = os.path.join(os.path.dirname(__file__), fname)
@@ -33,7 +35,7 @@ setup(
     author="Robert Haase, Talley Lambert",
     author_email="robert.haase@tu-dresden.de",
     description="OpenCL based GPU-accelerated image processing in napari",
-    long_description=read("README.md"),
+    long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/clesperanto/napari_pyclesperanto_assistant",
     packages=find_packages(),
