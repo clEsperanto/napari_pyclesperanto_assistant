@@ -10,3 +10,4 @@ pyperclip
 loguru
 jupytext
 jupyter
+pandas
