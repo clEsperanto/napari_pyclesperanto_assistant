@@ -2,8 +2,8 @@ napari-plugin-engine>=0.1.4
 pyopencl
 toolz
 scikit-image
-napari >=0.4.7, <=0.4.8
-pyclesperanto_prototype >=0.8.0, <=0.9.0
+napari >=0.4.7
+pyclesperanto_prototype >=0.8.0
 magicgui
 numpy!=1.19.4
 pyperclip
