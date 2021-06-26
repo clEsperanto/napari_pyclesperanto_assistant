@@ -56,6 +56,80 @@ In case napari doesn't start up with an error mentioning numpy ([see also](https
 pip install numpy==1.19.3
 ```
 
+In case of error messages like `RuntimeError: module compiled against API version 0xe but this version of numpy is 0xd` try:
+```
+pip uninstall pyopencl
+conda install -c conda-forge pyopencl==2021.2.1
+```
+
+## Features
+[pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) offers various possibilities for processing images. It comes from developers who work in life sciences and thus, it may be focused towards processing two- and three-dimensional microscopy image data showing cells and tissues. A selection of pyclesperanto's functionality is available via the assistant user interface. Typical workflows which can be built with this assistant include
+* image filtering
+  * denoising / noise reduction
+  * background subtraction
+  * grey value morphology 
+* combining images
+  * masking
+  * image math (adding, subtracting, multiplying, dividing images) 
+* image transformations
+  * translation
+  * rotation
+  * sub-stacks
+* image projections
+  * minimum / mean / maximum / sum / standard deviation projections
+* image segmentation
+  * binarization 
+  * thresholding
+  * labeling
+  * regionalization
+  * instance segmentation
+  * semantic segmentation
+  * detect label edges
+  * label spots
+  * connected component labeling
+  * Voronoi-Otsu-labeling
+* post-processing of binary images
+  * dilation
+  * erosion
+  * binary opening
+  * binary closing 
+  * binary and / or / xor
+* post-processing of label images
+  * dilation (expansion) of labels
+  * erosion (shrinking) of labels 
+  * extend labels via Voronoi
+  * exclude labels on edges
+  * exclude labels within / out of size / value range
+* parametric maps
+  * proximal / touching neighbor count
+  * distance measurements to touching / proximal / n-nearest neighbors
+  * pixel count map
+  * mean / maximum / extension ratio map
+* label measurements / post processing of parametric maps
+  * minimum / mean / maximum / standard devation intensity maps
+  * minimum / mean / maximum / standard deviation of touching neighbors
+  * minimum / mean / maximum / standard deviation of n-nearest neighbors
+  * minimum / mean / maximum / standard deviation of proximal neighbors
+* neighbor meshes
+  * touching neighbors
+  * n-nearest neighbors
+  * proximal neighbors
+  * distance meshes
+* measurements based on label images
+  * bounding box 2D / 3D
+  * minimum / mean / maximum / sum / standard deviation intensity
+  * mass center
+  * centroid
+  * mean / maximum distance to centroid (and min/max ratio shape descriptor)
+  * mean / maximum distance to center of mass (and min/max ratio shape descriptor)
+* code export
+  * python / Fiji-compatible jython
+  * python jupyter notebooks
+* pyclesperanto scripting
+  * cell counting
+  * cell differentiation
+  * tissue classification
+
 ## Usage
 This short tutorial demonstrates how to generate code using the pyclersperanto-assistant. 
 
