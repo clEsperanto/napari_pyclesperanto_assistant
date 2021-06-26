@@ -36,11 +36,11 @@ C:\Users\<username>\AppData\Local\Programs\napari\python\python.exe -m pip insta
 ```
 
 Start napari and navigate to its menu `Plugins > Install/Uninstall Package(s)...`. Select `napari-pyclesperanto-assistant` from the list and install it by clicking the blue button on the right:
-![](docs/images/screenshot_installer.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_installer.png)
 
 Restart napari. Afterwards, you should find the Assistant in the plugins menu:
 
-![](docs/images/screenshot_menu.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_menu.png)
 
 ### Installation on windows
 On windows some additional steps are necessary. Download a pre-compiled wheel of [pyopencl](https://documen.tician.de/pyopencl/) e.g. from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyopencl). 
@@ -131,8 +131,8 @@ conda install -c conda-forge pyopencl==2021.2.1
 ## Usage
 This short tutorial demonstrates how to generate code using the pyclersperanto-assistant. 
 
-<iframe src="docs/images/pyclesperanto_assistant_screencast.mp4" width="600" height="300"></iframe>
-[Download workflow as video](docs/images/pyclesperanto_assistant_screencast.mp4)
+<iframe src="https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/pyclesperanto_assistant_screencast.mp4" width="600" height="300"></iframe>
+[Download workflow as video](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/pyclesperanto_assistant_screencast.mp4)
 
 ### Start up the assistant
 Open a command line and start up the assistant and pass the image file you want to process. The shown example image can be found [online](https://github.com/clEsperanto/napari_pyclesperanto_assistant/blob/master/napari_pyclesperanto_assistant/data/CalibZAPWfixed_000154_max-16.tif)
@@ -153,13 +153,13 @@ napari.run()
 
 napari will open with the assistant activated:
 
-![](docs/images/screenshot_1.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_1.png)
 
 ### Set up a workflow
 
 Choose categories of operations in the top right panel, for example start with denoising using a Gaussian Blur with sigma 1 in x and y:
 
-![](docs/images/screenshot_2.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_2.png)
 
 Choose more processing steps. Note: You can change the input image/layer for each operation, the operation and its parameters in the bottom right panel.
 For example, continue with these steps
@@ -171,17 +171,17 @@ For example, continue with these steps
 
 Hide some layers showing intermediate results. Switch the bleinding of the final result layer to "additive" to see through it on the original image.
 
-![](docs/images/screenshot_3.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_3.png)
 
 ### Code generation
 In the plugins menu, you find two entries which allow you to export your workflow as Python/Jython code.
-![](docs/images/screenshot_4.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_4.png)
 
 Export your workflow as Jupyter notebook. Start the notebook from the command line using
 ```
 jupyter notebook my_notebook.ipynb
 ```
-![](docs/images/screenshot_5.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_5.png)
 
 Alternatively, export the workflow as Jython/Python script. This script can be executed from the command line like this
 ```
@@ -190,14 +190,14 @@ python my_script.py
 
 It can also be executed in Fiji, in case the [CLIJx-assistant is installed](https://clij.github.io/assistant/installation).
 
-![](docs/images/screenshot_6.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_6.png)
 
 Note: Depeending on which layers were visible while exporting the code, different code is exported. 
 Only visible layers are shown. 
 Change layer visibility and export the script again. 
 If Fiji asks you if it should reload the script file, click on "Reload".
 
-![](docs/images/screenshot_7.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_7.png)
 
 ## For developers
 
