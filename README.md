@@ -106,10 +106,8 @@ conda install -c conda-forge pyopencl==2021.2.1
   * pixel count map
   * mean / maximum / extension ratio map
 * label measurements / post processing of parametric maps
-  * minimum / mean / maximum / standard devation intensity maps
-  * minimum / mean / maximum / standard deviation of touching neighbors
-  * minimum / mean / maximum / standard deviation of n-nearest neighbors
-  * minimum / mean / maximum / standard deviation of proximal neighbors
+  * minimum / mean / maximum / standard deviation intensity maps
+  * minimum / mean / maximum / standard deviation of touching / n-nearest / neighbors
 * neighbor meshes
   * touching neighbors
   * n-nearest neighbors
