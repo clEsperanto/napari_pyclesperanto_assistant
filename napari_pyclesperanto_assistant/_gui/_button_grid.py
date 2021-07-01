@@ -42,11 +42,15 @@ class ButtonGrid(QListWidget):
             return ""
         return str(path)
 
-    def addItem(self, label: str):
+    def addItem(self, label : str, tool_tip : str = None):
         if isinstance(label, QListWidgetItem):
             super().addItem(label)
-        super().addItem(QListWidgetItem(QIcon(self._get_icon(label)), label))
+
+        item = QListWidgetItem(QIcon(self._get_icon(label)), label)
+        if tool_tip is not None:
+            item.setToolTip(tool_tip)
+        super().addItem(item)
 
     def addItems(self, labels) -> None:
         for label in labels:
-            self.addItem(label)
+            self.addItem(label, labels[label].tool_tip)

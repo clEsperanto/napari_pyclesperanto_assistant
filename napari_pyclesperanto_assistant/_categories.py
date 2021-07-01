@@ -27,6 +27,7 @@ class Category:
     # visualization
     color_map : str = "gray"
     blending : str = "translucent"
+    tool_tip : str = None
 
 
 CATEGORIES = {
@@ -170,3 +171,9 @@ CATEGORIES = {
         blending="translucent",
     )
 }
+
+def attach_tooltips():
+    # attach tooltips
+    import pyclesperanto_prototype as cle
+    for c in CATEGORIES.items():
+        c.tool_tip = "\n".join(list(cle.operations(['in assistant'] + list(c.include), c.exclude)))
