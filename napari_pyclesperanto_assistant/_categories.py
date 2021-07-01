@@ -135,17 +135,6 @@ CATEGORIES = {
     ),
     "Label measurements": Category(
         name="Label measurements",
-        inputs=(ImageInput, LabelsInput),
-        default_op="label_mean_intensity_map",
-        args=[
-            ("n", PositiveFloatRange, 1)
-        ],
-        include=("combine", "map"),
-        color_map="turbo",
-        blending="translucent",
-    ),
-    "Map": Category(
-        name="Map",
         inputs=(LabelsInput,),
         default_op="label_pixel_count_map",
         args=[
@@ -167,5 +156,17 @@ CATEGORIES = {
         include=("label measurement", "mesh"),
         color_map="green",
         blending="additive",
+    ),
+    "Label filters": Category(
+        name="Label filters",
+        inputs=(ImageInput, LabelsInput),
+        default_op="mean_of_proximal_neighbors_map",
+        args=[
+            ("n", PositiveFloatRange, 1),
+            ("m", PositiveFloatRange, 1)
+        ],
+        include=("combine", "map"),
+        color_map="turbo",
+        blending="translucent",
     )
 }
