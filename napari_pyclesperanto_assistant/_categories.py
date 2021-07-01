@@ -175,5 +175,5 @@ CATEGORIES = {
 def attach_tooltips():
     # attach tooltips
     import pyclesperanto_prototype as cle
-    for c in CATEGORIES.items():
+    for k, c in CATEGORIES.items():
         c.tool_tip = "\n".join(list(cle.operations(['in assistant'] + list(c.include), c.exclude)))
