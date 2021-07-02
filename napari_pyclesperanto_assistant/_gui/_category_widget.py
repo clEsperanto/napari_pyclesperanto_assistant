@@ -24,7 +24,7 @@ def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
 
 
 @logger.catch
-def call_op(op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
+def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, *args) -> cle.Image:
     """Call cle operation `op_name` with specified inputs and args.
 
     Takes care of transfering data to GPU and omitting extra positional args
@@ -46,8 +46,13 @@ def call_op(op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
         return
 
     # transfer data to gpu
-    i0 = inputs[0].data
-    gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
+    if timepoint is None:
+        i0 = inputs[0].data
+        gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
+    else:
+        i0 = inputs[0].data[timepoint] if len(inputs[0].data.shape) == 4 else inputs[0].data
+        gpu_ins = [cle.push((i.data[timepoint] if len(i.data.shape) == 4 else i.data) if i is not None else i0) for i in inputs]
+
     # todo: we could make this a little faster by getting gpu_out from a central manager
     gpu_out = None
 
@@ -184,8 +189,16 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         """
         viewer = kwargs.pop(VIEWER_PARAM, None)
         inputs = [kwargs.pop(k) for k in list(kwargs) if k.startswith("input")]
+        t_position = None
+        if len(viewer.dims.current_step) == 4:
+            # in case we process a 4D-data set, we need read out the current timepoint
+            # and consider it further down in call_op
+            t_position = viewer.dims.current_step[0]
+
+        # todo: deal with 5D and nD data
+
         op_name = kwargs.pop("op_name")
-        result = call_op(op_name, inputs, *kwargs.values())
+        result = call_op(op_name, inputs, t_position, *kwargs.values())
         if result is not None:
             return _show_result(
                 result,
@@ -203,6 +216,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
 
     # create the widget
     widget = magicgui(gui_function, auto_call=True)
+
 
     # when the operation name changes, we want to update the argument labels
     # to be appropriate for the corresponding cle operation.
