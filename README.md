@@ -15,7 +15,7 @@ This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiec
 ## Installation
 
 It is recommended to install the plugin via conda:
-```
+```shell
 conda create --name bio11 python==3.8.5 
 conda activate bio11 
 conda install -c conda-forge pyopencl==2021.2.1
@@ -23,7 +23,10 @@ pip install napari-pyclesperanto-assistant
 pip install napari[all]
 ```
 
-(You can also find the assistant in the `Plugins` menu.)
+You can then start napari and find the assistant in the `Plugins` menu.
+```shell
+napari
+```
 
 ![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
 
