@@ -189,7 +189,6 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
     magicgui.widgets.FunctionGui
         A magicgui widget instance
     """
-    widget = None
     def gui_function(**kwargs) -> Optional[Layer]:
         """A function that calls a cle operation `call_op` and shows the result.
 
@@ -199,7 +198,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         viewer = kwargs.pop(VIEWER_PARAM, None)
         inputs = [kwargs.pop(k) for k in list(kwargs) if k.startswith("input")]
         t_position = None
-        if len(viewer.dims.current_step) == 4:
+        if viewer is not None and len(viewer.dims.current_step) == 4:
             # in case we process a 4D-data set, we need read out the current timepoint
             # and consider it further down in call_op
             t_position = viewer.dims.current_step[0]
