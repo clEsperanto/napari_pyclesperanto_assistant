@@ -4,6 +4,7 @@ from inspect import Parameter, Signature, signature
 from typing import Optional, TYPE_CHECKING, Sequence
 
 import pyclesperanto_prototype as cle
+import toolz
 from loguru import logger
 from magicgui import magicgui
 from typing_extensions import Annotated
@@ -165,6 +166,14 @@ def _generate_signature_for_category(category: Category) -> Signature:
     )
     return Signature(params)
 
+# source: https://github.com/jni/platelet-unet-watershed/blob/8dd7fa72a7d11d674443120e36417a9088767623/plateseg/_dock_widget.py#L15-L21
+@toolz.curry
+def self_destructing_callback(callback, disconnect):
+    def run_once_callback(*args, **kwargs):
+        result = callback(*args, **kwargs)
+        disconnect(run_once_callback)
+        return result
+    return run_once_callback
 
 def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[Layer]:
     """Generate a magicgui widget for a Category object
@@ -180,7 +189,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
     magicgui.widgets.FunctionGui
         A magicgui widget instance
     """
-
+    widget = None
     def gui_function(**kwargs) -> Optional[Layer]:
         """A function that calls a cle operation `call_op` and shows the result.
 
@@ -194,6 +203,14 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
             # in case we process a 4D-data set, we need read out the current timepoint
             # and consider it further down in call_op
             t_position = viewer.dims.current_step[0]
+
+            currstep_event = viewer.dims.events.current_step
+
+            @self_destructing_callback(disconnect=currstep_event.disconnect)
+            def update(event):
+                print(viewer.dims.current_step)
+                widget()
+            currstep_event.connect(update)
 
         # todo: deal with 5D and nD data
 
@@ -216,7 +233,6 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
 
     # create the widget
     widget = magicgui(gui_function, auto_call=True)
-
 
     # when the operation name changes, we want to update the argument labels
     # to be appropriate for the corresponding cle operation.
