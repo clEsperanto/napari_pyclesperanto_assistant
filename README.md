@@ -13,54 +13,19 @@ It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) 
 This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiecutter) using with napari's [cookiecutter-napari-plugin](https://github.com/napari/cookiecutter-napari-plugin) template.
 
 ## Installation
-### Installation using conda
+
+It is recommended to install the plugin via conda:
 ```
-conda install -c conda-forge pyopencl
-pip install napari[all] napari-pyclesperanto-assistant
+conda create --name bio11 python==3.8.5 
+conda activate bio11 
+conda install -c conda-forge pyopencl==2021.2.1
+pip install napari-pyclesperanto-assistant
+pip install napari[all]
 ```
-Afterwards, start napari from the command line:
-```
-napari --with clEsperanto
-```
+
 (You can also find the assistant in the `Plugins` menu.)
 
 ![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
-
-### Installation using the napari installer
-
-Download and install [napari](https://github.com/napari/napari/releases/tag/v0.4.3).
-
-Windows users please download [pyopencl...cl12-cp38-cp38-win_amd64.whl](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyopencl). Use the command line to navigate to the folder where you downloaded it (for example the Downloads folder using `cd Downloads`). From there, run the following line after replacing `<username>` with your username:
-```
-C:\Users\<username>\AppData\Local\Programs\napari\python\python.exe -m pip install pyopencl-2020.2.2+cl12-cp38-cp38-win_amd64.whl
-```
-
-Start napari and navigate to its menu `Plugins > Install/Uninstall Package(s)...`. Select `napari-pyclesperanto-assistant` from the list and install it by clicking the blue button on the right:
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_installer.png)
-
-Restart napari. Afterwards, you should find the Assistant in the plugins menu:
-
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_menu.png)
-
-### Installation on windows
-On windows some additional steps are necessary. Download a pre-compiled wheel of [pyopencl](https://documen.tician.de/pyopencl/) e.g. from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyopencl). 
-It is recommended to install `pyopencl-...+cl12-cp38-cp38-win_amd64` - the `cl12` and `cp38` are important when choosing the right download. They stand for OpenCL 1.2 and Python 3.8.
-
-Enter the correct pyopencl filename and execute this from the command line:
-```
-pip install pyopencl-2020.3.1+cl12-cp38-cp38-win_amd64.whl
-```
-
-In case napari doesn't start up with an error mentioning numpy ([see also](https://github.com/napari/napari/issues/2022)), execute this from the command line:
-```
-pip install numpy==1.19.3
-```
-
-In case of error messages like `RuntimeError: module compiled against API version 0xe but this version of numpy is 0xd` try:
-```
-pip uninstall pyopencl
-conda install -c conda-forge pyopencl==2021.2.1
-```
 
 ## Features
 [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) offers various possibilities for processing images. It comes from developers who work in life sciences and thus, it may be focused towards processing two- and three-dimensional microscopy image data showing cells and tissues. A selection of pyclesperanto's functionality is available via the assistant user interface. Typical workflows which can be built with this assistant include
