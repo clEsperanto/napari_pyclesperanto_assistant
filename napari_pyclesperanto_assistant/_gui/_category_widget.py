@@ -189,6 +189,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
     magicgui.widgets.FunctionGui
         A magicgui widget instance
     """
+    widget = None
     def gui_function(**kwargs) -> Optional[Layer]:
         """A function that calls a cle operation `call_op` and shows the result.
 
