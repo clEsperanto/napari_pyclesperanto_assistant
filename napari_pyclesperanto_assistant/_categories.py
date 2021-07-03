@@ -115,7 +115,7 @@ CATEGORIES = {
     "Label": Category(
         name="Label",
         inputs=(LayerInput,),
-        default_op="connected_components_labeling_box",
+        default_op="voronoi_otsu_labeling",
         output="labels",
         args=[
             ("a", PositiveFloatRange, 2),
