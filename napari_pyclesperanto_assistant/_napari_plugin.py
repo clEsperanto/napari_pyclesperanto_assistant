@@ -26,7 +26,7 @@ def napari_provide_sample_data():
     data = Path(__file__).parent / "data"
     return {
         "Lund": data / "Lund_000500_resampled-cropped.tif",
-        "CalibZAPW": data / "CalibZAPWfixed_000154_max-16.tif",
+        "CalibZAPWfixed": data / "CalibZAPWfixed_000154_max.tif",
         "Sonneberg": data / "Sonneberg100_Resampled_RotY-40_MaxZ.tif",
     }
 
