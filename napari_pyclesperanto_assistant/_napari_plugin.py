@@ -9,9 +9,11 @@ from ._categories import CATEGORIES
 from ._gui import Assistant
 from ._gui._category_widget import make_gui_for_category
 from ._statistics_of_labeled_pixels import statistics_of_labeled_pixels
+from ._categories import attach_tooltips
 
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
+    attach_tooltips()
     return [Assistant] + [
         (partial(make_gui_for_category, category), {"name": name})
         for name, category in CATEGORIES.items()
