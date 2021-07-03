@@ -4,6 +4,7 @@ from inspect import Parameter, Signature, signature
 from typing import Optional, TYPE_CHECKING, Sequence
 
 import pyclesperanto_prototype as cle
+import toolz
 from loguru import logger
 from magicgui import magicgui
 from typing_extensions import Annotated
@@ -24,7 +25,7 @@ def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
 
 
 @logger.catch
-def call_op(op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
+def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, *args) -> cle.Image:
     """Call cle operation `op_name` with specified inputs and args.
 
     Takes care of transfering data to GPU and omitting extra positional args
@@ -46,8 +47,17 @@ def call_op(op_name: str, inputs: Sequence[Layer], *args) -> cle.Image:
         return
 
     # transfer data to gpu
-    i0 = inputs[0].data
-    gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
+    if timepoint is None:
+        i0 = inputs[0].data
+        gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
+    else:
+        i0 = inputs[0].data[timepoint] if len(inputs[0].data.shape) == 4 else inputs[0].data
+        gpu_ins = [cle.push((i.data[timepoint] if len(i.data.shape) == 4 else i.data) if i is not None else i0) for i in inputs]
+
+    # convert 3d-1-slice-data into 2d data
+    # to support 2d timelapse data
+    gpu_ins = [i if len(i.shape) != 3 or i.shape[0] != 1 else i [0] for i in gpu_ins]
+
     # todo: we could make this a little faster by getting gpu_out from a central manager
     gpu_out = None
 
@@ -160,7 +170,6 @@ def _generate_signature_for_category(category: Category) -> Signature:
     )
     return Signature(params)
 
-
 def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[Layer]:
     """Generate a magicgui widget for a Category object
 
@@ -175,7 +184,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
     magicgui.widgets.FunctionGui
         A magicgui widget instance
     """
-
+    widget = None
     def gui_function(**kwargs) -> Optional[Layer]:
         """A function that calls a cle operation `call_op` and shows the result.
 
@@ -184,8 +193,29 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         """
         viewer = kwargs.pop(VIEWER_PARAM, None)
         inputs = [kwargs.pop(k) for k in list(kwargs) if k.startswith("input")]
+        t_position = None
+        if viewer is not None and len(viewer.dims.current_step) == 4:
+            # in case we process a 4D-data set, we need read out the current timepoint
+            # and consider it further down in call_op
+            t_position = viewer.dims.current_step[0]
+
+            currstep_event = viewer.dims.events.current_step
+
+            def update(event):
+                currstep_event.disconnect(update)
+                widget()
+
+            if hasattr(widget, 'updater'):
+                currstep_event.disconnect(widget.updater)
+
+            widget.updater = update
+
+            currstep_event.connect(update)
+
+        # todo: deal with 5D and nD data
+
         op_name = kwargs.pop("op_name")
-        result = call_op(op_name, inputs, *kwargs.values())
+        result = call_op(op_name, inputs, t_position, *kwargs.values())
         if result is not None:
             return _show_result(
                 result,

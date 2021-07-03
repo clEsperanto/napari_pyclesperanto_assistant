@@ -27,6 +27,7 @@ class Category:
     # visualization
     color_map : str = "gray"
     blending : str = "translucent"
+    tool_tip : str = None
 
 
 CATEGORIES = {
@@ -114,7 +115,7 @@ CATEGORIES = {
     "Label": Category(
         name="Label",
         inputs=(LayerInput,),
-        default_op="connected_components_labeling_box",
+        default_op="voronoi_otsu_labeling",
         output="labels",
         args=[
             ("a", PositiveFloatRange, 2),
@@ -135,17 +136,6 @@ CATEGORIES = {
     ),
     "Label measurements": Category(
         name="Label measurements",
-        inputs=(ImageInput, LabelsInput),
-        default_op="label_mean_intensity_map",
-        args=[
-            ("n", PositiveFloatRange, 1)
-        ],
-        include=("combine", "map"),
-        color_map="turbo",
-        blending="translucent",
-    ),
-    "Map": Category(
-        name="Map",
         inputs=(LabelsInput,),
         default_op="label_pixel_count_map",
         args=[
@@ -167,5 +157,23 @@ CATEGORIES = {
         include=("label measurement", "mesh"),
         color_map="green",
         blending="additive",
+    ),
+    "Label filters": Category(
+        name="Label filters",
+        inputs=(ImageInput, LabelsInput),
+        default_op="mean_of_proximal_neighbors_map",
+        args=[
+            ("n", PositiveFloatRange, 1),
+            ("m", PositiveFloatRange, 1)
+        ],
+        include=("combine", "map"),
+        color_map="turbo",
+        blending="translucent",
     )
 }
+
+def attach_tooltips():
+    # attach tooltips
+    import pyclesperanto_prototype as cle
+    for k, c in CATEGORIES.items():
+        c.tool_tip = "\n".join(list(cle.operations(['in assistant'] + list(c.include), c.exclude)))

@@ -7,6 +7,7 @@ from warnings import warn
 import pyclesperanto_prototype as cle
 from qtpy.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QVBoxLayout, QWidget
 
+from ._select_gpu import select_gpu
 from .._categories import CATEGORIES, Category
 from .._pipeline import Pipeline
 from ._button_grid import ButtonGrid
@@ -76,6 +77,8 @@ class Assistant(QWidget):
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(icon_grid)
         self.layout().addLayout(export_btns)
+
+        select_gpu()
 
     def _on_selection(self, event):
         for layer, (dw, gui) in self._layers.items():
