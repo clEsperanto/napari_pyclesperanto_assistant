@@ -54,6 +54,10 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, *args
         i0 = inputs[0].data[timepoint] if len(inputs[0].data.shape) == 4 else inputs[0].data
         gpu_ins = [cle.push((i.data[timepoint] if len(i.data.shape) == 4 else i.data) if i is not None else i0) for i in inputs]
 
+    # convert 3d-1-slice-data into 2d data
+    # to support 2d timelapse data
+    gpu_ins = [i if len(i.shape) != 3 or i.shape[0] != 1 else i [0] for i in gpu_ins]
+
     # todo: we could make this a little faster by getting gpu_out from a central manager
     gpu_out = None
 
