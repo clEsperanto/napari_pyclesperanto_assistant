@@ -166,15 +166,6 @@ def _generate_signature_for_category(category: Category) -> Signature:
     )
     return Signature(params)
 
-# source: https://github.com/jni/platelet-unet-watershed/blob/8dd7fa72a7d11d674443120e36417a9088767623/plateseg/_dock_widget.py#L15-L21
-@toolz.curry
-def self_destructing_callback(callback, disconnect):
-    def run_once_callback(*args, **kwargs):
-        result = callback(*args, **kwargs)
-        disconnect(run_once_callback)
-        return result
-    return run_once_callback
-
 def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[Layer]:
     """Generate a magicgui widget for a Category object
 
@@ -206,10 +197,15 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
 
             currstep_event = viewer.dims.events.current_step
 
-            @self_destructing_callback(disconnect=currstep_event.disconnect)
             def update(event):
-                print(viewer.dims.current_step)
+                currstep_event.disconnect(update)
                 widget()
+
+            if hasattr(widget, 'updater'):
+                currstep_event.disconnect(widget.updater)
+
+            widget.updater = update
+
             currstep_event.connect(update)
 
         # todo: deal with 5D and nD data
