@@ -16,8 +16,8 @@ def select_gpu():
 
     print("selecting gpu")
 
-    print(cle.available_device_names())
-    gpu_selector.show()
+    if len(cle.available_device_names()) > 1:
+        gpu_selector.show()
 
 
 select_gpu.device = None
