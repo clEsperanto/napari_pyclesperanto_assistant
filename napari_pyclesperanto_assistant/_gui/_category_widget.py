@@ -156,6 +156,9 @@ def _generate_signature_for_category(category: Category) -> Signature:
     ]
     # Add valid operations choices (will create the combo box)
     choices = list(cle.operations(['in assistant'] + list(category.include), category.exclude))
+    # temporary workaround: remove entries that start with "label_", those have been renamed in pyclesperanto
+    # and are only there for backwards compatibility
+    choices = list([c for c in choices if not c.startswith('label_')])
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
     params.append(
         Parameter(OP_NAME_PARAM, k, annotation=op_type, default=category.default_op)

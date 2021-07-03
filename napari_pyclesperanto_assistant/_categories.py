@@ -31,8 +31,8 @@ class Category:
 
 
 CATEGORIES = {
-    "Noise removal": Category(
-        name="Noise removal",
+    "Remove noise": Category(
+        name="Removal noise",
         inputs=(ImageInput,),
         default_op="gaussian_blur",
         args=[
@@ -43,8 +43,8 @@ CATEGORIES = {
         include=("filter", "denoise"),
         exclude=("combine",),
     ),
-    "Background removal": Category(
-        name="Background removal",
+    "Remove background": Category(
+        name="Remove background",
         inputs=(ImageInput,),
         default_op="top_hat_box",
         args=[
@@ -65,7 +65,7 @@ CATEGORIES = {
             ("z", FloatRange, 0)
         ],
         include=("filter",),
-        exclude=("combine", "denoise", "background removal"),
+        exclude=("combine", "denoise", "background removal", "binary processing"),
     ),
     "Combine": Category(
         name="Combine",
@@ -123,8 +123,8 @@ CATEGORIES = {
         ],
         include=("label",),
     ),
-    "Label processing": Category(
-        name="Label processing",
+    "Process labels": Category(
+        name="Process labels",
         inputs=(LabelsInput,),
         default_op="exclude_labels_on_edges",
         output="labels",
@@ -134,8 +134,8 @@ CATEGORIES = {
         ],
         include=("label processing",),
     ),
-    "Label measurements": Category(
-        name="Label measurements",
+    "Measure labels": Category(
+        name="Measure labels",
         inputs=(LabelsInput,),
         default_op="label_pixel_count_map",
         args=[
@@ -144,6 +144,18 @@ CATEGORIES = {
         ],
         include=("label measurement", "map"),
         exclude=("combine",),
+        color_map="turbo",
+        blending="translucent",
+    ),
+    "Measure labeled image": Category(
+        name="Measure labeled image",
+        inputs=(ImageInput, LabelsInput),
+        default_op="label_mean_intensity_map",
+        args=[
+            ("n", PositiveFloatRange, 1),
+            ("m", PositiveFloatRange, 1)
+        ],
+        include=("combine","label measurement", "map"),
         color_map="turbo",
         blending="translucent",
     ),
@@ -158,22 +170,26 @@ CATEGORIES = {
         color_map="green",
         blending="additive",
     ),
-    "Label filters": Category(
-        name="Label filters",
+    "Label neighbor filters": Category(
+        name="Label neighbor filters",
         inputs=(ImageInput, LabelsInput),
-        default_op="mean_of_proximal_neighbors_map",
+        default_op="mean_of_n_nearest_neighbors_map",
         args=[
             ("n", PositiveFloatRange, 1),
-            ("m", PositiveFloatRange, 1)
+            ("m", PositiveFloatRange, 100),
         ],
-        include=("combine", "map"),
+        include=("neighbor",),
         color_map="turbo",
         blending="translucent",
-    )
+    ),
 }
 
 def attach_tooltips():
     # attach tooltips
     import pyclesperanto_prototype as cle
     for k, c in CATEGORIES.items():
-        c.tool_tip = "\n".join(list(cle.operations(['in assistant'] + list(c.include), c.exclude)))
+        choices = list(cle.operations(['in assistant'] + list(c.include), c.exclude))
+        # temporary workaround: remove entries that start with "label_", those have been renamed in pyclesperanto
+        # and are only there for backwards compatibility
+        choices = list([c for c in choices if not c.startswith('label_')])
+        c.tool_tip = "\n".join(choices)
