@@ -28,7 +28,7 @@ You can then start napari and find the assistant in the `Plugins` menu.
 napari
 ```
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support.gif)
 
 ## Features
 [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) offers various possibilities for processing images. It comes from developers who work in life sciences and thus, it may be focused towards processing two- and three-dimensional microscopy image data showing cells and tissues. A selection of pyclesperanto's functionality is available via the assistant user interface. Typical workflows which can be built with this assistant include
