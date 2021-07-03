@@ -137,7 +137,7 @@ CATEGORIES = {
     "Measure labels": Category(
         name="Measure labels",
         inputs=(LabelsInput,),
-        default_op="label_pixel_count_map",
+        default_op="pixel_count_map",
         args=[
             ("n", PositiveFloatRange, 1),
             ("m", PositiveFloatRange, 1)
