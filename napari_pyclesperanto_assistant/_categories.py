@@ -103,6 +103,11 @@ CATEGORIES = {
         description="Reduce dimensionality of images\nfrom three to two dimensions.",
         inputs=(LayerInput,),
         default_op="maximum_z_projection",
+        args=[
+            ("rx", PositiveFloatRange, 1),
+            ("ry", PositiveFloatRange, 1),
+            ("s", PositiveFloatRange, 1),
+        ],
         output="image",  # can also be labels
         include=("projection",),
     ),

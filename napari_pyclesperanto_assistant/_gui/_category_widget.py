@@ -123,7 +123,7 @@ def _show_result(
 
     try:
         # look for an existing layer
-        layer = next(x for x in viewer.layers if x.metadata.get(OP_ID) == op_id)
+        layer = next(x for x in viewer.layers if isinstance(x.metadata, dict) and x.metadata.get(OP_ID) == op_id)
         logger.debug(f"updating existing layer: {layer}, with id: {op_id}")
         layer.data = data
         layer.name = name
