@@ -159,7 +159,8 @@ class Assistant(QWidget):
             key = None
             if isinstance(layer.metadata, dict):
                 key = layer.metadata.get(OP_ID)
-            if key is not None:
+
+            if key is None:
                 key = "some_random_key"
 
             args = []
@@ -173,7 +174,8 @@ class Assistant(QWidget):
                         op_id = w.value.metadata.get(OP_ID)
                     if op_id is None:
                         op_id = "some_random_key"
-                        graph[self._id_to_name(op_id, name_dict)] = (cle.imread, ["w.value._source"], [])  # TODO
+                        source = str(w.value.source.path).replace("\\", "/") if w.value.source is not None else "file"
+                        graph[self._id_to_name(op_id, name_dict)] = (cle.imread, ["'" + source + "'"], [])  # TODO
                     inputs.append(self._id_to_name(op_id, name_dict))
                 else:
                     args.append(w.value)
