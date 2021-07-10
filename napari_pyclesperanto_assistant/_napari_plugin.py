@@ -10,7 +10,7 @@ from ._gui import Assistant
 from ._gui._category_widget import make_gui_for_category
 from ._statistics_of_labeled_pixels import statistics_of_labeled_pixels
 from ._convert_to_numpy import convert_to_numpy, convert_to_2d_timelapse, make_labels_editable, \
-    reset_brightness_contrast, auto_brightness_contrast
+    reset_brightness_contrast, auto_brightness_contrast, split_stack, auto_brightness_contrast_all_images
 from ._categories import attach_tooltips
 
 @napari_hook_implementation
@@ -38,7 +38,9 @@ def napari_experimental_provide_function():
         statistics_of_labeled_pixels,
         make_labels_editable,
         auto_brightness_contrast,
+        auto_brightness_contrast_all_images,
         reset_brightness_contrast,
+        split_stack,
         convert_to_numpy,
         convert_to_2d_timelapse
     ]
