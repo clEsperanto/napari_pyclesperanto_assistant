@@ -219,6 +219,9 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
 
         op_name = kwargs.pop("op_name")
         result = call_op(op_name, inputs, t_position, *kwargs.values())
+
+        widget.native.setToolTip(cle.operation(op_name).__doc__)
+
         if result is not None:
             return _show_result(
                 result,
