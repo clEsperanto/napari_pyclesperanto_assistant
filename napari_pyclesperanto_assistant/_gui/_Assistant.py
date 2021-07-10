@@ -156,8 +156,10 @@ class Assistant(QWidget):
         graph = {}
         name_dict = {}
         for layer, (dw, mgui) in self._layers.items():
-            key = layer.metadata.get(OP_ID)
-            if not key:
+            key = None
+            if isinstance(layer.metadata, dict):
+                key = layer.metadata.get(OP_ID)
+            if key is not None:
                 key = "some_random_key"
 
             args = []
@@ -166,7 +168,9 @@ class Assistant(QWidget):
                 if w.name in (VIEWER_PARAM, OP_NAME_PARAM):
                     continue
                 if "napari.layers" in type(w.value).__module__:
-                    op_id = w.value.metadata.get(OP_ID)
+                    op_id = None
+                    if isinstance(w.value.metadata, dict):
+                        op_id = w.value.metadata.get(OP_ID)
                     if op_id is None:
                         op_id = "some_random_key"
                         graph[self._id_to_name(op_id, name_dict)] = (cle.imread, ["w.value._source"], [])  # TODO
