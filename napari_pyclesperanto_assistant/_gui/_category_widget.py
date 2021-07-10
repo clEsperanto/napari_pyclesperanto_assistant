@@ -240,6 +240,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         widget.help.setToolTip(description)
         widget.help.clicked.connect(call_link)
         widget.native.layout().addWidget(widget.help)
+        getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
 
         if result is not None:
             return _show_result(
