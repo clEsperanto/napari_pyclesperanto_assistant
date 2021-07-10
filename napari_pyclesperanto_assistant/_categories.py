@@ -16,6 +16,7 @@ global_magic_opts = {"auto_call": True}
 @dataclass
 class Category:
     name: str
+    description: str
     inputs: Sequence[Type]
     default_op: str
     output: str = "image"  # or labels
@@ -33,6 +34,7 @@ class Category:
 CATEGORIES = {
     "Remove noise": Category(
         name="Removal noise",
+        description="Remove noise from images, e.g. by local averaging and blurring.",
         inputs=(ImageInput,),
         default_op="gaussian_blur",
         args=[
@@ -45,6 +47,7 @@ CATEGORIES = {
     ),
     "Remove background": Category(
         name="Remove background",
+        description="Remove background intensity, e.g. caused\nby out-of-focus light or uneven illumination.",
         inputs=(ImageInput,),
         default_op="top_hat_box",
         args=[
@@ -57,6 +60,7 @@ CATEGORIES = {
     ),
     "Filter": Category(
         name="Filter",
+        description="Filter images, e.g. to adjust gamma or detect edges.",
         inputs=(ImageInput,),
         default_op="gamma_correction",
         args=[
@@ -68,7 +72,8 @@ CATEGORIES = {
         exclude=("combine", "denoise", "background removal", "binary processing"),
     ),
     "Combine": Category(
-        name="Combine",
+        name="Combine",\
+        description="Combine images using pixel-wise mathematical operations.",
         inputs=(LayerInput, LayerInput),
         default_op="add_images",
         include=("combine",),
@@ -80,6 +85,7 @@ CATEGORIES = {
     ),
     "Transform": Category(
         name="Transform",
+        description="Apply spatial transformation to images.",
         inputs=(LayerInput,),
         default_op="sub_stack",
         output="image",  # can also be labels
@@ -94,6 +100,7 @@ CATEGORIES = {
     ),
     "Projection": Category(
         name="Projection",
+        description="Reduce dimensionality of images\nfrom three to two dimensions.",
         inputs=(LayerInput,),
         default_op="maximum_z_projection",
         output="image",  # can also be labels
@@ -101,6 +108,7 @@ CATEGORIES = {
     ),
     "Binarize": Category(
         name="Binarize",
+        description="Turn images into binary images.",
         inputs=(LayerInput,),
         default_op="threshold_otsu",
         output="labels",
@@ -114,6 +122,7 @@ CATEGORIES = {
     ),
     "Label": Category(
         name="Label",
+        description="Turn images or binary images into\nlabel images by labeling objects.",
         inputs=(LayerInput,),
         default_op="voronoi_otsu_labeling",
         output="labels",
@@ -125,6 +134,7 @@ CATEGORIES = {
     ),
     "Process labels": Category(
         name="Process labels",
+        description="Process label images to improve\nby changing their shape and/or removing\nobjects which don't fulfill certain conditions.",
         inputs=(LabelsInput,),
         default_op="exclude_labels_on_edges",
         output="labels",
@@ -136,6 +146,7 @@ CATEGORIES = {
     ),
     "Measure labels": Category(
         name="Measure labels",
+        description="Measure and visualize spatial\nfeatures of labeled objects.",
         inputs=(LabelsInput,),
         default_op="pixel_count_map",
         args=[
@@ -149,6 +160,7 @@ CATEGORIES = {
     ),
     "Measure labeled image": Category(
         name="Measure labeled image",
+        description="Measure and visualize intensity-based\nfeatures of labeled objects.",
         inputs=(ImageInput, LabelsInput),
         default_op="label_mean_intensity_map",
         args=[
@@ -161,6 +173,7 @@ CATEGORIES = {
     ),
     "Mesh": Category(
         name="Mesh",
+        description="Draw connectivity meshes between\ncentroids of labeled objects.",
         inputs=(LabelsInput,),
         default_op="draw_mesh_between_touching_labels",
         args=[
@@ -172,6 +185,7 @@ CATEGORIES = {
     ),
     "Label neighbor filters": Category(
         name="Label neighbor filters",
+        description="Process values associated with labeled objects\naccording to the neighborhood-graph of the labels.",
         inputs=(ImageInput, LabelsInput),
         default_op="mean_of_n_nearest_neighbors_map",
         args=[
@@ -192,4 +206,4 @@ def attach_tooltips():
         # temporary workaround: remove entries that start with "label_", those have been renamed in pyclesperanto
         # and are only there for backwards compatibility
         choices = list([c for c in choices if not c.startswith('label_')])
-        c.tool_tip = "\n".join(choices)
+        c.tool_tip = c.description + "\n\nOperations:\n* " + "\n* ".join(choices).replace("_", " ")
