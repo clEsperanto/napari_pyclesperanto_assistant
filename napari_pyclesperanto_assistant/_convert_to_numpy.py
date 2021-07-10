@@ -14,3 +14,9 @@ def convert_to_2d_timelapse(layer : LayerInput) -> Layer:
         return Labels(np.expand_dims(layer.data, axis=1), name="2d+t " + layer.name)
     else:
         return Image(np.expand_dims(layer.data, axis=1), name="2d+t " + layer.name)
+
+def make_labels_editable(labels : Labels) -> Labels:
+    return Labels(np.asarray(labels.data), name="np " + labels.name)
+
+def reset_brightness_contrast(image: Image):
+    image.contrast_limits = (image.data.min(), image.data.max())
