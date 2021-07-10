@@ -20,3 +20,9 @@ def make_labels_editable(labels : Labels) -> Labels:
 
 def reset_brightness_contrast(image: Image):
     image.contrast_limits = (image.data.min(), image.data.max())
+
+def auto_brightness_contrast(image: Image, lower_percentile : float = 1, upper_percentile : float = 99):
+    data = np.asarray(image.data)
+    lp = np.percentile(data, lower_percentile)
+    up = np.percentile(data, upper_percentile)
+    image.contrast_limits = (lp, up)
