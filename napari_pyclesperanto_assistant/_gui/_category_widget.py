@@ -10,6 +10,7 @@ from magicgui import magicgui
 from typing_extensions import Annotated
 
 from .._categories import Category
+from qtpy.QtWidgets import QPushButton
 
 if TYPE_CHECKING:
     from napari.layers import Layer
@@ -224,7 +225,22 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         op_name = kwargs.pop("op_name")
         result = call_op(op_name, inputs, t_position, *kwargs.values())
 
-        widget.native.setToolTip(cle.operation(op_name).__doc__.replace("\n    ", "\n"))
+        # add a help-button
+        description = cle.operation(op_name).__doc__.replace("\n    ", "\n")
+        temp = description.split('https:')
+        link = "https://napari-hub.org/plugins/napari-pyclesperanto-assistant"
+        print(temp)
+        if len(temp) > 1:
+            link = "https:" + temp[1].split("\n")[0]
+        def call_link():
+            import webbrowser
+            webbrowser.open(link)
+        if hasattr(widget, 'help'):
+            widget.native.layout().removeWidget(widget.help)
+        widget.help = QPushButton("Help")
+        widget.help.setToolTip(description)
+        widget.help.clicked.connect(call_link)
+        widget.native.layout().addWidget(widget.help)
 
         if result is not None:
             return _show_result(
