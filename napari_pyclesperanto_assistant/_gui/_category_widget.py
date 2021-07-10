@@ -141,7 +141,8 @@ def _show_result(
         layer = add_layer(data, **kwargs)
 
     if scale is not None:
-        layer.scale = scale
+        if len(layer.data.shape) <= len(scale):
+            layer.scale = scale[-len(layer.data.shape):]
     return layer
 
 
