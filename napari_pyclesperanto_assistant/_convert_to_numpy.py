@@ -59,3 +59,14 @@ def split_stack(image : Image, napari_viewer : Viewer, axis : int = 0):
     for i in range(data.shape[axis]):
         napari_viewer.add_image(data.take(i, axis), name=image.name + "[" + str(i) + "]")
     napari_viewer.window.remove_dock_widget(split_stack.native)
+
+
+def set_voxel_size(image : LayerInput, voxel_width : float = 1, voxel_height : float = 1, voxel_depth : float = 1):
+    image.scale = [voxel_depth, voxel_height, voxel_width]
+
+
+def set_voxel_size_of_all_layers(napari_viewer : Viewer, voxel_width : float = 1, voxel_height : float = 1, voxel_depth : float = 1):
+    for layer in napari_viewer.layers:
+        layer.scale = [voxel_depth, voxel_height, voxel_width]
+    napari_viewer.window.remove_dock_widget(set_voxel_size_of_all_layers.native)
+
