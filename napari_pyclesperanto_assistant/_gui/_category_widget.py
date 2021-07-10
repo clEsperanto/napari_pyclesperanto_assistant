@@ -229,7 +229,6 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         description = cle.operation(op_name).__doc__.replace("\n    ", "\n")
         temp = description.split('https:')
         link = "https://napari-hub.org/plugins/napari-pyclesperanto-assistant"
-        print(temp)
         if len(temp) > 1:
             link = "https:" + temp[1].split("\n")[0]
         def call_link():
