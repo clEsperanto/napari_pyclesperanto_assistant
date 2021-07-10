@@ -41,7 +41,10 @@ class JythonGenerator:
     @staticmethod
     def operate(step) -> str:
         # TODO: in case of imread, we may do something special here...
-        args = step.inputs + [f"cle.create_like({step.inputs[0]})"] + step.args
+        if "imread" in step.operation:
+            args = step.inputs
+        else:
+            args = step.inputs + [f"cle.create_like({step.inputs[0]})"] + step.args
         return f"{step.output} = cle.{step.operation}({', '.join(map(str, args))})"
 
     @staticmethod

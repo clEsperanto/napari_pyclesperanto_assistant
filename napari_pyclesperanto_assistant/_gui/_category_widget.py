@@ -10,6 +10,7 @@ from magicgui import magicgui
 from typing_extensions import Annotated
 
 from .._categories import Category
+from qtpy.QtWidgets import QPushButton
 
 if TYPE_CHECKING:
     from napari.layers import Layer
@@ -81,6 +82,7 @@ def _show_result(
     translate=None,
     cmap=None,
     blending=None,
+    scale=None,
 ) -> Optional[Layer]:
     """Show `gpu_out` in the napari viewer.
 
@@ -123,12 +125,10 @@ def _show_result(
 
     try:
         # look for an existing layer
-        layer = next(x for x in viewer.layers if x.metadata.get(OP_ID) == op_id)
+        layer = next(x for x in viewer.layers if isinstance(x.metadata, dict) and x.metadata.get(OP_ID) == op_id)
         logger.debug(f"updating existing layer: {layer}, with id: {op_id}")
         layer.data = data
         layer.name = name
-        if layer_type != "labels":
-            layer.contrast_limits = clims
         # layer.translate = translate
     except StopIteration:
         # otherwise create a new one
@@ -138,7 +138,12 @@ def _show_result(
         if layer_type == "image":
             kwargs["colormap"] = cmap
             kwargs["blending"] = blending
+            kwargs['contrast_limits'] = clims
         layer = add_layer(data, **kwargs)
+
+    if scale is not None:
+        if len(layer.data.shape) <= len(scale):
+            layer.scale = scale[-len(layer.data.shape):]
     return layer
 
 
@@ -219,6 +224,24 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
 
         op_name = kwargs.pop("op_name")
         result = call_op(op_name, inputs, t_position, *kwargs.values())
+
+        # add a help-button
+        description = cle.operation(op_name).__doc__.replace("\n    ", "\n")
+        temp = description.split('https:')
+        link = "https://napari-hub.org/plugins/napari-pyclesperanto-assistant"
+        if len(temp) > 1:
+            link = "https:" + temp[1].split("\n")[0]
+        def call_link():
+            import webbrowser
+            webbrowser.open(link)
+        if hasattr(widget, 'help'):
+            widget.native.layout().removeWidget(widget.help)
+        widget.help = QPushButton("Help")
+        widget.help.setToolTip(description)
+        widget.help.clicked.connect(call_link)
+        widget.native.layout().addWidget(widget.help)
+        getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
+
         if result is not None:
             return _show_result(
                 result,
@@ -228,6 +251,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
                 op_id=id(gui_function),
                 cmap=category.color_map,
                 blending=category.blending,
+                scale=inputs[0].scale,
             )
         return None
 
