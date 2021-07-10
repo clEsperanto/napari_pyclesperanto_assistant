@@ -167,7 +167,7 @@ CATEGORIES = {
         name="Measure labeled image",
         description="Measure and visualize intensity-based\nfeatures of labeled objects.",
         inputs=(ImageInput, LabelsInput),
-        default_op="label_mean_intensity_map",
+        default_op="mean_intensity_map",
         args=[
             ("n", PositiveFloatRange, 1),
             ("m", PositiveFloatRange, 1)
