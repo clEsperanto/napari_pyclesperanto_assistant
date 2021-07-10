@@ -58,6 +58,9 @@ class Assistant(QWidget):
             napari_viewer.events.active_layer.connect(self._on_active_layer_change)
         self._layers: Dict[Layer, Tuple[QtViewerDockWidget, FunctionGui]] = {}
 
+        # visualize intermediate results human-readable from top-left to bottom-right
+        self._viewer.grid.stride = -1
+
         icon_grid = ButtonGrid(self)
         icon_grid.addItems(CATEGORIES)
         icon_grid.itemClicked.connect(self._on_item_clicked)
