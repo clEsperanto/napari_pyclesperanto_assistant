@@ -12,9 +12,11 @@ It is part of the [clEsperanto](http://clesperanto.net) project and thus, aims a
 It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) and with that [pyopencl](https://documen.tician.de/pyopencl/) as backend for processing images.
 This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiecutter) using with napari's [cookiecutter-napari-plugin](https://github.com/napari/cookiecutter-napari-plugin) template.
 
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support1.gif)
+
 ## Installation
 
-It is recommended to install the plugin via conda:
+It is recommended to install the assistant via conda:
 ```shell
 conda create --name bio11 python==3.8.5 
 conda activate bio11 
@@ -23,12 +25,17 @@ pip install napari-pyclesperanto-assistant
 pip install napari[all]
 ```
 
-You can then start napari and find the assistant in the `Plugins` menu.
+Alternatively, you can install the assistant using napari's plugin installer in the menu `Plugins > Install/uninstall Packages`.
+Windows users should make sure the [Microsoft buildtools are installed](https://biapol.github.io/blog/robert_haase/ms_build_tools/) in advance.
+
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_installer.png)
+
+You can then start napari, e.g. from command line, and find the assistant in the `Plugins` menu.
 ```shell
 napari
 ```
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support1.gif)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.gif)
 
 ## Features
 [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) offers various possibilities for processing images. It comes from developers who work in life sciences and thus, it may be focused towards processing two- and three-dimensional microscopy image data showing cells and tissues. A selection of pyclesperanto's functionality is available via the assistant user interface. Typical workflows which can be built with this assistant include
