@@ -28,7 +28,7 @@ You can then start napari and find the assistant in the `Plugins` menu.
 napari
 ```
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support.gif)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support1.gif)
 
 ## Features
 [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) offers various possibilities for processing images. It comes from developers who work in life sciences and thus, it may be focused towards processing two- and three-dimensional microscopy image data showing cells and tissues. A selection of pyclesperanto's functionality is available via the assistant user interface. Typical workflows which can be built with this assistant include
@@ -103,10 +103,6 @@ napari
   * tissue classification
 
 ## Usage
-This short tutorial demonstrates how to generate code using the pyclersperanto-assistant. 
-
-<iframe src="https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/pyclesperanto_assistant_screencast.mp4" width="600" height="300"></iframe>
-[Download workflow as video](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/pyclesperanto_assistant_screencast.mp4)
 
 ### Start up the assistant
 Start up napari, e.g. from the command line:
@@ -117,35 +113,35 @@ napari
 Load example data, e.g. from the menu `File > Open Samples > clEsperanto > CalibZAPWfixed` and 
 start the assistant from the menu `Plugins > clEsperanto > Assistant`. Select a GPU in case you are asked to.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_1.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot1.png)
 
 In case of two dimensional timelapse data, an initial conversion step might be necessary depending on your data source. 
 Click the menu `Plugins > clEsperanto > Convert to 2d timelapse`. In the dialog, select the dataset and click ok. 
 You can delete the original dataset afterwards:
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_1a.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot1a.png)
 
 ### Set up a workflow
 
 Choose categories of operations in the top right panel, for example start with denoising using a Gaussian Blur with sigma 1 in x and y.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_2.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2.png)
 
 Continue with background removal using the top-hat filter with radius 5 in x and y.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_2a.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2a.png)
 
 For labeling the objects, use [Voronoi-Otsu-Labeling](https://nbviewer.jupyter.org/github/clEsperanto/pyclesperanto_prototype/blob/master/demo/segmentation/voronoi_otsu_labeling.ipynb) with both sigma parameters set to 2.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_2b.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2b.png)
 
 The labeled objects can be extended using a Voronoi diagram to derive a estimations of cell boundaries.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_2c.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2c.png)
 
 You can then configure napari to show the label boundaries on top of the original image:
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_2d.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2d.png)
 
 When your workflow is set up, click the play button below your dataset:
 
@@ -153,7 +149,7 @@ When your workflow is set up, click the play button below your dataset:
 
 ### Code generation
 You can also export your workflow as Python/Jython code or as notebook.
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_3.png)
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot3.png)
 
 After exporting your workflow as Jupyter notebook, you can start the notebook from the command line using
 ```
