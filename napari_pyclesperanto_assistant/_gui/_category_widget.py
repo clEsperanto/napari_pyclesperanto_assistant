@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from inspect import Parameter, Signature, signature
+
+from qtpy import QtCore
 from typing import Optional, TYPE_CHECKING, Sequence
 
 import pyclesperanto_prototype as cle
@@ -226,21 +228,23 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         result = call_op(op_name, inputs, t_position, *kwargs.values())
 
         # add a help-button
-        description = cle.operation(op_name).__doc__.replace("\n    ", "\n")
+        description = cle.operation(op_name).__doc__.replace("\n    ", "\n") + "\n\nRight-click to learn more..."
         temp = description.split('https:')
         link = "https://napari-hub.org/plugins/napari-pyclesperanto-assistant"
         if len(temp) > 1:
             link = "https:" + temp[1].split("\n")[0]
-        def call_link():
-            import webbrowser
-            webbrowser.open(link)
-        if hasattr(widget, 'help'):
-            widget.native.layout().removeWidget(widget.help)
-        widget.help = QPushButton("Help")
-        widget.help.setToolTip(description)
-        widget.help.clicked.connect(call_link)
-        widget.native.layout().addWidget(widget.help)
         getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
+
+        # Right-click: Open online help
+        combobox = getattr(widget, OP_NAME_PARAM).native
+        combobox.orig_mousePressEvent = getattr(widget, OP_NAME_PARAM).native.mousePressEvent
+        def call_link(event):
+            if event.button() == QtCore.Qt.RightButton:
+                import webbrowser
+                webbrowser.open(link)
+            else:
+                combobox.orig_mousePressEvent(event)
+        combobox.mousePressEvent = call_link
 
         if result is not None:
             return _show_result(
