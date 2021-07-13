@@ -26,7 +26,16 @@ pip install napari[all]
 ```
 
 Alternatively, you can install the assistant using napari's plugin installer in the menu `Plugins > Install/uninstall Packages`.
-Windows users should make sure the [Microsoft buildtools are installed](https://biapol.github.io/blog/robert_haase/ms_build_tools/) in advance.
+Windows users should paste this URL
+
+```
+https://github.com/clEsperanto/napari_pyclesperanto_assistant/blob/master/installation_help/pyopencl-2020.3.1+cl12-cp38-cp38-win_amd64.whl?raw=true
+```
+
+in this field and click on `Install` before proceeding:
+![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_installer2.png)
+
+Afterwards, click install clEsperanto like by clicking on `Install` here:
 
 ![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_installer.png)
 
