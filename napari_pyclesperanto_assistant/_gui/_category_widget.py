@@ -228,7 +228,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         result = call_op(op_name, inputs, t_position, *kwargs.values())
 
         # add a help-button
-        description = cle.operation(op_name).__doc__.replace("\n    ", "\n")
+        description = cle.operation(op_name).__doc__.replace("\n    ", "\n") + "\n\nRight-click to learn more..."
         temp = description.split('https:')
         link = "https://napari-hub.org/plugins/napari-pyclesperanto-assistant"
         if len(temp) > 1:
