@@ -12,7 +12,7 @@ It is part of the [clEsperanto](http://clesperanto.net) project and thus, aims a
 It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) and with that [pyopencl](https://documen.tician.de/pyopencl/) as backend for processing images.
 This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiecutter) using with napari's [cookiecutter-napari-plugin](https://github.com/napari/cookiecutter-napari-plugin) template.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support1.gif)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support1.gif)
 
 ## Installation
 
@@ -33,18 +33,18 @@ https://github.com/clEsperanto/napari_pyclesperanto_assistant/blob/master/instal
 ```
 
 in this field and click on `Install` before proceeding:
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_installer2.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot_installer2.png)
 
 Afterwards, click install clEsperanto like by clicking on `Install` here:
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot_installer.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot_installer.png)
 
 You can then start napari, e.g. from command line, and find the assistant in the `Plugins` menu.
 ```shell
 napari
 ```
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot.gif)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
 
 ## Features
 [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) offers various possibilities for processing images. It comes from developers who work in life sciences and thus, it may be focused towards processing two- and three-dimensional microscopy image data showing cells and tissues. A selection of pyclesperanto's functionality is available via the assistant user interface. Typical workflows which can be built with this assistant include
@@ -129,43 +129,43 @@ napari
 Load example data, e.g. from the menu `File > Open Samples > clEsperanto > CalibZAPWfixed` and 
 start the assistant from the menu `Plugins > clEsperanto > Assistant`. Select a GPU in case you are asked to.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot1.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot1.png)
 
 In case of two dimensional timelapse data, an initial conversion step might be necessary depending on your data source. 
 Click the menu `Plugins > clEsperanto > Convert to 2d timelapse`. In the dialog, select the dataset and click ok. 
 You can delete the original dataset afterwards:
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot1a.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot1a.png)
 
 ### Set up a workflow
 
 Choose categories of operations in the top right panel, for example start with denoising using a Gaussian Blur with sigma 1 in x and y.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2.png)
 
 Continue with background removal using the top-hat filter with radius 5 in x and y.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2a.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2a.png)
 
 For labeling the objects, use [Voronoi-Otsu-Labeling](https://nbviewer.jupyter.org/github/clEsperanto/pyclesperanto_prototype/blob/master/demo/segmentation/voronoi_otsu_labeling.ipynb) with both sigma parameters set to 2.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2b.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2b.png)
 
 The labeled objects can be extended using a Voronoi diagram to derive a estimations of cell boundaries.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2c.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2c.png)
 
 You can then configure napari to show the label boundaries on top of the original image:
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot2d.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2d.png)
 
 When your workflow is set up, click the play button below your dataset:
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/timelapse_2d.gif)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/timelapse_2d.gif)
 
 ### Code generation
 You can also export your workflow as Python/Jython code or as notebook.
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/screenshot3.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot3.png)
 
 After exporting your workflow as Jupyter notebook, you can start the notebook from the command line using
 ```
@@ -175,12 +175,12 @@ jupyter notebook my_notebook.ipynb
 In some cases you need to replace the command `cle.imread('None`)` with a command loading your image data. 
 After that, you can execute the notebook.
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/notebook.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/notebook.png)
 
 You can also export code to the clipboard or as python code to disc. 
 This python code can also be executed in [Fiji](https://fiji.sc)`s Jython, in case the [CLIJx-assistant is installed](https://clij.github.io/assistant/installation).
 
-![](https://github.com/haesleinhuepf/pyclesperanto_assistant/raw/master/docs/images/fiji_execution.png)
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/fiji_execution.png)
 
 Also note: The generated python/jython code is not capable of processing timelapse data,
 you need to program a for-loop processing timepoints individually yourself. 
