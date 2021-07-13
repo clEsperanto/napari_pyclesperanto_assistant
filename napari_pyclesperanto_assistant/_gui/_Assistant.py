@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+
 from typing import TYPE_CHECKING, Dict, Tuple
 from warnings import warn
 
@@ -139,8 +140,29 @@ class Assistant(QWidget):
         self._layers[gui()] = (dw, gui)
         # turn on auto_call, and make sure that if the input changes we update
         gui._auto_call = True
-        # TODO: if the input layer changes this needs to be disconnected
-        input_layer.events.data.connect(lambda x: gui())
+        self._connect_to_all_layers()
+
+    def _refesh_data(self, event):
+        self._refresh(event.source)
+
+    def _refresh(self, changed_layer):
+        """Goes through all layers and refreshs those which have changed_layer as input
+
+        Parameters
+        ----------
+        changed_layer
+        """
+        for layer, (dw, mgui) in self._layers.items():
+            for w in mgui:
+                if w.value == changed_layer:
+                    mgui()
+
+    def _connect_to_all_layers(self):
+        """Attach an event listener to all layers that are currently open in napari
+        """
+        for layer in self._viewer.layers:
+            layer.events.data.disconnect(self._refesh_data)
+            layer.events.data.connect(self._refesh_data)
 
     def load_sample_data(self, fname="Lund_000500_resampled-cropped.tif"):
         data_dir = Path(__file__).parent.parent / "data"
