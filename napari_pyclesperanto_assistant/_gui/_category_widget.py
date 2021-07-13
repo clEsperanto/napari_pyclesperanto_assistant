@@ -239,7 +239,6 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         combobox = getattr(widget, OP_NAME_PARAM).native
         combobox.orig_mousePressEvent = getattr(widget, OP_NAME_PARAM).native.mousePressEvent
         def call_link(event):
-            print(event.button())
             if event.button() == QtCore.Qt.RightButton:
                 import webbrowser
                 webbrowser.open(link)
