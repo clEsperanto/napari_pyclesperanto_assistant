@@ -236,15 +236,15 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
 
         # Right-click: Open online help
-        combobox = getattr(widget, OP_NAME_PARAM).native
-        combobox.orig_mousePressEvent = getattr(widget, OP_NAME_PARAM).native.mousePressEvent
-        def call_link(event):
-            if event.button() == QtCore.Qt.RightButton:
-                import webbrowser
-                webbrowser.open(link)
-            else:
-                combobox.orig_mousePressEvent(event)
-        combobox.mousePressEvent = call_link
+        #combobox = getattr(widget, OP_NAME_PARAM).native
+        #combobox.orig_mousePressEvent = getattr(widget, OP_NAME_PARAM).native.mousePressEvent
+        #def call_link(event):
+        #    if event.button() == QtCore.Qt.RightButton:
+        #        import webbrowser
+        #        webbrowser.open(link)
+        #    else:
+        #        combobox.orig_mousePressEvent(event)
+        #combobox.mousePressEvent = call_link
 
         if result is not None:
             return _show_result(
