@@ -35,6 +35,7 @@ setup(
     author="Robert Haase, Talley Lambert",
     author_email="robert.haase@tu-dresden.de",
     description="OpenCL based GPU-accelerated image processing in napari",
+    license="BSD-3-Clause",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/clesperanto/napari_pyclesperanto_assistant",
