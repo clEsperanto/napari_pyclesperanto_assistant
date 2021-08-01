@@ -15,6 +15,11 @@ def convert_to_numpy(layer : LayerInput) -> Layer:
     else:
         return Image(np.asarray(layer.data), name="np " + layer.name)
 
+def convert_image_to_labels(layer : Image) -> Layer:
+    return Labels(np.asarray(layer.data).astype(int), name="Labels " + layer.name)
+
+def convert_labels_to_image(layer : Labels) -> Layer:
+    return Image(np.asarray(layer.data), name="Image " + layer.name)
 
 def convert_to_2d_timelapse(layer : LayerInput) -> Layer:
     if isinstance(layer, Labels):
