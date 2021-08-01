@@ -55,7 +55,13 @@ setup(
     ],
     entry_points={
         "napari.plugin": [
-            "clEsperanto = napari_pyclesperanto_assistant._napari_plugin",
+            "9 clEsperanto = napari_pyclesperanto_assistant._napari_pyclesperanto_assistant",
+            "8 Filtering on GPU (clEsperanto) = napari_pyclesperanto_assistant._napari_filters",
+            "7 Transforms on GPU (clEsperanto) = napari_pyclesperanto_assistant._napari_transforms",
+            "6 Projections on GPU (clEsperanto) = napari_pyclesperanto_assistant._napari_projections",
+            "5 Segmentation on GPU (clEsperanto) = napari_pyclesperanto_assistant._napari_segmentation",
+            "4 Measurements on GPU (clEsperanto) = napari_pyclesperanto_assistant._napari_measurements",
+            "3 Utilities (clEsperanto) = napari_pyclesperanto_assistant._napari_utilities",
         ],
     },
 )
