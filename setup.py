@@ -31,10 +31,10 @@ with open(filename) as f:
 #use_scm = {"write_to": "napari_pyclesperanto_assistant/_version.py"}
 setup(
     name="napari_pyclesperanto_assistant",
-    version="0.9.8",
+    version="0.9.9",
     author="Robert Haase, Talley Lambert",
     author_email="robert.haase@tu-dresden.de",
-    description="OpenCL based GPU-accelerated image processing in napari",
+    description="GPU-accelerated image processing in napari using OpenCL",
     license="BSD-3-Clause",
     long_description=long_description,
     long_description_content_type="text/markdown",
