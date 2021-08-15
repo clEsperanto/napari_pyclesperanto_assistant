@@ -30,7 +30,8 @@ def napari_provide_sample_data():
         "Lund": data / "Lund_000500_resampled-cropped.tif",
         "CalibZAPWfixed": data / "CalibZAPWfixed_000154_max.tif",
         "Sonneberg": data / "Sonneberg100_Resampled_RotY-40_MaxZ.tif",
-        "Haase_MRT_tfl3d1": "https://zenodo.org/record/5090508/files/Haase_MRT_tfl3d1.tif?download=1",
+        "Haase_MRT_tfl3d1": data / "Haase_MRT_tfl3d1.tif",
+        "Blobs (from ImageJ)": data / "blobs.tif",
     }
 
 
