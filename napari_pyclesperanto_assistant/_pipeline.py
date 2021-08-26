@@ -17,7 +17,7 @@ class JythonGenerator:
         # ```
         # pip install pyclesperanto_prototype
         # ```
-        # Read more: https://clesperanto.net
+        # Read more: http://clesperanto.net
         #
         # To make this script run in Fiji, please activate the clij, clij2 and
         # clijx-assistant update sites in your Fiji.
