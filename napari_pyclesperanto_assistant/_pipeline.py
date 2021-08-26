@@ -22,7 +22,7 @@ class JythonGenerator:
         # To make this script run in Fiji, please activate the clij, clij2 and
         # clijx-assistant update sites in your Fiji.
         #
-        # Read more: https://clij.github.io/assistant
+        # Read more: https://clij.github.io/
         #
         # Generator (P) version: {__version__}
         #
