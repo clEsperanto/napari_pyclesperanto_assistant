@@ -3,7 +3,7 @@ from __future__ import annotations
 from inspect import Parameter, Signature, signature
 
 from qtpy import QtCore
-from typing import Optional, TYPE_CHECKING, Sequence
+from typing import Any, Optional, TYPE_CHECKING, Sequence
 
 import pyclesperanto_prototype as cle
 import toolz
@@ -270,7 +270,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
     op_name_widget = getattr(widget, OP_NAME_PARAM)
 
     @op_name_widget.changed.connect
-    def update_positional_labels(*_):
+    def update_positional_labels(*_: Any):
         new_sig = signature(cle.operation(op_name_widget.value))
         # get the names of positional parameters in the new operation
         param_names = [
