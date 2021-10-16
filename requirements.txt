@@ -11,3 +11,4 @@ loguru
 jupytext
 jupyter
 pandas
+napari-tools-menu

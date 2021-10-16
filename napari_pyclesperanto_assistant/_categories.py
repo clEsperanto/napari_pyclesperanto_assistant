@@ -29,6 +29,7 @@ class Category:
     color_map : str = "gray"
     blending : str = "translucent"
     tool_tip : str = None
+    tools_menu : str = None
 
 
 CATEGORIES = {
@@ -44,6 +45,7 @@ CATEGORIES = {
         ],
         include=("filter", "denoise"),
         exclude=("combine",),
+        tools_menu="Filtering",
     ),
     "Remove background": Category(
         name="Remove background",
@@ -57,6 +59,7 @@ CATEGORIES = {
         ],
         include=("filter", "background removal"),
         exclude=("combine",),
+        tools_menu="Filtering",
     ),
     "Filter": Category(
         name="Filter",
@@ -70,9 +73,10 @@ CATEGORIES = {
         ],
         include=("filter",),
         exclude=("combine", "denoise", "background removal", "binary processing"),
+        tools_menu="Filtering",
     ),
     "Combine": Category(
-        name="Combine",\
+        name="Combine",
         description="Combine images using pixel-wise mathematical operations.",
         inputs=(LayerInput, LayerInput),
         default_op="add_images",
@@ -81,7 +85,8 @@ CATEGORIES = {
         args=[
             ("a", FloatRange, 1),
             ("b", FloatRange, 1),
-        ]
+        ],
+        tools_menu="Utilities",
     ),
     "Transform": Category(
         name="Transform",
@@ -97,6 +102,7 @@ CATEGORIES = {
             ("e", bool, False),
         ],
         include=("transform",),
+        tools_menu="Transform",
     ),
     "Projection": Category(
         name="Projection",
@@ -110,6 +116,7 @@ CATEGORIES = {
         ],
         output="image",  # can also be labels
         include=("projection",),
+        tools_menu="Transform",
     ),
     "Binarize": Category(
         name="Binarize",
@@ -124,6 +131,7 @@ CATEGORIES = {
         ],
         include=("binarize",),
         exclude=("combine",),
+        tools_menu="Segmentation",
     ),
     "Label": Category(
         name="Label",
@@ -136,6 +144,7 @@ CATEGORIES = {
             ("b", PositiveFloatRange, 2)
         ],
         include=("label",),
+        tools_menu="Segmentation",
     ),
     "Process labels": Category(
         name="Process labels",
@@ -148,6 +157,7 @@ CATEGORIES = {
             ("max", PositiveFloatRange, 100)
         ],
         include=("label processing",),
+        tools_menu="Segmentation",
     ),
     "Measure labels": Category(
         name="Measure labels",
@@ -162,6 +172,7 @@ CATEGORIES = {
         exclude=("combine",),
         color_map="turbo",
         blending="translucent",
+        tools_menu="Measurement",
     ),
     "Measure labeled image": Category(
         name="Measure labeled image",
@@ -175,6 +186,7 @@ CATEGORIES = {
         include=("combine","label measurement", "map"),
         color_map="turbo",
         blending="translucent",
+        tools_menu="Measurement",
     ),
     "Mesh": Category(
         name="Mesh",
@@ -187,6 +199,7 @@ CATEGORIES = {
         include=("label measurement", "mesh"),
         color_map="green",
         blending="additive",
+        tools_menu="Visualization",
     ),
     "Label neighbor filters": Category(
         name="Label neighbor filters",
@@ -200,6 +213,7 @@ CATEGORIES = {
         include=("neighbor",),
         color_map="turbo",
         blending="translucent",
+        tools_menu="Segmentation",
     ),
 }
 

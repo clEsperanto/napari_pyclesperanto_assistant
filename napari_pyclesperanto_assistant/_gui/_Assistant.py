@@ -28,11 +28,12 @@ if TYPE_CHECKING:
 
 from napari import __version__ as napari_version
 from packaging.version import parse as parse_version
+from napari_tools_menu import register_dock_widget
 
 npv = parse_version(napari_version)
 NAP048 = (npv.major, npv.minor, npv.micro) >= (0, 4, 8)
 
-
+@register_dock_widget(menu="Utilities > Assistant (clEsperanto)")
 class Assistant(QWidget):
     """The main cle Assistant widget.
 
