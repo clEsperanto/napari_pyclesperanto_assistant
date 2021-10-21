@@ -12,7 +12,7 @@ from magicgui import magicgui
 from typing_extensions import Annotated
 
 from .._categories import Category
-from qtpy.QtWidgets import QPushButton
+from qtpy.QtWidgets import QPushButton, QDockWidget
 
 if TYPE_CHECKING:
     from napari.layers import Layer
@@ -247,7 +247,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         #combobox.mousePressEvent = call_link
 
         if result is not None:
-            return _show_result(
+            result_layer = _show_result(
                 result,
                 viewer,
                 name=f"Result of {op_name}",
@@ -257,6 +257,22 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
                 blending=category.blending,
                 scale=inputs[0].scale,
             )
+
+            def _on_layer_removed(event):
+                layer = event.value
+                if layer in inputs or layer is result_layer:
+                    dock_widget = None
+                    for dw in viewer.window._qt_window.findChildren(QDockWidget):
+                        if dw.widget() is widget.native:
+                            dock_widget = dw
+                    if dock_widget is None:
+                        print("cannot remove dock_widget of ", widget)
+                    else:
+                        viewer.window.remove_dock_widget(dock_widget)
+
+            viewer.layers.events.removed.connect(_on_layer_removed)
+
+            return result_layer
         return None
 
     gui_function.__name__ = f'do_{category.name.lower().replace(" ", "_")}'
