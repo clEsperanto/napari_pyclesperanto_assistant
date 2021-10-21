@@ -262,7 +262,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
                 layer = event.value
                 if layer in inputs or layer is result_layer:
                     try:
-                        viewer.window.remove_dock_widget(widget)
+                        viewer.window.remove_dock_widget(widget.native)
                     except:
                         pass
 
