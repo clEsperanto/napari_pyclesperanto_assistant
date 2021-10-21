@@ -22,7 +22,7 @@ conda create --name bio11 python==3.8.5
 conda activate bio11 
 conda install -c conda-forge pyopencl==2021.2.1
 pip install napari-pyclesperanto-assistant
-pip install napari[all]
+pip install "napari[all]"
 ```
 
 Alternatively, you can install the assistant using napari's plugin installer in the menu `Plugins > Install/uninstall Packages`.
