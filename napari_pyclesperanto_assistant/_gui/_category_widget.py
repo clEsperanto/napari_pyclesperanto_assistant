@@ -261,14 +261,10 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
             def _on_layer_removed(event):
                 layer = event.value
                 if layer in inputs or layer is result_layer:
-                    dock_widget = None
-                    for dw in viewer.window._qt_window.findChildren(QDockWidget):
-                        if dw.widget() is widget.native:
-                            dock_widget = dw
-                    if dock_widget is None:
-                        print("cannot remove dock_widget of ", widget)
-                    else:
-                        viewer.window.remove_dock_widget(dock_widget)
+                    try:
+                        viewer.window.remove_dock_widget(widget)
+                    except:
+                        pass
 
             viewer.layers.events.removed.connect(_on_layer_removed)
 
