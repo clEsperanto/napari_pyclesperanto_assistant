@@ -73,6 +73,7 @@ def auto_brightness_contrast_all_images(napari_viewer : Viewer, lower_percentile
     napari_viewer.window.remove_dock_widget(auto_brightness_contrast_all_images.native)
 
 
+@register_function(menu="Utilities > Split stack along axis")
 def split_stack(image : Image, napari_viewer : Viewer, axis : int = 0):
     data = np.asarray(image.data)
     for i in range(data.shape[axis]):
