@@ -233,9 +233,5 @@ def attach_tooltips():
     # attach tooltips
     import pyclesperanto_prototype as cle
     for k, c in CATEGORIES.items():
-        if "Compare" in c.name:
-            print("Searching for including", ['in assistant'] + list(c.include), "excluding", c.exclude)
         choices = list(cle.operations(['in assistant'] + list(c.include), c.exclude))
-        if "Compare" in c.name:
-            print("found", choices)
         c.tool_tip = c.description + "\n\nOperations:\n* " + "\n* ".join(choices).replace("_", " ")
