@@ -183,7 +183,19 @@ CATEGORIES = {
             ("n", PositiveFloatRange, 1),
             ("m", PositiveFloatRange, 1)
         ],
-        include=("combine","label measurement", "map"),
+        include=("combine","label measurement", "map",),
+        exclude=("label comparison",),
+        color_map="turbo",
+        blending="translucent",
+        tools_menu="Measurement",
+    ),
+    "Compare label images": Category(
+        name="Compare label images",
+        description="Measure and visualize overlap and \nnonzero pixel count/ratio of labeled \nobjects in two label images.",
+        inputs=(LabelsInput, LabelsInput),
+        default_op="label_overlap_count_map",
+        args=[],
+        include=("combine","label measurement", "map", "label comparison",),
         color_map="turbo",
         blending="translucent",
         tools_menu="Measurement",
@@ -221,8 +233,9 @@ def attach_tooltips():
     # attach tooltips
     import pyclesperanto_prototype as cle
     for k, c in CATEGORIES.items():
+        if "Compare" in c.name:
+            print("Searching for including", ['in assistant'] + list(c.include), "excluding", c.exclude)
         choices = list(cle.operations(['in assistant'] + list(c.include), c.exclude))
-        # temporary workaround: remove entries that start with "label_", those have been renamed in pyclesperanto
-        # and are only there for backwards compatibility
-        choices = list([c for c in choices if not c.startswith('label_')])
+        if "Compare" in c.name:
+            print("found", choices)
         c.tool_tip = c.description + "\n\nOperations:\n* " + "\n* ".join(choices).replace("_", " ")
