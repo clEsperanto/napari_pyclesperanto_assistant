@@ -157,6 +157,7 @@ CATEGORIES = {
             ("max", PositiveFloatRange, 100)
         ],
         include=("label processing",),
+        exclude=("combine",),
         tools_menu="Segmentation",
     ),
     "Measure labels": Category(
