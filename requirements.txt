@@ -12,3 +12,4 @@ jupytext
 jupyter
 pandas
 napari-tools-menu
+napari-time-slicer
