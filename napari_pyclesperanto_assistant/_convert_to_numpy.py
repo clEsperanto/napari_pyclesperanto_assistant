@@ -24,13 +24,6 @@ def convert_image_to_labels(layer : Image) -> Layer:
 def convert_labels_to_image(layer : Labels) -> Layer:
     return Image(np.asarray(layer.data), name="Image " + layer.name)
 
-@register_function(menu="Utilities > Convert 3D stack to 2D timelapse")
-def convert_to_2d_timelapse(layer : LayerInput) -> Layer:
-    if isinstance(layer, Labels):
-        return Labels(np.expand_dims(layer.data, axis=1), name="2d+t " + layer.name)
-    else:
-        return Image(np.expand_dims(layer.data, axis=1), name="2d+t " + layer.name)
-
 
 def make_labels_editable(labels : Labels) -> Labels:
     return Labels(np.asarray(labels.data), name="np " + labels.name)
