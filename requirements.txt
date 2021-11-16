@@ -13,3 +13,4 @@ jupyter
 pandas
 napari-tools-menu
 napari-time-slicer
+napari-skimage-regionprops
