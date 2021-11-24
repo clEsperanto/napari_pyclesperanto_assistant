@@ -74,6 +74,14 @@ class Assistant(QWidget):
             ("Export Notebook", self.to_notebook),
             ("Copy to clipboard", self.to_clipboard),
         ]
+
+        # add Send to script editor menu in case it's installed
+        try:
+            import napari_script_editor
+            actions.append(("Send to script editor", self.to_script_editor))
+        except ImportError:
+            pass
+
         for name, cb in actions:
             btn = QPushButton(name, self)
             btn.clicked.connect(cb)
@@ -227,3 +235,8 @@ class Assistant(QWidget):
         import pyperclip
 
         pyperclip.copy(Pipeline.from_assistant(self).to_jython())
+
+    def to_script_editor(self):
+        import napari_script_editor
+        editor = napari_script_editor.ScriptEditor.get_script_editor_from_viewer(self._viewer)
+        editor.set_code(Pipeline.from_assistant(self).to_jython())
