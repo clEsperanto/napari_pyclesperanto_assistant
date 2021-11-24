@@ -59,6 +59,67 @@ class JythonGenerator:
     def newline():
         return ""
 
+class NapariPythonGenerator(JythonGenerator):
+    @staticmethod
+    def header():
+        from napari_pyclesperanto_assistant import __version__
+        from textwrap import dedent
+
+        return dedent(
+            f"""
+            # To make this script run in napari's script editor, install 
+            # pyclesperanto_prototype and the script editor
+            #
+            # ```
+            # pip install pyclesperanto_prototype napari-script-editor
+            # ```
+            # Read more: http://clesperanto.net
+            #
+            # Generator (P) version: {__version__}
+            #
+            
+            import pyclesperanto_prototype as cle
+            import napari
+
+            if 'viewer' not in globals():
+                viewer = napari.Viewer()
+            """
+        ).strip()
+
+    @staticmethod
+    def imports():
+        return ""
+
+    @staticmethod
+    def operate(step) -> str:
+        from textwrap import dedent
+
+        if "imread" in step.operation:
+            return dedent(
+                f"""
+                # todo: configure which inputs should be taken here.
+                # This takes the first selected layer's image data:
+                {step.output} = list(viewer.layers.selection)[0].data
+                """).strip()
+        else:
+            return JythonGenerator.operate(step)
+
+    @staticmethod
+    def show(step):
+        code = ""
+        name = f"Result of {step.operation.replace('_', ' ')}"
+        if step.is_labels:
+            code = code + "viewer.add_labels("
+        else:
+            code = code + "viewer.add_image("
+
+        code = code + f"{step.output}"
+        code = code + f", name='{name}'"
+        if step.clims:
+            code = code + ", contrast_limits=" + str(step.clims)
+        code = code + ")"
+        return code
+
 
 @dataclass
 class Step:
@@ -94,6 +155,14 @@ class Pipeline:
             filename = Path(filename).expanduser().resolve()
             filename.write_text(code)
         return code
+
+    def to_napari_python(self, filename=None):
+        code = "\n".join(self._generate(NapariPythonGenerator))
+        if filename:
+            filename = Path(filename).expanduser().resolve()
+            filename.write_text(code)
+        return code
+
 
     def to_notebook(self, filename=None, execute=False):
         import jupytext

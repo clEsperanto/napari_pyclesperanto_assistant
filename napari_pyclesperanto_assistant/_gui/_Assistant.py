@@ -239,4 +239,4 @@ class Assistant(QWidget):
     def to_script_editor(self):
         import napari_script_editor
         editor = napari_script_editor.ScriptEditor.get_script_editor_from_viewer(self._viewer)
-        editor.set_code(Pipeline.from_assistant(self).to_jython())
+        editor.set_code(Pipeline.from_assistant(self).to_napari_python())
