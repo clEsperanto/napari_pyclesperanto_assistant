@@ -182,6 +182,11 @@ This python code can also be executed in [Fiji](https://fiji.sc)`s Jython, in ca
 
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/fiji_execution.png)
 
+Alternatively, you can also generate code and edit it directly in the Script Editor. 
+Therefore, the [napari-script-editor](https://www.napari-hub.org/plugins/napari-script-editor) must be installed.
+
+![img.png](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/script_editor.png)
+
 Also note: The generated python/jython code is not capable of processing timelapse data,
 you need to program a for-loop processing timepoints individually yourself. 
 
