@@ -189,6 +189,7 @@ Therefore, the [napari-script-editor](https://www.napari-hub.org/plugins/napari-
 
 Also note: The generated python/jython code is not capable of processing timelapse data,
 you need to program a for-loop processing timepoints individually yourself. 
+See also [this notebook](https://github.com/BiAPoL/Bio-image_Analysis_with_Python/blob/main/image_processing/12_process_folders.ipynb) for how to do this.
 
 Work in progress, contributions welcome.
 
