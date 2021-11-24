@@ -172,7 +172,7 @@ class Pipeline:
         return code
 
     def to_napari_python(self, filename=None):
-        code = "\n".join(self._generate(NapariPythonGenerator))
+        code = "\n".join(self._generate(NapariPythonGenerator)).replace("\n\n\n\n", "\n\n")
         if filename:
             filename = Path(filename).expanduser().resolve()
             filename.write_text(code)
