@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from typing import TYPE_CHECKING, Dict, Tuple
+from typing import TYPE_CHECKING, Dict, Tuple, Callable
 from warnings import warn
 import napari
 from napari._qt.widgets.qt_action_context_menu import QtActionContextMenu
@@ -11,6 +11,9 @@ from napari._qt.widgets.qt_action_context_menu import QtActionContextMenu
 import pyclesperanto_prototype as cle
 from qtpy.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QVBoxLayout, QWidget, QMenu, QAction
 from qtpy.QtGui import QCursor
+
+from typing import Union
+
 
 from ._select_gpu import select_gpu
 from .._categories import CATEGORIES, Category
@@ -67,14 +70,15 @@ class Assistant(QWidget):
         # visualize intermediate results human-readable from top-left to bottom-right
         self._viewer.grid.stride = -1
 
+        CATEGORIES["Generate code..."] = self._code_menu
+
         icon_grid = ButtonGrid(self)
         icon_grid.addItems(CATEGORIES)
         icon_grid.itemClicked.connect(self._on_item_clicked)
 
-        export_btns = QHBoxLayout()
         # create menu
         self.actions = [
-            ("Export script to file", self.to_jython),
+            ("Export Python script to file", self.to_jython),
             ("Export Jupyter Notebook", self.to_notebook),
             ("Copy to clipboard", self.to_clipboard),
         ]
@@ -86,13 +90,8 @@ class Assistant(QWidget):
         except ImportError:
             pass
 
-        self.btn = QPushButton("Generate Python code and ...", self)
-        self.btn.clicked.connect(self._code_menu)
-        export_btns.addWidget(self.btn)
-
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(icon_grid)
-        self.layout().addLayout(export_btns)
 
         select_gpu()
 
@@ -137,7 +136,11 @@ class Assistant(QWidget):
         else:
             return self._viewer.active_layer
 
-    def _activate(self, category: Category):
+    def _activate(self, category: Image = Union[Category, Callable]):
+        if callable(category):
+            category()
+            return
+
         # get currently active layer (before adding dock widget)
         input_layer = self._get_active_layer()
         if not input_layer:

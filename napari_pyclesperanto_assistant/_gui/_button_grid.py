@@ -53,4 +53,7 @@ class ButtonGrid(QListWidget):
 
     def addItems(self, labels) -> None:
         for label in labels:
-            self.addItem(label, labels[label].tool_tip)
+            if hasattr(labels[label], "tool_tip"):
+                self.addItem(label, labels[label].tool_tip)
+            else:
+                self.addItem(label)
