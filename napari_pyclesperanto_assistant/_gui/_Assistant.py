@@ -92,6 +92,8 @@ class Assistant(QWidget):
 
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(icon_grid)
+        self.layout().setContentsMargins(5, 5, 5, 5)
+        self.setMinimumWidth(345)
 
         select_gpu()
 
