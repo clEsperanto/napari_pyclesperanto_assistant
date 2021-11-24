@@ -5,10 +5,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, Tuple
 from warnings import warn
 import napari
+from napari._qt.widgets.qt_action_context_menu import QtActionContextMenu
 
 
 import pyclesperanto_prototype as cle
-from qtpy.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QVBoxLayout, QWidget
+from qtpy.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QVBoxLayout, QWidget, QMenu, QAction
+from qtpy.QtGui import QCursor
 
 from ._select_gpu import select_gpu
 from .._categories import CATEGORIES, Category
@@ -71,29 +73,46 @@ class Assistant(QWidget):
 
         export_btns = QHBoxLayout()
         # create menu
-        actions = [
-            ("Export Python", self.to_jython),
-            ("Export Notebook", self.to_notebook),
+        self.actions = [
+            ("Export script to file", self.to_jython),
+            ("Export Jupyter Notebook", self.to_notebook),
             ("Copy to clipboard", self.to_clipboard),
         ]
 
         # add Send to script editor menu in case it's installed
         try:
             import napari_script_editor
-            actions.append(("Send to script editor", self.to_script_editor))
+            self.actions.append(("Send to script editor", self.to_script_editor))
         except ImportError:
             pass
 
-        for name, cb in actions:
-            btn = QPushButton(name, self)
-            btn.clicked.connect(cb)
-            export_btns.addWidget(btn)
+        self.btn = QPushButton("Generate Python code and ...", self)
+        self.btn.clicked.connect(self._code_menu)
+        export_btns.addWidget(self.btn)
 
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(icon_grid)
         self.layout().addLayout(export_btns)
 
         select_gpu()
+
+    def _code_menu(self):
+        menu = QMenu(self)
+
+        for name, cb in self.actions:
+            submenu = menu.addAction(name)
+            submenu.triggered.connect(cb)
+
+        menu.move(QCursor.pos())
+        menu.show()
+
+
+    def processtrigger(self, q):
+        print(q.text() + " is triggered")
+
+    def processtrigger_a(self):
+        print("A")
+
 
     def _on_selection(self, event):
         for layer, (dw, gui) in self._layers.items():
