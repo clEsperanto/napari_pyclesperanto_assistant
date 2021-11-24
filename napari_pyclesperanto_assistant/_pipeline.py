@@ -44,7 +44,8 @@ class JythonGenerator:
         if "imread" in step.operation:
             args = step.inputs
         else:
-            args = step.inputs + [f"cle.create_like({step.inputs[0]})"] + step.args
+            inter = "labels_" if step.is_labels else ""
+            args = step.inputs + [f"cle.create_{inter}like({step.inputs[0]})"] + step.args
         return f"{step.output} = cle.{step.operation}({', '.join(map(str, args))})"
 
     @staticmethod
@@ -201,8 +202,8 @@ class Pipeline:
         import dask
         steps = []
         for key in dask.order.order(graph):
-            op, inputs, args = graph[key]
-            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key))
+            op, inputs, args, is_labels = graph[key]
+            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key, is_labels=is_labels))
         return cls(steps=steps)
 
 
