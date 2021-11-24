@@ -92,14 +92,25 @@ class NapariPythonGenerator(JythonGenerator):
         return ""
 
     @staticmethod
+    def subheader(step):
+        if "imread" in step.operation:
+            from textwrap import dedent
+
+            return dedent(
+                f"""
+                # todo: configure which inputs should be taken here.
+                # This takes the first selected layer's image data:
+                """).strip()
+        else:
+            return JythonGenerator.subheader(step)
+
+    @staticmethod
     def operate(step) -> str:
         from textwrap import dedent
 
         if "imread" in step.operation:
             return dedent(
                 f"""
-                # todo: configure which inputs should be taken here.
-                # This takes the first selected layer's image data:
                 {step.output} = list(viewer.layers.selection)[0].data
                 """).strip()
         else:
@@ -107,6 +118,9 @@ class NapariPythonGenerator(JythonGenerator):
 
     @staticmethod
     def show(step):
+        if "imread" in step.operation:
+            return ""
+
         code = ""
         name = f"Result of {step.operation.replace('_', ' ')}"
         if step.is_labels:
