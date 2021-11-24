@@ -106,14 +106,6 @@ class Assistant(QWidget):
         menu.move(QCursor.pos())
         menu.show()
 
-
-    def processtrigger(self, q):
-        print(q.text() + " is triggered")
-
-    def processtrigger_a(self):
-        print("A")
-
-
     def _on_selection(self, event):
         for layer, (dw, gui) in self._layers.items():
             if layer in self._viewer.layers.selection:
