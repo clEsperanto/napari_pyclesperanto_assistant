@@ -82,7 +82,7 @@ class Assistant(QWidget):
         # add Send to script editor menu in case it's installed
         try:
             import napari_script_editor
-            self.actions.append(("Send to script editor", self.to_script_editor))
+            self.actions.append(("Send to Script Editor", self.to_script_editor))
         except ImportError:
             pass
 
