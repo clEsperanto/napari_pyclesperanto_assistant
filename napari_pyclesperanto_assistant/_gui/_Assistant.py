@@ -70,6 +70,7 @@ class Assistant(QWidget):
         # visualize intermediate results human-readable from top-left to bottom-right
         self._viewer.grid.stride = -1
 
+        CATEGORIES["Measure"] = self._measure
         CATEGORIES["Generate code..."] = self._code_menu
 
         icon_grid = ButtonGrid(self)
@@ -96,6 +97,10 @@ class Assistant(QWidget):
         self.setMinimumWidth(345)
 
         select_gpu()
+
+    def _measure(self):
+        from .._statistics_of_labeled_pixels import statistics_of_labeled_pixels
+        self._viewer.window.add_function_widget(statistics_of_labeled_pixels)
 
     def _code_menu(self):
         menu = QMenu(self)
