@@ -111,7 +111,7 @@ class NapariPythonGenerator(JythonGenerator):
         if "imread" in step.operation:
             return dedent(
                 f"""
-                {step.output} = list(viewer.layers.selection)[0].data
+                {step.output} = cle.push(list(viewer.layers.selection)[0].data)
                 """).strip()
         else:
             return JythonGenerator.operate(step)
