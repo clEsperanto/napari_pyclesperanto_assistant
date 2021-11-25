@@ -130,7 +130,7 @@ class NapariPythonGenerator(JythonGenerator):
 
         code = code + f"{step.output}"
         code = code + f", name='{name}'"
-        if step.clims:
+        if step.clims and not step.is_labels:
             code = code + ", contrast_limits=" + str(step.clims)
         code = code + ")"
         return code
@@ -216,8 +216,8 @@ class Pipeline:
         import dask
         steps = []
         for key in dask.order.order(graph):
-            op, inputs, args, is_labels = graph[key]
-            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key, is_labels=is_labels))
+            op, inputs, args, is_labels, min_intensity, max_intensity = graph[key]
+            steps.append(Step(operation=op.__name__, inputs=inputs, args=args, output=key, is_labels=is_labels, clims=(min_intensity, max_intensity)))
         return cls(steps=steps)
 
 

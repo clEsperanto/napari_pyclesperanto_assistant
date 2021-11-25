@@ -229,7 +229,7 @@ class Assistant(QWidget):
                     if op_id is None:
                         op_id = "some_random_key"
                         source = str(w.value.source.path).replace("\\", "/") if w.value.source is not None else "file"
-                        graph[self._id_to_name(op_id, name_dict)] = (cle.imread, ["'" + source + "'"], [], False)  # TODO
+                        graph[self._id_to_name(op_id, name_dict)] = (cle.imread, ["'" + source + "'"], [], False, layer.contrast_limits[0], layer.contrast_limits[1])  # TODO
                     inputs.append(self._id_to_name(op_id, name_dict))
                 else:
                     args.append(w.value)
@@ -241,7 +241,7 @@ class Assistant(QWidget):
                 args = args[:nargs]
 
             is_labels = isinstance(layer, napari.layers.Labels)
-            graph[self._id_to_name(key, name_dict)] = (op, inputs, args, is_labels)
+            graph[self._id_to_name(key, name_dict)] = (op, inputs, args, is_labels, layer.contrast_limits[0], layer.contrast_limits[1])
 
         return graph
 
