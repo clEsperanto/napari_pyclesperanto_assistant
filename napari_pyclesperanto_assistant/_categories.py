@@ -45,7 +45,7 @@ CATEGORIES = {
         ],
         include=("filter", "denoise"),
         exclude=("combine",),
-        tools_menu="Filtering",
+        tools_menu="Filtering / noise removal",
     ),
     "Remove background": Category(
         name="Remove background",
@@ -59,7 +59,7 @@ CATEGORIES = {
         ],
         include=("filter", "background removal"),
         exclude=("combine",),
-        tools_menu="Filtering",
+        tools_menu="Filtering / background removal",
     ),
     "Filter": Category(
         name="Filter",
@@ -86,7 +86,7 @@ CATEGORIES = {
             ("a", FloatRange, 1),
             ("b", FloatRange, 1),
         ],
-        tools_menu="Utilities",
+        tools_menu="Image math",
     ),
     "Transform": Category(
         name="Transform",
@@ -131,7 +131,7 @@ CATEGORIES = {
         ],
         include=("binarize",),
         exclude=("combine",),
-        tools_menu="Segmentation",
+        tools_menu="Segmentation / binarization",
     ),
     "Label": Category(
         name="Label",
@@ -144,7 +144,7 @@ CATEGORIES = {
             ("b", PositiveFloatRange, 2)
         ],
         include=("label",),
-        tools_menu="Segmentation",
+        tools_menu="Segmentation / labeling",
     ),
     "Process labels": Category(
         name="Process labels",
@@ -158,7 +158,7 @@ CATEGORIES = {
         ],
         include=("label processing",),
         exclude=("combine",),
-        tools_menu="Segmentation",
+        tools_menu="Segmentation post-processing",
     ),
     "Measure labels": Category(
         name="Measure labels",
@@ -226,7 +226,7 @@ CATEGORIES = {
         include=("neighbor",),
         color_map="turbo",
         blending="translucent",
-        tools_menu="Segmentation",
+        tools_menu="Segmentation post-processing",
     ),
 }
 
