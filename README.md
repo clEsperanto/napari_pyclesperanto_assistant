@@ -44,7 +44,13 @@ You can then start napari, e.g. from command line, and find the assistant in the
 napari
 ```
 
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot.png)
+Also consider installing napari-workflow-inspector for visualizing the workflows you build using the assistant:
+
+```
+pip install napari-workflow-inspector
+```
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/workflow_inspector.gif)
 
 ## Features
 [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) offers various possibilities for processing images. It comes from developers who work in life sciences and thus, it may be focused towards processing two- and three-dimensional microscopy image data showing cells and tissues. A selection of pyclesperanto's functionality is available via the assistant user interface. Typical workflows which can be built with this assistant include
