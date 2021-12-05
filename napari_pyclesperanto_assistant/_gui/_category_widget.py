@@ -52,10 +52,10 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, *args
     # transfer data to gpu
     if timepoint is None:
         i0 = inputs[0].data
-        gpu_ins = [cle.push(i.data if i is not None else i0) for i in inputs]
+        gpu_ins = [i.data if i is not None else i0 for i in inputs]
     else:
         i0 = inputs[0].data[timepoint] if len(inputs[0].data.shape) == 4 else inputs[0].data
-        gpu_ins = [cle.push((i.data[timepoint] if len(i.data.shape) == 4 else i.data) if i is not None else i0) for i in inputs]
+        gpu_ins = [(i.data[timepoint] if len(i.data.shape) == 4 else i.data if i is not None else i0) for i in inputs]
 
     # convert 3d-1-slice-data into 2d data
     # to support 2d timelapse data
@@ -72,7 +72,7 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, *args
     gpu_out = cle_function(*args)
 
     # return output
-    return gpu_out
+    return gpu_out, args
 
 
 def _show_result(
@@ -222,7 +222,7 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         # todo: deal with 5D and nD data
 
         op_name = kwargs.pop("op_name")
-        result = call_op(op_name, inputs, t_position, *kwargs.values())
+        result, used_args = call_op(op_name, inputs, t_position, *kwargs.values())
 
         # add a help-button
         description = cle.operation(op_name).__doc__.replace("\n    ", "\n") + "\n\nRight-click to learn more..."
@@ -254,6 +254,15 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
                 blending=category.blending,
                 scale=inputs[0].scale,
             )
+
+            # notify workflow manage that something was created / updated
+            try:
+                from napari_time_slicer import WorkflowManager
+                manager = WorkflowManager.install(viewer)
+                manager.update(result_layer, cle.operation(op_name), *used_args)
+                print("notified", result_layer.name, cle.operation(op_name))
+            except ImportError:
+                pass # recording workflows in the WorkflowManager is a nice-to-have at the moment.
 
             def _on_layer_removed(event):
                 layer = event.value
