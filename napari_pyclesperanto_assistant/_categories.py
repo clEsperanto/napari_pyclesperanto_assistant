@@ -102,6 +102,7 @@ CATEGORIES = {
             ("e", bool, False),
         ],
         include=("transform",),
+        exclude=("combine",),
         tools_menu="Transform",
     ),
     "Projection": Category(
