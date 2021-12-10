@@ -80,12 +80,25 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
         print("args", args)
         kwargs = {}
 
-        #import inspect
-        #sig = inspect.signature(cle_function)
+        import inspect
+        sig = inspect.signature(cle_function)
         #for k, v in sig.parameters.items():
         #    print(k, v.annotation)
         #    if k == "viewer" or k == "napari_viewer" or "napari.viewer.Viewer" in str(v):
         #        kwargs[k] = viewer
+
+        # Make sure that the annotated types are really passed to a given function
+        for i, k in enumerate(list(sig.parameters.keys())):
+            if i >= len(args):
+                break
+            type_annotation = str(sig.parameters[k].annotation)
+            print("Annotation:", type_annotation)
+            args = list(args)
+            for typ in ["int", "float", "str"]:
+                if typ in type_annotation:
+                    converter = eval(typ)
+                    print("converter", converter)
+                    args[i] = converter(args[i])
 
         gpu_out = cle_function(*args, **kwargs)
         return gpu_out, args
@@ -333,6 +346,7 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
 
     @op_name_widget.changed.connect
     def update_positional_labels(*_: Any):
+        print("a")
         new_sig = signature(find_function(op_name_widget.value))
         # get the names of positional parameters in the new operation
         param_names = [
@@ -340,7 +354,7 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
             for name, param in new_sig.parameters.items()
             if param.annotation in {int, str, float, bool}
         ]
-
+        print("b", len(param_names))
         # update the labels of each positional-arg subwidget
         # or, if there are too many, hide them
         n_params = len(param_names)
@@ -352,7 +366,7 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
                 wdg.show()
             else:
                 wdg.hide()
-
+        print("c")
     print("D")
 
     # run it once to update the labels
