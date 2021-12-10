@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, Sequence, Tuple, Type
 
 import numpy as np
+import napari
 from napari.layers import Image, Labels, Layer
 from typing_extensions import Annotated
 
@@ -246,22 +247,48 @@ def collect_cle():
     result = {}
 
     for k, c in CATEGORIES.items():
-        choices = cle.operations(['in assistant'] + list(c.include), c.exclude)
-        for choice, func in choices.items():
-            result[c.tools_menu + ">" + choice + " (clesperanto)"] = func
+        if not callable(c):
+            choices = cle.operations(['in assistant'] + list(c.include), c.exclude)
+            for choice, func in choices.items():
+                result[c.tools_menu + ">" + choice + " (clesperanto)"] = func
 
     return result
 
 
 def collect_tools():
     from napari_tools_menu import ToolsMenu
+    import inspect
+
+    allowed_types = ["napari.types.LabelsData", "napari.types.ImageData", "int", "float", "str", "bool",
+                     "napari.viewer.Viewer"]
+    allowed_types = allowed_types + ["<class '" + t + "'>" for t in allowed_types]
 
     result = {}
     for k, v in ToolsMenu.menus.items():
         typ = v[1]
         if typ == "function":
             f = v[0]
+            sig = inspect.signature(f)
+
+            # all parameters must be images, labels, int, float or str
+            skip = False
+            for i, key in enumerate(list(sig.parameters.keys())):
+                type_annotation = str(sig.parameters[key].annotation)
+                if not "function NewType.<locals>.new_type" in type_annotation:
+                    if type_annotation not in allowed_types:
+                        #print("Skip", k, "because", str(type_annotation), "not in allowed types")
+                        skip = True
+                        break
+            if skip:
+                continue
+
+            # return type must be image or label_image
+            if sig.return_annotation not in [napari.types.LabelsData, "napari.types.LabelsData", napari.types.ImageData, "napari.types.ImageData"]:
+                continue
+
             result[k] = f
+
+    print(allowed_types)
     return result
 
 
