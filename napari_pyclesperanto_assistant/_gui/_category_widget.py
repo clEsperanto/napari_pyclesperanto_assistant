@@ -10,6 +10,7 @@ import toolz
 from loguru import logger
 from magicgui import magicgui
 from typing_extensions import Annotated
+import napari
 
 from .._categories import Category
 from qtpy.QtWidgets import QPushButton, QDockWidget
@@ -101,6 +102,11 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
                     args[i] = converter(args[i])
 
         gpu_out = cle_function(*args, **kwargs)
+
+        if sig.return_annotation in [napari.types.LabelsData, "napari.types.LabelsData"]:
+            if gpu_out.dtype is not int:
+                gpu_out = gpu_out.astype(int)
+
         return gpu_out, args
 def find_function(op_name):
     cle_function = None
@@ -210,9 +216,19 @@ def _generate_signature_for_category(category: Category) -> Signature:
     choices = list(operations_in_menu(category.tools_menu))
     print("choices:", choices)
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
-    params.append(
-        Parameter(OP_NAME_PARAM, k, annotation=op_type, default=category.default_op)
-    )
+    default_op = category.default_op
+    if not any(default_op == op for op in choices):
+        print("Default-operation is not in list!")
+        default_op = None
+
+    if default_op is None:
+        params.append(
+            Parameter(OP_NAME_PARAM, k, annotation=op_type)
+        )
+    else:
+        params.append(
+            Parameter(OP_NAME_PARAM, k, annotation=op_type, default=default_op)
+        )
     # add the args that will be passed to the cle operation.
     for name, type_, default in category.args:
         params.append(Parameter(name, k, annotation=type_, default=default))
