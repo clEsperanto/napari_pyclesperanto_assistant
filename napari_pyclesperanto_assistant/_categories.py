@@ -37,7 +37,7 @@ CATEGORIES = {
         name="Removal noise",
         description="Remove noise from images, e.g. by local averaging and blurring.",
         inputs=(ImageInput,),
-        default_op="gaussian_blur",
+        default_op="gaussian_blur (clesperanto)",
         args=[
             ("x", FloatRange, 1),
             ("y", FloatRange, 1),
@@ -117,7 +117,7 @@ CATEGORIES = {
         ],
         output="image",  # can also be labels
         include=("projection",),
-        tools_menu="Transform",
+        tools_menu="Projection",
     ),
     "Binarize": Category(
         name="Binarize",
@@ -227,13 +227,60 @@ CATEGORIES = {
         include=("neighbor",),
         color_map="turbo",
         blending="translucent",
-        tools_menu="Segmentation post-processing",
+        tools_menu="Label neighbor filters",
     ),
 }
 
+
+
 def attach_tooltips():
     # attach tooltips
-    import pyclesperanto_prototype as cle
     for k, c in CATEGORIES.items():
-        choices = list(cle.operations(['in assistant'] + list(c.include), c.exclude))
+        choices = operations_in_menu(c.tools_menu)
         c.tool_tip = c.description + "\n\nOperations:\n* " + "\n* ".join(choices).replace("_", " ")
+
+from functools import lru_cache
+
+def collect_cle():
+    import pyclesperanto_prototype as cle
+    result = {}
+
+    for k, c in CATEGORIES.items():
+        choices = cle.operations(['in assistant'] + list(c.include), c.exclude)
+        for choice, func in choices.items():
+            result[c.tools_menu + ">" + choice + " (clesperanto)"] = func
+
+    return result
+
+
+def collect_tools():
+    from napari_tools_menu import ToolsMenu
+
+    result = {}
+    for k, v in ToolsMenu.menus.items():
+        typ = v[1]
+        if typ == "function":
+            f = v[0]
+            result[k] = f
+    return result
+
+
+@lru_cache
+def all_operations():
+    cle_ops = collect_cle()
+    tools_ops = collect_tools()
+    all_ops = {**cle_ops, **tools_ops}
+    return all_ops
+
+def filter_operations(menu_name):
+    result = {}
+    for k,v in all_operations().items():
+        if menu_name in k:
+            result[k] = v
+    return result
+
+def operations_in_menu(menu_name):
+    choices = filter_operations(menu_name)
+    choices = [c.split(">")[1] for c in choices]
+    choices = sorted(choices)
+    return choices

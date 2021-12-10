@@ -28,7 +28,7 @@ def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
 
 
 @logger.catch
-def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, *args) -> cle.Image:
+def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewer: napari.Viewer = None, *args) -> cle.Image:
     """Call cle operation `op_name` with specified inputs and args.
 
     Takes care of transfering data to GPU and omitting extra positional args
@@ -61,19 +61,49 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, *args
     # to support 2d timelapse data
     gpu_ins = [i if len(i.shape) != 3 or i.shape[0] != 1 else i [0] for i in gpu_ins]
 
-    # todo: we could make this a little faster by getting gpu_out from a central manager
-    gpu_out = None
-
     # call actual cle function ignoring extra positional args
-    cle_function = cle.operation(op_name)  # couldn't this just be getattr(cle, ...)?
+    cle_function = find_function(op_name)
     nargs = num_positional_args(cle_function)
-    logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
-    args = ((*gpu_ins, gpu_out) + args)[:nargs]
-    gpu_out = cle_function(*args)
 
-    # return output
-    return gpu_out, args
+    if cle_function.__module__ == "pyclesperanto_prototype":
+        # todo: we could make this a little faster by getting gpu_out from a central manager
+        gpu_out = None
 
+        logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
+        args = ((*gpu_ins, gpu_out) + args)[:nargs]
+        gpu_out = cle_function(*args)
+
+        # return output
+        return gpu_out, args
+    else:
+        args = (*gpu_ins, *args)[:nargs+1]
+        print("args", args)
+        kwargs = {}
+
+        #import inspect
+        #sig = inspect.signature(cle_function)
+        #for k, v in sig.parameters.items():
+        #    print(k, v.annotation)
+        #    if k == "viewer" or k == "napari_viewer" or "napari.viewer.Viewer" in str(v):
+        #        kwargs[k] = viewer
+
+        gpu_out = cle_function(*args, **kwargs)
+        return gpu_out, args
+def find_function(op_name):
+    cle_function = None
+    try:
+        cle_function = cle.operation(op_name)  # couldn't this just be getattr(cle, ...)?
+    except:
+        pass
+    if cle_function is None:
+        from .._categories import all_operations
+        all_ops = all_operations()
+        for k, f in all_ops.items():
+            if op_name in k:
+                cle_function = f
+    if cle_function is None:
+        print("No function found for", op_name)
+    return cle_function
 
 def _show_result(
     gpu_out: cle.Image,
@@ -113,6 +143,7 @@ def _show_result(
     layer : Optional[Layer]
         The created/udpated layer, or None if no viewer is present.
     """
+    print("OP ID ", op_id)
     if not viewer:
         logger.warning("no viewer, cannot add image")
         return
@@ -162,7 +193,9 @@ def _generate_signature_for_category(category: Category) -> Signature:
         Parameter(f"input{n}", k, annotation=t) for n, t in enumerate(category.inputs)
     ]
     # Add valid operations choices (will create the combo box)
-    choices = list(cle.operations(['in assistant'] + list(category.include), category.exclude))
+    from .._categories import operations_in_menu
+    choices = list(operations_in_menu(category.tools_menu))
+    print("choices:", choices)
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
     params.append(
         Parameter(OP_NAME_PARAM, k, annotation=op_type, default=category.default_op)
@@ -175,9 +208,12 @@ def _generate_signature_for_category(category: Category) -> Signature:
     params.append(
         Parameter(VIEWER_PARAM, k, annotation="napari.viewer.Viewer", default=None)
     )
-    return Signature(params)
+    result = Signature(params)
+    print("Signature", result)
+    return result
 
-def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[Layer]:
+
+def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> magicgui.widgets.FunctionGui[Layer]:
     """Generate a magicgui widget for a Category object
 
     Parameters
@@ -222,15 +258,17 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         # todo: deal with 5D and nD data
 
         op_name = kwargs.pop("op_name")
-        result, used_args = call_op(op_name, inputs, t_position, *kwargs.values())
+        result, used_args = call_op(op_name, inputs, t_position, viewer, *kwargs.values())
 
         # add a help-button
-        description = cle.operation(op_name).__doc__.replace("\n    ", "\n") + "\n\nRight-click to learn more..."
-        temp = description.split('https:')
-        link = "https://napari-hub.org/plugins/napari-pyclesperanto-assistant"
-        if len(temp) > 1:
-            link = "https:" + temp[1].split("\n")[0]
-        getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
+        description = find_function(op_name).__doc__
+        if description is not None:
+            description = description.replace("\n    ", "\n") + "\n\nRight-click to learn more..."
+            temp = description.split('https:')
+            link = "https://napari-hub.org/plugins/napari-pyclesperanto-assistant"
+            if len(temp) > 1:
+                link = "https:" + temp[1].split("\n")[0]
+            getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
 
         # Right-click: Open online help
         #combobox = getattr(widget, OP_NAME_PARAM).native
@@ -259,8 +297,8 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
             try:
                 from napari_time_slicer import WorkflowManager
                 manager = WorkflowManager.install(viewer)
-                manager.update(result_layer, cle.operation(op_name), *used_args)
-                print("notified", result_layer.name, cle.operation(op_name))
+                manager.update(result_layer, find_function(op_name), *used_args)
+                print("notified", result_layer.name, find_function(op_name))
             except ImportError:
                 pass # recording workflows in the WorkflowManager is a nice-to-have at the moment.
 
@@ -280,16 +318,22 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
     gui_function.__name__ = f'do_{category.name.lower().replace(" ", "_")}'
     gui_function.__signature__ = _generate_signature_for_category(category)
 
+    print("A", gui_function.__name__)
+
     # create the widget
     widget = magicgui(gui_function, auto_call=True)
+
+    print("B")
 
     # when the operation name changes, we want to update the argument labels
     # to be appropriate for the corresponding cle operation.
     op_name_widget = getattr(widget, OP_NAME_PARAM)
 
+    print("C")
+
     @op_name_widget.changed.connect
     def update_positional_labels(*_: Any):
-        new_sig = signature(cle.operation(op_name_widget.value))
+        new_sig = signature(find_function(op_name_widget.value))
         # get the names of positional parameters in the new operation
         param_names = [
             name
@@ -309,7 +353,11 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
             else:
                 wdg.hide()
 
+    print("D")
+
     # run it once to update the labels
     update_positional_labels()
+
+    print("E")
 
     return widget
