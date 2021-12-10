@@ -51,7 +51,7 @@ CATEGORIES = {
         name="Remove background",
         description="Remove background intensity, e.g. caused\nby out-of-focus light or uneven illumination.",
         inputs=(ImageInput,),
-        default_op="top_hat_box",
+        default_op="top_hat_box (clesperanto)",
         args=[
             ("x", FloatRange, 10),
             ("y", FloatRange, 10),
@@ -65,7 +65,7 @@ CATEGORIES = {
         name="Filter",
         description="Filter images, e.g. to adjust gamma or detect edges.",
         inputs=(ImageInput,),
-        default_op="gamma_correction",
+        default_op="gamma_correction (clesperanto)",
         args=[
             ("x", FloatRange, 1),
             ("y", FloatRange, 1),
@@ -79,7 +79,7 @@ CATEGORIES = {
         name="Combine",
         description="Combine images using pixel-wise mathematical operations.",
         inputs=(LayerInput, LayerInput),
-        default_op="add_images",
+        default_op="add_images (clesperanto)",
         include=("combine",),
         exclude=("map",),
         args=[
@@ -92,7 +92,7 @@ CATEGORIES = {
         name="Transform",
         description="Apply spatial transformation to images.",
         inputs=(LayerInput,),
-        default_op="sub_stack",
+        default_op="sub_stack (clesperanto)",
         output="image",  # can also be labels
         args=[
             ("a", FloatRange, 0),
@@ -109,7 +109,7 @@ CATEGORIES = {
         name="Projection",
         description="Reduce dimensionality of images\nfrom three to two dimensions.",
         inputs=(LayerInput,),
-        default_op="maximum_z_projection",
+        default_op="maximum_z_projection (clesperanto)",
         args=[
             ("rx", PositiveFloatRange, 1),
             ("ry", PositiveFloatRange, 1),
@@ -123,7 +123,7 @@ CATEGORIES = {
         name="Binarize",
         description="Turn images into binary images.",
         inputs=(LayerInput,),
-        default_op="threshold_otsu",
+        default_op="threshold_otsu (clesperanto)",
         output="labels",
         args=[
             ("radius_x", PositiveFloatRange, 1),
@@ -138,7 +138,7 @@ CATEGORIES = {
         name="Label",
         description="Turn images or binary images into\nlabel images by labeling objects.",
         inputs=(LayerInput,),
-        default_op="voronoi_otsu_labeling",
+        default_op="voronoi_otsu_labeling (clesperanto)",
         output="labels",
         args=[
             ("a", PositiveFloatRange, 2),
@@ -151,7 +151,7 @@ CATEGORIES = {
         name="Process labels",
         description="Process label images to improve\nby changing their shape and/or removing\nobjects which don't fulfill certain conditions.",
         inputs=(LabelsInput,),
-        default_op="exclude_labels_on_edges",
+        default_op="exclude_labels_on_edges (clesperanto)",
         output="labels",
         args=[
             ("min", PositiveFloatRange, 2),
@@ -165,7 +165,7 @@ CATEGORIES = {
         name="Measure labels",
         description="Measure and visualize spatial\nfeatures of labeled objects.",
         inputs=(LabelsInput,),
-        default_op="pixel_count_map",
+        default_op="pixel_count_map (clesperanto)",
         args=[
             ("n", PositiveFloatRange, 1),
             ("m", PositiveFloatRange, 1)
@@ -180,7 +180,7 @@ CATEGORIES = {
         name="Measure labeled image",
         description="Measure and visualize intensity-based\nfeatures of labeled objects.",
         inputs=(ImageInput, LabelsInput),
-        default_op="mean_intensity_map",
+        default_op="mean_intensity_map (clesperanto)",
         args=[
             ("n", PositiveFloatRange, 1),
             ("m", PositiveFloatRange, 1)
@@ -195,7 +195,7 @@ CATEGORIES = {
         name="Compare label images",
         description="Measure and visualize overlap and \nnonzero pixel count/ratio of labeled \nobjects in two label images.",
         inputs=(LabelsInput, LabelsInput),
-        default_op="label_overlap_count_map",
+        default_op="label_overlap_count_map (clesperanto)",
         args=[],
         include=("combine","label measurement", "map", "label comparison",),
         color_map="turbo",
@@ -206,7 +206,7 @@ CATEGORIES = {
         name="Mesh",
         description="Draw connectivity meshes between\ncentroids of labeled objects.",
         inputs=(LabelsInput,),
-        default_op="draw_mesh_between_touching_labels",
+        default_op="draw_mesh_between_touching_labels (clesperanto)",
         args=[
             ("n", PositiveFloatRange, 1)
         ],
@@ -219,7 +219,7 @@ CATEGORIES = {
         name="Label neighbor filters",
         description="Process values associated with labeled objects\naccording to the neighborhood-graph of the labels.",
         inputs=(ImageInput, LabelsInput),
-        default_op="mean_of_n_nearest_neighbors_map",
+        default_op="mean_of_n_nearest_neighbors_map (clesperanto)",
         args=[
             ("n", PositiveFloatRange, 1),
             ("m", PositiveFloatRange, 100),
