@@ -260,7 +260,7 @@ def collect_tools():
     import inspect
 
     allowed_types = ["napari.types.LabelsData", "napari.types.ImageData", "int", "float", "str", "bool",
-                     "napari.viewer.Viewer"]
+                     "napari.viewer.Viewer", "napari.Viewer"]
     allowed_types = allowed_types + ["<class '" + t + "'>" for t in allowed_types]
 
     result = {}
