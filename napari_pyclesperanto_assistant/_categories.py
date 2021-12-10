@@ -309,5 +309,5 @@ def filter_operations(menu_name):
 def operations_in_menu(menu_name):
     choices = filter_operations(menu_name)
     choices = [c.split(">")[1] for c in choices]
-    choices = sorted(choices)
+    choices = sorted(choices, key=str.casefold)
     return choices
