@@ -114,7 +114,7 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
     args = tuple(args)
 
     if cle_function.__module__ == "pyclesperanto_prototype":
-        # todo: we could make this a little faster by getting gpu_out from a central manager
+        # todo: we should handle all functions equally
         gpu_out = None
 
         logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
@@ -125,7 +125,6 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
         return gpu_out, args
     else:
         args = (*gpu_ins, *args)[:nargs+1]
-        #print("args", args)
         kwargs = {}
 
         import inspect
@@ -158,17 +157,11 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
 
 
 def find_function(op_name):
-    cle_function = None
-    try:
-        cle_function = cle.operation(op_name)  # couldn't this just be getattr(cle, ...)?
-    except:
-        pass
-    if cle_function is None:
-        from .._categories import all_operations
-        all_ops = all_operations()
-        for k, f in all_ops.items():
-            if op_name in k:
-                cle_function = f
+    from .._categories import all_operations
+    all_ops = all_operations()
+    for k, f in all_ops.items():
+        if op_name in k:
+            cle_function = f
     if cle_function is None:
         print("No function found for", op_name)
     return cle_function
@@ -249,7 +242,7 @@ def _show_result(
     return layer
 
 
-def _generate_signature_for_category(category: Category) -> Signature:
+def _generate_signature_for_category(category: Category, search_string:str= None) -> Signature:
     """Create an inspect.Signature object representing a cle Category.
 
     The output of this function can be used to set function.__signature__ so that
@@ -263,7 +256,7 @@ def _generate_signature_for_category(category: Category) -> Signature:
     ]
     # Add valid operations choices (will create the combo box)
     from .._categories import operations_in_menu
-    choices = list(operations_in_menu(category.tools_menu))
+    choices = list(operations_in_menu(category.tools_menu, search_string))
     #print("choices:", choices)
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
     default_op = category.default_op
@@ -294,7 +287,7 @@ def _generate_signature_for_category(category: Category) -> Signature:
     return result
 
 
-def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> magicgui.widgets.FunctionGui[Layer]:
+def make_gui_for_category(category: Category, search_string:str = None, viewer: napari.Viewer = None) -> magicgui.widgets.FunctionGui[Layer]:
     """Generate a magicgui widget for a Category object
 
     Parameters
@@ -351,21 +344,7 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
         if description is not None:
             description = description.replace("\n    ", "\n") + "\n\nRight-click to learn more..."
             temp = description.split('https:')
-            link = "https://napari-hub.org/plugins/napari-pyclesperanto-assistant"
-            if len(temp) > 1:
-                link = "https:" + temp[1].split("\n")[0]
             getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
-
-        # Right-click: Open online help
-        #combobox = getattr(widget, OP_NAME_PARAM).native
-        #combobox.orig_mousePressEvent = getattr(widget, OP_NAME_PARAM).native.mousePressEvent
-        #def call_link(event):
-        #    if event.button() == QtCore.Qt.RightButton:
-        #        import webbrowser
-        #        webbrowser.open(link)
-        #    else:
-        #        combobox.orig_mousePressEvent(event)
-        #combobox.mousePressEvent = call_link
 
         if result is not None:
             result_layer = _show_result(
@@ -402,7 +381,7 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
         return None
 
     gui_function.__name__ = f'do_{category.name.lower().replace(" ", "_")}'
-    gui_function.__signature__ = _generate_signature_for_category(category)
+    gui_function.__signature__ = _generate_signature_for_category(category, search_string)
 
     # create the widget
     widget = magicgui(gui_function, auto_call=True)
@@ -418,20 +397,12 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
         # get the names of positional parameters in the new operation
         param_names, numeric_param_names, bool_param_names, str_param_names = separate_argnames_by_type(
             new_sig.parameters.items())
-
-        print("function", func.__name__)
-        print("numeric_param_names", numeric_param_names)
-
         num_count = 0
         str_count = 0
         bool_count = 0
 
-        # update the labels of each positional-arg subwidget
-
-        n_params = len(param_names)
-
-
         # show needed elements and set right label
+        n_params = len(param_names)
         for n, arg in enumerate(category_args):
             arg_gui_name = arg[0]
             arg_gui_type = arg[1]
