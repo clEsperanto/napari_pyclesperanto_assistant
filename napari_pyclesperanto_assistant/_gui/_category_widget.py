@@ -11,6 +11,7 @@ from loguru import logger
 from magicgui import magicgui
 from typing_extensions import Annotated
 import napari
+import numpy as np
 
 from .._categories import Category
 from qtpy.QtWidgets import QPushButton, QDockWidget
@@ -23,10 +24,14 @@ VIEWER_PARAM = "viewer"
 OP_NAME_PARAM = "op_name"
 OP_ID = "op_id"
 
-from .._categories import FloatRange, BoolType, StringType
+# We currently support operations with up to 6 numeric parameters, 3 booleans and 3 strings (see lists below)
+FloatRange = Annotated[float, {"min": np.finfo(np.float32).min, "max": np.finfo(np.float32).max}]
+BoolType = Annotated[bool, {}]
+StringType = Annotated[str, {}]
+PositiveFloatRange = Annotated[float, {"min": 0, "max": np.finfo(np.float32).max}]
 category_args = [
-    ("x", FloatRange, 00),
-    ("y", FloatRange, 00),
+    ("x", FloatRange, 0),
+    ("y", FloatRange, 0),
     ("z", FloatRange, 0),
     ("u", FloatRange, 0),
     ("v", FloatRange, 0),

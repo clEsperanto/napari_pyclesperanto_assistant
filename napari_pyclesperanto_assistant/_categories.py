@@ -6,10 +6,6 @@ import napari
 from napari.layers import Image, Labels, Layer
 from typing_extensions import Annotated
 
-FloatRange = Annotated[float, {"min": np.finfo(np.float32).min, "max": np.finfo(np.float32).max}]
-BoolType = Annotated[bool, {}]
-StringType = Annotated[str, {}]
-PositiveFloatRange = Annotated[float, {"min": 0, "max": np.finfo(np.float32).max}]
 ImageInput = Annotated[Image, {"label": "Image"}]
 LayerInput = Annotated[Layer, {"label": "Image"}]
 LabelsInput = Annotated[Labels, {"label": "Labels"}]
@@ -24,8 +20,6 @@ class Category:
     default_op: str
     default_values : Sequence[float]
     output: str = "image"  # or labels
-    # [(name, annotation, default), ...]
-    args: Sequence[Tuple[str, Type, Any]] = field(default_factory=tuple)
     # categories
     include: Sequence[str] = field(default_factory=tuple)
     exclude: Sequence[str] = field(default_factory=tuple)
@@ -42,11 +36,6 @@ CATEGORIES = {
         description="Remove noise from images, e.g. by local averaging and blurring.",
         inputs=(ImageInput,),
         default_op="gaussian_blur (clesperanto)",
-        args=[
-            ("x", FloatRange, 1),
-            ("y", FloatRange, 1),
-            ("z", FloatRange, 0)
-        ],
         default_values=[1, 1, 0],
         include=("filter", "denoise"),
         exclude=("combine",),
@@ -57,11 +46,6 @@ CATEGORIES = {
         description="Remove background intensity, e.g. caused\nby out-of-focus light or uneven illumination.",
         inputs=(ImageInput,),
         default_op="top_hat_box (clesperanto)",
-        args=[
-            ("x", FloatRange, 10),
-            ("y", FloatRange, 10),
-            ("z", FloatRange, 0)
-        ],
         default_values=[10, 10, 0],
         include=("filter", "background removal"),
         exclude=("combine",),
@@ -72,11 +56,6 @@ CATEGORIES = {
         description="Filter images, e.g. to adjust gamma or detect edges.",
         inputs=(ImageInput,),
         default_op="gamma_correction (clesperanto)",
-        args=[
-            ("x", FloatRange, 1),
-            ("y", FloatRange, 1),
-            ("z", FloatRange, 0)
-        ],
         default_values=[1, 1, 0],
         include=("filter",),
         exclude=("combine", "denoise", "background removal", "binary processing"),
@@ -89,10 +68,6 @@ CATEGORIES = {
         default_op="add_images (clesperanto)",
         include=("combine",),
         exclude=("map",),
-        args=[
-            ("a", FloatRange, 1),
-            ("b", FloatRange, 1),
-        ],
         default_values=[1, 1],
         tools_menu="Image math",
     ),
@@ -102,13 +77,6 @@ CATEGORIES = {
         inputs=(LayerInput,),
         default_op="sub_stack (clesperanto)",
         output="image",  # can also be labels
-        args=[
-            ("a", FloatRange, 0),
-            ("b", FloatRange, 0),
-            ("c", FloatRange, 0),
-            ("d", bool, False),
-            ("e", bool, False),
-        ],
         default_values=[0, 0, 0, 1, 1],
         include=("transform",),
         exclude=("combine",),
@@ -119,11 +87,6 @@ CATEGORIES = {
         description="Reduce dimensionality of images\nfrom three to two dimensions.",
         inputs=(LayerInput,),
         default_op="maximum_z_projection (clesperanto)",
-        args=[
-            ("rx", PositiveFloatRange, 1),
-            ("ry", PositiveFloatRange, 1),
-            ("s", PositiveFloatRange, 1),
-        ],
         default_values=[1, 1, 1],
         output="image",  # can also be labels
         include=("projection",),
@@ -135,11 +98,6 @@ CATEGORIES = {
         inputs=(LayerInput,),
         default_op="threshold_otsu (clesperanto)",
         output="labels",
-        args=[
-            ("radius_x", PositiveFloatRange, 1),
-            ("radius_y", PositiveFloatRange, 1),
-            ("radius_z", PositiveFloatRange, 0),
-        ],
         default_values=[1, 1, 0],
         include=("binarize",),
         exclude=("combine",),
@@ -151,10 +109,6 @@ CATEGORIES = {
         inputs=(LayerInput,),
         default_op="voronoi_otsu_labeling (clesperanto)",
         output="labels",
-        args=[
-            ("a", PositiveFloatRange, 2),
-            ("b", PositiveFloatRange, 2)
-        ],
         default_values=[2, 2],
         include=("label",),
         tools_menu="Segmentation / labeling",
@@ -165,10 +119,6 @@ CATEGORIES = {
         inputs=(LabelsInput,),
         default_op="exclude_labels_on_edges (clesperanto)",
         output="labels",
-        args=[
-            ("min", PositiveFloatRange, 2),
-            ("max", PositiveFloatRange, 100)
-        ],
         default_values=[2, 100],
         include=("label processing",),
         exclude=("combine",),
@@ -179,10 +129,6 @@ CATEGORIES = {
         description="Measure and visualize spatial\nfeatures of labeled objects.",
         inputs=(LabelsInput,),
         default_op="pixel_count_map (clesperanto)",
-        args=[
-            ("n", PositiveFloatRange, 1),
-            ("m", PositiveFloatRange, 1)
-        ],
         default_values=[1, 1],
         include=("label measurement", "map"),
         exclude=("combine",),
@@ -195,10 +141,6 @@ CATEGORIES = {
         description="Measure and visualize intensity-based\nfeatures of labeled objects.",
         inputs=(ImageInput, LabelsInput),
         default_op="mean_intensity_map (clesperanto)",
-        args=[
-            ("n", PositiveFloatRange, 1),
-            ("m", PositiveFloatRange, 1)
-        ],
         default_values=[1, 1],
         include=("combine","label measurement", "map",),
         exclude=("label comparison",),
@@ -211,7 +153,6 @@ CATEGORIES = {
         description="Measure and visualize overlap and \nnonzero pixel count/ratio of labeled \nobjects in two label images.",
         inputs=(LabelsInput, LabelsInput),
         default_op="label_overlap_count_map (clesperanto)",
-        args=[],
         default_values=[],
         include=("combine","label measurement", "map", "label comparison",),
         color_map="turbo",
@@ -223,9 +164,6 @@ CATEGORIES = {
         description="Draw connectivity meshes between\ncentroids of labeled objects.",
         inputs=(LabelsInput,),
         default_op="draw_mesh_between_touching_labels (clesperanto)",
-        args=[
-            ("n", PositiveFloatRange, 1)
-        ],
         default_values=[1],
         include=("label measurement", "mesh"),
         color_map="green",
@@ -237,10 +175,6 @@ CATEGORIES = {
         description="Process values associated with labeled objects\naccording to the neighborhood-graph of the labels.",
         inputs=(ImageInput, LabelsInput),
         default_op="mean_of_n_nearest_neighbors_map (clesperanto)",
-        args=[
-            ("n", PositiveFloatRange, 1),
-            ("m", PositiveFloatRange, 100),
-        ],
         default_values=[1, 100],
         include=("neighbor",),
         color_map="turbo",
