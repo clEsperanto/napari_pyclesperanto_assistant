@@ -13,7 +13,7 @@ from typing_extensions import Annotated
 import napari
 import numpy as np
 
-from .._categories import Category
+from .._categories import Category, find_function
 from qtpy.QtWidgets import QPushButton, QDockWidget
 
 if TYPE_CHECKING:
@@ -156,17 +156,6 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
         return gpu_out, args
 
 
-def find_function(op_name):
-    from .._categories import all_operations
-    all_ops = all_operations()
-    for k, f in all_ops.items():
-        if op_name in k:
-            cle_function = f
-    if cle_function is None:
-        print("No function found for", op_name)
-    return cle_function
-
-
 def _show_result(
     gpu_out: cle.Image,
     viewer: Viewer,
@@ -256,7 +245,7 @@ def _generate_signature_for_category(category: Category, search_string:str= None
     ]
     # Add valid operations choices (will create the combo box)
     from .._categories import operations_in_menu
-    choices = list(operations_in_menu(category.tools_menu, search_string))
+    choices = list(operations_in_menu(category, search_string))
     #print("choices:", choices)
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
     default_op = category.default_op
@@ -385,6 +374,7 @@ def make_gui_for_category(category: Category, search_string:str = None, viewer: 
 
     # create the widget
     widget = magicgui(gui_function, auto_call=True)
+    widget.native.setMaximumWidth(345)
 
     # when the operation name changes, we want to update the argument labels
     # to be appropriate for the corresponding cle operation.

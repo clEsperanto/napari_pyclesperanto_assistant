@@ -5,9 +5,10 @@ import numpy as np
 import napari
 from napari.layers import Image, Labels, Layer
 from typing_extensions import Annotated
+import inspect
 
 ImageInput = Annotated[Image, {"label": "Image"}]
-LayerInput = Annotated[Layer, {"label": "Image"}]
+LayerInput = Annotated[Layer, {"label": "Image or labels"}]
 LabelsInput = Annotated[Labels, {"label": "Labels"}]
 global_magic_opts = {"auto_call": True}
 
@@ -188,7 +189,7 @@ CATEGORIES = {
 def attach_tooltips():
     # attach tooltips
     for k, c in CATEGORIES.items():
-        choices = operations_in_menu(c.tools_menu)
+        choices = operations_in_menu(c)
         c.tool_tip = c.description + "\n\nOperations:\n* " + "\n* ".join(choices).replace("_", " ")
 
 from functools import lru_cache
@@ -208,7 +209,6 @@ def collect_cle():
 
 def collect_tools():
     from napari_tools_menu import ToolsMenu
-    import inspect
 
     allowed_types = ["napari.types.LabelsData", "napari.types.ImageData", "int", "float", "str", "bool",
                      "napari.viewer.Viewer", "napari.Viewer"]
@@ -257,13 +257,58 @@ def filter_operations(menu_name):
             result[k] = v
     return result
 
-def operations_in_menu(menu_name, search_string: str = None):
+def operations_in_menu(category, search_string: str = None):
+    menu_name = category.tools_menu
     choices = filter_operations(menu_name)
     if search_string is not None and len(search_string) > 0:
         choices = [c for c in choices if search_string in c.lower()]
     choices = [c.split(">")[1] for c in choices]
     choices = sorted(choices, key=str.casefold)
-    return choices
+
+    #print("\n", category.name)
+
+    # check if the image parameters fit
+    result = []
+    for name in choices:
+        func = find_function(name)
+        sig = inspect.signature(func)
+
+        # count number of image-like parameters and compare to category
+        num_image_parameters_in_category = len(category.inputs)
+        num_image_parameters_in_function = 0
+        for i, key in enumerate(list(sig.parameters.keys())):
+            type_annotation = str(sig.parameters[key].annotation)
+
+            if "NewType.<locals>.new_type" in type_annotation or \
+                "Image" in type_annotation or \
+                "LabelsData" in type_annotation or \
+                "LayerData" in type_annotation:
+                num_image_parameters_in_function = num_image_parameters_in_function + 1
+            else:
+                break
+
+        if "pyclesperanto_prototype" in func.__module__:
+            # all clesperanto function have an output image which we don't pass
+            num_image_parameters_in_function -= 1
+
+        # only keep the function in this category if it matches
+        if num_image_parameters_in_category == num_image_parameters_in_function:
+            result.append(name)
+        #else:
+            #print(name, num_image_parameters_in_category, num_image_parameters_in_function)
+
+    return result
+
+
+def find_function(op_name):
+    all_ops = all_operations()
+    for k, f in all_ops.items():
+        if op_name in k:
+            cle_function = f
+    if cle_function is None:
+        print("No function found for", op_name)
+    return cle_function
+
 
 def filter_categories(search_string:str=""):
     if search_string is None or len(search_string) == 0:
@@ -279,7 +324,7 @@ def filter_categories(search_string:str=""):
                 result[k] = new_c
 
     for k, c in result.items():
-        choices = operations_in_menu(c.tools_menu, search_string)
+        choices = operations_in_menu(c, search_string)
         c.tool_tip = c.description + "\n\nOperations:\n* " + "\n* ".join(choices).replace("_", " ")
 
     return result
