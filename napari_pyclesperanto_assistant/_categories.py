@@ -7,6 +7,8 @@ from napari.layers import Image, Labels, Layer
 from typing_extensions import Annotated
 
 FloatRange = Annotated[float, {"min": np.finfo(np.float32).min, "max": np.finfo(np.float32).max}]
+BoolType = Annotated[bool, {}]
+StringType = Annotated[str, {}]
 PositiveFloatRange = Annotated[float, {"min": 0, "max": np.finfo(np.float32).max}]
 ImageInput = Annotated[Image, {"label": "Image"}]
 LayerInput = Annotated[Layer, {"label": "Image"}]

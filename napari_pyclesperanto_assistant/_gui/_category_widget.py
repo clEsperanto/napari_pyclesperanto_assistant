@@ -23,13 +23,32 @@ VIEWER_PARAM = "viewer"
 OP_NAME_PARAM = "op_name"
 OP_ID = "op_id"
 
+from .._categories import FloatRange, BoolType, StringType
+category_args = [
+    ("x", FloatRange, 10),
+    ("y", FloatRange, 10),
+    ("z", FloatRange, 0),
+    ("u", FloatRange, 0),
+    ("v", FloatRange, 0),
+    ("w", FloatRange, 0),
+    ("a", BoolType, True),
+    ("b", BoolType, True),
+    ("c", BoolType, True),
+    ("k", StringType, ""),
+    ("l", StringType, ""),
+    ("m", StringType, ""),
+]
+category_args_numeric = ["x", "y", "z", "u", "v", "w"]
+category_args_bool = ["a", "b", "c"]
+category_args_text = ["k", "l", "m"]
+
 def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
     params = signature(func).parameters
     return len([p for p in params.values() if p.annotation in types])
 
 
 @logger.catch
-def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewer: napari.Viewer = None, *args) -> cle.Image:
+def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewer: napari.Viewer = None, **kwargs) -> cle.Image:
     """Call cle operation `op_name` with specified inputs and args.
 
     Takes care of transfering data to GPU and omitting extra positional args
@@ -65,6 +84,29 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
     # call actual cle function ignoring extra positional args
     cle_function = find_function(op_name)
     nargs = num_positional_args(cle_function)
+
+    args = []
+    new_sig = signature(cle_function)
+    # get the names of positional parameters in the new operation
+    param_names, numeric_param_names, bool_param_names, str_param_names = separate_argnames_by_type(
+        new_sig.parameters.items())
+
+    # go through all parameters and collect their values in an args-array
+    num_count = 0
+    str_count = 0
+    bool_count = 0
+    for key in param_names:
+        if key in numeric_param_names:
+            value = kwargs[category_args_numeric[num_count]]
+            num_count = num_count + 1
+        elif key in bool_param_names:
+            value = kwargs[category_args_bool[bool_count]]
+            bool_count = bool_count + 1
+        elif key in str_param_names:
+            value = kwargs[category_args_text[str_count]]
+            str_count = str_count + 1
+        args.append(value)
+    args = tuple(args)
 
     if cle_function.__module__ == "pyclesperanto_prototype":
         # todo: we could make this a little faster by getting gpu_out from a central manager
@@ -230,7 +272,7 @@ def _generate_signature_for_category(category: Category) -> Signature:
             Parameter(OP_NAME_PARAM, k, annotation=op_type, default=default_op)
         )
     # add the args that will be passed to the cle operation.
-    for name, type_, default in category.args:
+    for name, type_, default in category_args:
         params.append(Parameter(name, k, annotation=type_, default=default))
 
     # add a viewer.  This allows our widget to know if it's in a viewer
@@ -285,9 +327,8 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
             currstep_event.connect(update)
 
         # todo: deal with 5D and nD data
-
         op_name = kwargs.pop("op_name")
-        result, used_args = call_op(op_name, inputs, t_position, viewer, *kwargs.values())
+        result, used_args = call_op(op_name, inputs, t_position, viewer, **kwargs)
 
         # add a help-button
         description = find_function(op_name).__doc__
@@ -356,26 +397,84 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
 
     @op_name_widget.changed.connect
     def update_positional_labels(*_: Any):
-        new_sig = signature(find_function(op_name_widget.value))
+        func = find_function(op_name_widget.value)
+        new_sig = signature(func)
         # get the names of positional parameters in the new operation
-        param_names = [
-            name
-            for name, param in new_sig.parameters.items()
-            if param.annotation in {int, str, float, bool}
-        ]
+        param_names, numeric_param_names, bool_param_names, str_param_names = separate_argnames_by_type(
+            new_sig.parameters.items())
+
+        print("function", func.__name__)
+        print("numeric_param_names", numeric_param_names)
+
+        num_count = 0
+        str_count = 0
+        bool_count = 0
+
         # update the labels of each positional-arg subwidget
-        # or, if there are too many, hide them
+
         n_params = len(param_names)
-        for n, arg in enumerate(category.args):
-            wdg = getattr(widget, arg[0])
-            if n < n_params:
-                wdg.label = param_names[n]
-                wdg.text = param_names[n]
-                wdg.show()
+
+
+        # show needed elements and set right label
+        for n, arg in enumerate(category_args):
+            arg_gui_name = arg[0]
+            arg_gui_type = arg[1]
+            wdg = getattr(widget, arg_gui_name)
+            if arg_gui_type == FloatRange:
+                if num_count < len(numeric_param_names):
+                    arg_func_name = numeric_param_names[num_count]
+                    num_count = num_count + 1
+                else:
+                    wdg.hide()
+                    continue
+            elif arg_gui_type == BoolType:
+                if bool_count < len(bool_param_names):
+                    arg_func_name = bool_param_names[bool_count]
+                    bool_count = bool_count + 1
+                else:
+                    wdg.hide()
+                    continue
+            elif arg_gui_type == StringType:
+                if str_count < len(str_param_names):
+                    arg_func_name = str_param_names[str_count]
+                    str_count = str_count + 1
+                else:
+                    wdg.hide()
+                    continue
             else:
-                wdg.hide()
+                arg_func_name = "?"
+                print("Unsupported type:", arg_gui_type)
+                continue
+
+            wdg.label = arg_func_name
+            wdg.text = arg_func_name
+            wdg.show()
 
     # run it once to update the labels
     update_positional_labels()
 
     return widget
+
+
+def separate_argnames_by_type(items):
+    param_names = [
+        name
+        for name, param in items
+        if param.annotation in {int, str, float, bool}
+    ]
+    numeric_param_names = [
+        name
+        for name, param in items
+        if param.annotation in {int, float}
+    ]
+    bool_param_names = [
+        name
+        for name, param in items
+        if param.annotation in {bool}
+    ]
+    str_param_names = [
+        name
+        for name, param in items
+        if param.annotation in {str}
+    ]
+    return param_names, numeric_param_names, bool_param_names, str_param_names
