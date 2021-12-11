@@ -22,6 +22,7 @@ class Category:
     description: str
     inputs: Sequence[Type]
     default_op: str
+    default_values : Sequence[float]
     output: str = "image"  # or labels
     # [(name, annotation, default), ...]
     args: Sequence[Tuple[str, Type, Any]] = field(default_factory=tuple)
@@ -46,6 +47,7 @@ CATEGORIES = {
             ("y", FloatRange, 1),
             ("z", FloatRange, 0)
         ],
+        default_values=[1, 1, 0],
         include=("filter", "denoise"),
         exclude=("combine",),
         tools_menu="Filtering / noise removal",
@@ -60,6 +62,7 @@ CATEGORIES = {
             ("y", FloatRange, 10),
             ("z", FloatRange, 0)
         ],
+        default_values=[10, 10, 0],
         include=("filter", "background removal"),
         exclude=("combine",),
         tools_menu="Filtering / background removal",
@@ -74,6 +77,7 @@ CATEGORIES = {
             ("y", FloatRange, 1),
             ("z", FloatRange, 0)
         ],
+        default_values=[1, 1, 0],
         include=("filter",),
         exclude=("combine", "denoise", "background removal", "binary processing"),
         tools_menu="Filtering",
@@ -89,6 +93,7 @@ CATEGORIES = {
             ("a", FloatRange, 1),
             ("b", FloatRange, 1),
         ],
+        default_values=[1, 1],
         tools_menu="Image math",
     ),
     "Transform": Category(
@@ -104,6 +109,7 @@ CATEGORIES = {
             ("d", bool, False),
             ("e", bool, False),
         ],
+        default_values=[0, 0, 0, 1, 1],
         include=("transform",),
         exclude=("combine",),
         tools_menu="Transform",
@@ -118,6 +124,7 @@ CATEGORIES = {
             ("ry", PositiveFloatRange, 1),
             ("s", PositiveFloatRange, 1),
         ],
+        default_values=[1, 1, 1],
         output="image",  # can also be labels
         include=("projection",),
         tools_menu="Projection",
@@ -133,6 +140,7 @@ CATEGORIES = {
             ("radius_y", PositiveFloatRange, 1),
             ("radius_z", PositiveFloatRange, 0),
         ],
+        default_values=[1, 1, 0],
         include=("binarize",),
         exclude=("combine",),
         tools_menu="Segmentation / binarization",
@@ -147,6 +155,7 @@ CATEGORIES = {
             ("a", PositiveFloatRange, 2),
             ("b", PositiveFloatRange, 2)
         ],
+        default_values=[2, 2],
         include=("label",),
         tools_menu="Segmentation / labeling",
     ),
@@ -160,6 +169,7 @@ CATEGORIES = {
             ("min", PositiveFloatRange, 2),
             ("max", PositiveFloatRange, 100)
         ],
+        default_values=[2, 100],
         include=("label processing",),
         exclude=("combine",),
         tools_menu="Segmentation post-processing",
@@ -173,6 +183,7 @@ CATEGORIES = {
             ("n", PositiveFloatRange, 1),
             ("m", PositiveFloatRange, 1)
         ],
+        default_values=[1, 1],
         include=("label measurement", "map"),
         exclude=("combine",),
         color_map="turbo",
@@ -188,6 +199,7 @@ CATEGORIES = {
             ("n", PositiveFloatRange, 1),
             ("m", PositiveFloatRange, 1)
         ],
+        default_values=[1, 1],
         include=("combine","label measurement", "map",),
         exclude=("label comparison",),
         color_map="turbo",
@@ -200,6 +212,7 @@ CATEGORIES = {
         inputs=(LabelsInput, LabelsInput),
         default_op="label_overlap_count_map (clesperanto)",
         args=[],
+        default_values=[],
         include=("combine","label measurement", "map", "label comparison",),
         color_map="turbo",
         blending="translucent",
@@ -213,6 +226,7 @@ CATEGORIES = {
         args=[
             ("n", PositiveFloatRange, 1)
         ],
+        default_values=[1],
         include=("label measurement", "mesh"),
         color_map="green",
         blending="additive",
@@ -227,6 +241,7 @@ CATEGORIES = {
             ("n", PositiveFloatRange, 1),
             ("m", PositiveFloatRange, 100),
         ],
+        default_values=[1, 100],
         include=("neighbor",),
         color_map="turbo",
         blending="translucent",

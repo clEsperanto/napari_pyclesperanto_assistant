@@ -25,15 +25,15 @@ OP_ID = "op_id"
 
 from .._categories import FloatRange, BoolType, StringType
 category_args = [
-    ("x", FloatRange, 10),
-    ("y", FloatRange, 10),
+    ("x", FloatRange, 00),
+    ("y", FloatRange, 00),
     ("z", FloatRange, 0),
     ("u", FloatRange, 0),
     ("v", FloatRange, 0),
     ("w", FloatRange, 0),
-    ("a", BoolType, True),
-    ("b", BoolType, True),
-    ("c", BoolType, True),
+    ("a", BoolType, False),
+    ("b", BoolType, False),
+    ("c", BoolType, False),
     ("k", StringType, ""),
     ("l", StringType, ""),
     ("m", StringType, ""),
@@ -150,6 +150,8 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
                 gpu_out = gpu_out.astype(int)
 
         return gpu_out, args
+
+
 def find_function(op_name):
     cle_function = None
     try:
@@ -165,6 +167,7 @@ def find_function(op_name):
     if cle_function is None:
         print("No function found for", op_name)
     return cle_function
+
 
 def _show_result(
     gpu_out: cle.Image,
@@ -272,7 +275,9 @@ def _generate_signature_for_category(category: Category) -> Signature:
             Parameter(OP_NAME_PARAM, k, annotation=op_type, default=default_op)
         )
     # add the args that will be passed to the cle operation.
-    for name, type_, default in category_args:
+    for i, (name, type_, default) in enumerate(category_args):
+        if i < len(category.default_values):
+            default = category.default_values[i]
         params.append(Parameter(name, k, annotation=type_, default=default))
 
     # add a viewer.  This allows our widget to know if it's in a viewer
@@ -328,7 +333,13 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
 
         # todo: deal with 5D and nD data
         op_name = kwargs.pop("op_name")
-        result, used_args = call_op(op_name, inputs, t_position, viewer, **kwargs)
+        try:
+            result, used_args = call_op(op_name, inputs, t_position, viewer, **kwargs)
+        except TypeError:
+            result = None
+            used_args = []
+            import warnings
+            warnings.warn("Operation failed. Please check input parameters and documentation.")
 
         # add a help-button
         description = find_function(op_name).__doc__
