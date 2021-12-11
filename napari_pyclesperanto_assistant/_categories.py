@@ -257,8 +257,29 @@ def filter_operations(menu_name):
             result[k] = v
     return result
 
-def operations_in_menu(menu_name):
+def operations_in_menu(menu_name, search_string: str = None):
     choices = filter_operations(menu_name)
+    if search_string is not None and len(search_string) > 0:
+        choices = [c for c in choices if search_string in c.lower()]
     choices = [c.split(">")[1] for c in choices]
     choices = sorted(choices, key=str.casefold)
     return choices
+
+def filter_categories(search_string:str=""):
+    if search_string is None or len(search_string) == 0:
+        return CATEGORIES
+
+    from copy import copy
+
+    result = {}
+    for k, c in CATEGORIES.items():
+        if not callable(c):
+            if search_string in c.tool_tip.lower():
+                new_c = copy(c)
+                result[k] = new_c
+
+    for k, c in result.items():
+        choices = operations_in_menu(c.tools_menu, search_string)
+        c.tool_tip = c.description + "\n\nOperations:\n* " + "\n* ".join(choices).replace("_", " ")
+
+    return result
