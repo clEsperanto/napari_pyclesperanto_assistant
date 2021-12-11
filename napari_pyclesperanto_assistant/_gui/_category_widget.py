@@ -78,7 +78,7 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
         return gpu_out, args
     else:
         args = (*gpu_ins, *args)[:nargs+1]
-        print("args", args)
+        #print("args", args)
         kwargs = {}
 
         import inspect
@@ -93,12 +93,12 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewe
             if i >= len(args):
                 break
             type_annotation = str(sig.parameters[k].annotation)
-            print("Annotation:", type_annotation)
+            #print("Annotation:", type_annotation)
             args = list(args)
             for typ in ["int", "float", "str"]:
                 if typ in type_annotation:
                     converter = eval(typ)
-                    print("converter", converter)
+                    #print("converter", converter)
                     args[i] = converter(args[i])
 
         gpu_out = cle_function(*args, **kwargs)
@@ -162,7 +162,7 @@ def _show_result(
     layer : Optional[Layer]
         The created/udpated layer, or None if no viewer is present.
     """
-    print("OP ID ", op_id)
+    #print("OP ID ", op_id)
     if not viewer:
         logger.warning("no viewer, cannot add image")
         return
@@ -214,11 +214,11 @@ def _generate_signature_for_category(category: Category) -> Signature:
     # Add valid operations choices (will create the combo box)
     from .._categories import operations_in_menu
     choices = list(operations_in_menu(category.tools_menu))
-    print("choices:", choices)
+    #print("choices:", choices)
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
     default_op = category.default_op
     if not any(default_op == op for op in choices):
-        print("Default-operation is not in list!")
+        #print("Default-operation is not in list!")
         default_op = None
 
     if default_op is None:
@@ -238,7 +238,7 @@ def _generate_signature_for_category(category: Category) -> Signature:
         Parameter(VIEWER_PARAM, k, annotation="napari.viewer.Viewer", default=None)
     )
     result = Signature(params)
-    print("Signature", result)
+    #print("Signature", result)
     return result
 
 
@@ -327,7 +327,7 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
                 from napari_time_slicer import WorkflowManager
                 manager = WorkflowManager.install(viewer)
                 manager.update(result_layer, find_function(op_name), *used_args)
-                print("notified", result_layer.name, find_function(op_name))
+                #print("notified", result_layer.name, find_function(op_name))
             except ImportError:
                 pass # recording workflows in the WorkflowManager is a nice-to-have at the moment.
 
@@ -347,22 +347,15 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
     gui_function.__name__ = f'do_{category.name.lower().replace(" ", "_")}'
     gui_function.__signature__ = _generate_signature_for_category(category)
 
-    print("A", gui_function.__name__)
-
     # create the widget
     widget = magicgui(gui_function, auto_call=True)
-
-    print("B")
 
     # when the operation name changes, we want to update the argument labels
     # to be appropriate for the corresponding cle operation.
     op_name_widget = getattr(widget, OP_NAME_PARAM)
 
-    print("C")
-
     @op_name_widget.changed.connect
     def update_positional_labels(*_: Any):
-        print("a")
         new_sig = signature(find_function(op_name_widget.value))
         # get the names of positional parameters in the new operation
         param_names = [
@@ -370,7 +363,6 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
             for name, param in new_sig.parameters.items()
             if param.annotation in {int, str, float, bool}
         ]
-        print("b", len(param_names))
         # update the labels of each positional-arg subwidget
         # or, if there are too many, hide them
         n_params = len(param_names)
@@ -382,12 +374,8 @@ def make_gui_for_category(category: Category, viewer: napari.Viewer = None) -> m
                 wdg.show()
             else:
                 wdg.hide()
-        print("c")
-    print("D")
 
     # run it once to update the labels
     update_positional_labels()
-
-    print("E")
 
     return widget
