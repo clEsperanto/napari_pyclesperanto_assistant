@@ -243,7 +243,7 @@ def collect_tools():
     return result
 
 
-@lru_cache
+@lru_cache(maxsize=1)
 def all_operations():
     cle_ops = collect_cle()
     tools_ops = collect_tools()
