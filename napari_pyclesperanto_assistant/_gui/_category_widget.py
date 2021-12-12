@@ -10,8 +10,10 @@ import toolz
 from loguru import logger
 from magicgui import magicgui
 from typing_extensions import Annotated
+import napari
+import numpy as np
 
-from .._categories import Category
+from .._categories import Category, find_function
 from qtpy.QtWidgets import QPushButton, QDockWidget
 
 if TYPE_CHECKING:
@@ -22,13 +24,36 @@ VIEWER_PARAM = "viewer"
 OP_NAME_PARAM = "op_name"
 OP_ID = "op_id"
 
+# We currently support operations with up to 6 numeric parameters, 3 booleans and 3 strings (see lists below)
+FloatRange = Annotated[float, {"min": np.finfo(np.float32).min, "max": np.finfo(np.float32).max}]
+BoolType = Annotated[bool, {}]
+StringType = Annotated[str, {}]
+PositiveFloatRange = Annotated[float, {"min": 0, "max": np.finfo(np.float32).max}]
+category_args = [
+    ("x", FloatRange, 0),
+    ("y", FloatRange, 0),
+    ("z", FloatRange, 0),
+    ("u", FloatRange, 0),
+    ("v", FloatRange, 0),
+    ("w", FloatRange, 0),
+    ("a", BoolType, False),
+    ("b", BoolType, False),
+    ("c", BoolType, False),
+    ("k", StringType, ""),
+    ("l", StringType, ""),
+    ("m", StringType, ""),
+]
+category_args_numeric = ["x", "y", "z", "u", "v", "w"]
+category_args_bool = ["a", "b", "c"]
+category_args_text = ["k", "l", "m"]
+
 def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
     params = signature(func).parameters
     return len([p for p in params.values() if p.annotation in types])
 
 
 @logger.catch
-def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, *args) -> cle.Image:
+def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, viewer: napari.Viewer = None, **kwargs) -> cle.Image:
     """Call cle operation `op_name` with specified inputs and args.
 
     Takes care of transfering data to GPU and omitting extra positional args
@@ -61,18 +86,74 @@ def call_op(op_name: str, inputs: Sequence[Layer], timepoint : int = None, *args
     # to support 2d timelapse data
     gpu_ins = [i if len(i.shape) != 3 or i.shape[0] != 1 else i [0] for i in gpu_ins]
 
-    # todo: we could make this a little faster by getting gpu_out from a central manager
-    gpu_out = None
-
     # call actual cle function ignoring extra positional args
-    cle_function = cle.operation(op_name)  # couldn't this just be getattr(cle, ...)?
+    cle_function = find_function(op_name)
     nargs = num_positional_args(cle_function)
-    logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
-    args = ((*gpu_ins, gpu_out) + args)[:nargs]
-    gpu_out = cle_function(*args)
 
-    # return output
-    return gpu_out, args
+    args = []
+    new_sig = signature(cle_function)
+    # get the names of positional parameters in the new operation
+    param_names, numeric_param_names, bool_param_names, str_param_names = separate_argnames_by_type(
+        new_sig.parameters.items())
+
+    # go through all parameters and collect their values in an args-array
+    num_count = 0
+    str_count = 0
+    bool_count = 0
+    for key in param_names:
+        if key in numeric_param_names:
+            value = kwargs[category_args_numeric[num_count]]
+            num_count = num_count + 1
+        elif key in bool_param_names:
+            value = kwargs[category_args_bool[bool_count]]
+            bool_count = bool_count + 1
+        elif key in str_param_names:
+            value = kwargs[category_args_text[str_count]]
+            str_count = str_count + 1
+        args.append(value)
+    args = tuple(args)
+
+    if cle_function.__module__ == "pyclesperanto_prototype":
+        # todo: we should handle all functions equally
+        gpu_out = None
+
+        logger.info(f"cle.{op_name}(..., {', '.join(map(str, args))})")
+        args = ((*gpu_ins, gpu_out) + args)[:nargs]
+        gpu_out = cle_function(*args)
+
+        # return output
+        return gpu_out, args
+    else:
+        args = (*gpu_ins, *args)[:nargs+1]
+        kwargs = {}
+
+        import inspect
+        sig = inspect.signature(cle_function)
+        #for k, v in sig.parameters.items():
+        #    print(k, v.annotation)
+        #    if k == "viewer" or k == "napari_viewer" or "napari.viewer.Viewer" in str(v):
+        #        kwargs[k] = viewer
+
+        # Make sure that the annotated types are really passed to a given function
+        for i, k in enumerate(list(sig.parameters.keys())):
+            if i >= len(args):
+                break
+            type_annotation = str(sig.parameters[k].annotation)
+            #print("Annotation:", type_annotation)
+            args = list(args)
+            for typ in ["int", "float", "str"]:
+                if typ in type_annotation:
+                    converter = eval(typ)
+                    #print("converter", converter)
+                    args[i] = converter(args[i])
+
+        gpu_out = cle_function(*args, **kwargs)
+
+        if sig.return_annotation in [napari.types.LabelsData, "napari.types.LabelsData"]:
+            if gpu_out.dtype is not int:
+                gpu_out = gpu_out.astype(int)
+
+        return gpu_out, args
 
 
 def _show_result(
@@ -113,6 +194,7 @@ def _show_result(
     layer : Optional[Layer]
         The created/udpated layer, or None if no viewer is present.
     """
+    #print("OP ID ", op_id)
     if not viewer:
         logger.warning("no viewer, cannot add image")
         return
@@ -149,7 +231,7 @@ def _show_result(
     return layer
 
 
-def _generate_signature_for_category(category: Category) -> Signature:
+def _generate_signature_for_category(category: Category, search_string:str= None) -> Signature:
     """Create an inspect.Signature object representing a cle Category.
 
     The output of this function can be used to set function.__signature__ so that
@@ -162,22 +244,39 @@ def _generate_signature_for_category(category: Category) -> Signature:
         Parameter(f"input{n}", k, annotation=t) for n, t in enumerate(category.inputs)
     ]
     # Add valid operations choices (will create the combo box)
-    choices = list(cle.operations(['in assistant'] + list(category.include), category.exclude))
+    from .._categories import operations_in_menu
+    choices = list(operations_in_menu(category, search_string))
+    #print("choices:", choices)
     op_type = Annotated[str, {"choices": choices, "label": "Operation"}]
-    params.append(
-        Parameter(OP_NAME_PARAM, k, annotation=op_type, default=category.default_op)
-    )
+    default_op = category.default_op
+    if not any(default_op == op for op in choices):
+        #print("Default-operation is not in list!")
+        default_op = None
+
+    if default_op is None:
+        params.append(
+            Parameter(OP_NAME_PARAM, k, annotation=op_type)
+        )
+    else:
+        params.append(
+            Parameter(OP_NAME_PARAM, k, annotation=op_type, default=default_op)
+        )
     # add the args that will be passed to the cle operation.
-    for name, type_, default in category.args:
+    for i, (name, type_, default) in enumerate(category_args):
+        if i < len(category.default_values):
+            default = category.default_values[i]
         params.append(Parameter(name, k, annotation=type_, default=default))
 
     # add a viewer.  This allows our widget to know if it's in a viewer
     params.append(
         Parameter(VIEWER_PARAM, k, annotation="napari.viewer.Viewer", default=None)
     )
-    return Signature(params)
+    result = Signature(params)
+    #print("Signature", result)
+    return result
 
-def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[Layer]:
+
+def make_gui_for_category(category: Category, search_string:str = None, viewer: napari.Viewer = None) -> magicgui.widgets.FunctionGui[Layer]:
     """Generate a magicgui widget for a Category object
 
     Parameters
@@ -220,28 +319,21 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
             currstep_event.connect(update)
 
         # todo: deal with 5D and nD data
-
         op_name = kwargs.pop("op_name")
-        result, used_args = call_op(op_name, inputs, t_position, *kwargs.values())
+        try:
+            result, used_args = call_op(op_name, inputs, t_position, viewer, **kwargs)
+        except TypeError:
+            result = None
+            used_args = []
+            import warnings
+            warnings.warn("Operation failed. Please check input parameters and documentation.")
 
         # add a help-button
-        description = cle.operation(op_name).__doc__.replace("\n    ", "\n") + "\n\nRight-click to learn more..."
-        temp = description.split('https:')
-        link = "https://napari-hub.org/plugins/napari-pyclesperanto-assistant"
-        if len(temp) > 1:
-            link = "https:" + temp[1].split("\n")[0]
-        getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
-
-        # Right-click: Open online help
-        #combobox = getattr(widget, OP_NAME_PARAM).native
-        #combobox.orig_mousePressEvent = getattr(widget, OP_NAME_PARAM).native.mousePressEvent
-        #def call_link(event):
-        #    if event.button() == QtCore.Qt.RightButton:
-        #        import webbrowser
-        #        webbrowser.open(link)
-        #    else:
-        #        combobox.orig_mousePressEvent(event)
-        #combobox.mousePressEvent = call_link
+        description = find_function(op_name).__doc__
+        if description is not None:
+            description = description.replace("\n    ", "\n") + "\n\nRight-click to learn more..."
+            temp = description.split('https:')
+            getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
 
         if result is not None:
             result_layer = _show_result(
@@ -259,8 +351,8 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
             try:
                 from napari_time_slicer import WorkflowManager
                 manager = WorkflowManager.install(viewer)
-                manager.update(result_layer, cle.operation(op_name), *used_args)
-                print("notified", result_layer.name, cle.operation(op_name))
+                manager.update(result_layer, find_function(op_name), *used_args)
+                #print("notified", result_layer.name, find_function(op_name))
             except ImportError:
                 pass # recording workflows in the WorkflowManager is a nice-to-have at the moment.
 
@@ -278,10 +370,11 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
         return None
 
     gui_function.__name__ = f'do_{category.name.lower().replace(" ", "_")}'
-    gui_function.__signature__ = _generate_signature_for_category(category)
+    gui_function.__signature__ = _generate_signature_for_category(category, search_string)
 
     # create the widget
     widget = magicgui(gui_function, auto_call=True)
+    widget.native.setMaximumWidth(345)
 
     # when the operation name changes, we want to update the argument labels
     # to be appropriate for the corresponding cle operation.
@@ -289,27 +382,76 @@ def make_gui_for_category(category: Category) -> magicgui.widgets.FunctionGui[La
 
     @op_name_widget.changed.connect
     def update_positional_labels(*_: Any):
-        new_sig = signature(cle.operation(op_name_widget.value))
+        func = find_function(op_name_widget.value)
+        new_sig = signature(func)
         # get the names of positional parameters in the new operation
-        param_names = [
-            name
-            for name, param in new_sig.parameters.items()
-            if param.annotation in {int, str, float, bool}
-        ]
+        param_names, numeric_param_names, bool_param_names, str_param_names = separate_argnames_by_type(
+            new_sig.parameters.items())
+        num_count = 0
+        str_count = 0
+        bool_count = 0
 
-        # update the labels of each positional-arg subwidget
-        # or, if there are too many, hide them
+        # show needed elements and set right label
         n_params = len(param_names)
-        for n, arg in enumerate(category.args):
-            wdg = getattr(widget, arg[0])
-            if n < n_params:
-                wdg.label = param_names[n]
-                wdg.text = param_names[n]
-                wdg.show()
+        for n, arg in enumerate(category_args):
+            arg_gui_name = arg[0]
+            arg_gui_type = arg[1]
+            wdg = getattr(widget, arg_gui_name)
+            if arg_gui_type == FloatRange:
+                if num_count < len(numeric_param_names):
+                    arg_func_name = numeric_param_names[num_count]
+                    num_count = num_count + 1
+                else:
+                    wdg.hide()
+                    continue
+            elif arg_gui_type == BoolType:
+                if bool_count < len(bool_param_names):
+                    arg_func_name = bool_param_names[bool_count]
+                    bool_count = bool_count + 1
+                else:
+                    wdg.hide()
+                    continue
+            elif arg_gui_type == StringType:
+                if str_count < len(str_param_names):
+                    arg_func_name = str_param_names[str_count]
+                    str_count = str_count + 1
+                else:
+                    wdg.hide()
+                    continue
             else:
-                wdg.hide()
+                arg_func_name = "?"
+                print("Unsupported type:", arg_gui_type)
+                continue
+
+            wdg.label = arg_func_name
+            wdg.text = arg_func_name
+            wdg.show()
 
     # run it once to update the labels
     update_positional_labels()
 
     return widget
+
+
+def separate_argnames_by_type(items):
+    param_names = [
+        name
+        for name, param in items
+        if param.annotation in {int, str, float, bool}
+    ]
+    numeric_param_names = [
+        name
+        for name, param in items
+        if param.annotation in {int, float}
+    ]
+    bool_param_names = [
+        name
+        for name, param in items
+        if param.annotation in {bool}
+    ]
+    str_param_names = [
+        name
+        for name, param in items
+        if param.annotation in {str}
+    ]
+    return param_names, numeric_param_names, bool_param_names, str_param_names

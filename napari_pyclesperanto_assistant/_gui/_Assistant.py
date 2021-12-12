@@ -5,18 +5,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, Tuple, Callable
 from warnings import warn
 import napari
-from napari._qt.widgets.qt_action_context_menu import QtActionContextMenu
-
 
 import pyclesperanto_prototype as cle
-from qtpy.QtWidgets import QFileDialog, QHBoxLayout, QPushButton, QVBoxLayout, QWidget, QMenu, QAction
+from qtpy.QtWidgets import QFileDialog, QLineEdit, QVBoxLayout, QWidget, QMenu
 from qtpy.QtGui import QCursor
 
 from typing import Union
 
 
 from ._select_gpu import select_gpu
-from .._categories import CATEGORIES, Category
+from .._categories import CATEGORIES, Category, filter_categories
 from .._pipeline import Pipeline
 from ._button_grid import ButtonGrid
 from ._category_widget import (
@@ -73,9 +71,19 @@ class Assistant(QWidget):
         CATEGORIES["Measure"] = self._measure
         CATEGORIES["Generate code..."] = self._code_menu
 
+        # build GUI
         icon_grid = ButtonGrid(self)
         icon_grid.addItems(CATEGORIES)
         icon_grid.itemClicked.connect(self._on_item_clicked)
+
+        self.seach_field = QLineEdit("")
+        def text_changed(*args, **kwargs):
+            search_string = self.seach_field.text().lower()
+            icon_grid.clear()
+            icon_grid.addItems(filter_categories(search_string))
+
+        self.seach_field.textChanged.connect(text_changed)
+
 
         # create menu
         self.actions = [
@@ -92,6 +100,7 @@ class Assistant(QWidget):
             pass
 
         self.setLayout(QVBoxLayout())
+        self.layout().addWidget(self.seach_field)
         self.layout().addWidget(icon_grid)
         self.layout().setContentsMargins(5, 5, 5, 5)
         self.setMinimumWidth(345)
@@ -143,7 +152,7 @@ class Assistant(QWidget):
         else:
             return self._viewer.active_layer
 
-    def _activate(self, category: Image = Union[Category, Callable]):
+    def _activate(self, category = Union[Category, Callable]):
         if callable(category):
             category()
             return
@@ -155,7 +164,7 @@ class Assistant(QWidget):
             return False
 
         # make a new widget
-        gui = make_gui_for_category(category)
+        gui = make_gui_for_category(category, self.seach_field.text(), self._viewer)
         # prevent auto-call when adding to the viewer, to avoid double calls
         # do this here rather than widget creation for the sake of
         # non-Assistant-based widgets.
