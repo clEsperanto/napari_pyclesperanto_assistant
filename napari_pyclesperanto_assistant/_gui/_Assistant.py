@@ -27,7 +27,6 @@ from ._category_widget import (
 
 if TYPE_CHECKING:
     from magicgui.widgets import FunctionGui
-    from napari._qt.widgets.qt_viewer_dock_widget import QtViewerDockWidget
     from napari.layers import Layer
     from napari.viewer import Viewer
 
@@ -56,14 +55,14 @@ class Assistant(QWidget):
 
     def __init__(self, napari_viewer: Viewer):
 
-        super().__init__(napari_viewer.window.qt_viewer)
+        super().__init__()
         self._viewer = napari_viewer
         napari_viewer.layers.events.removed.connect(self._on_layer_removed)
         if NAP048:
             napari_viewer.layers.selection.events.changed.connect(self._on_selection)
         else:
             napari_viewer.events.active_layer.connect(self._on_active_layer_change)
-        self._layers: Dict[Layer, Tuple[QtViewerDockWidget, FunctionGui]] = {}
+        self._layers = {}
 
         # visualize intermediate results human-readable from top-left to bottom-right
         self._viewer.grid.stride = -1
