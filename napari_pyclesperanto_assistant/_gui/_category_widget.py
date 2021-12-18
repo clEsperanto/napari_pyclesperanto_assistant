@@ -347,6 +347,9 @@ def make_gui_for_category(category: Category, search_string:str = None, viewer: 
                 scale=inputs[0].scale,
             )
 
+            # store widget in metadata
+            result_layer.metadata['magic_gui_widget'] = widget
+
             # notify workflow manage that something was created / updated
             try:
                 from napari_time_slicer import WorkflowManager
