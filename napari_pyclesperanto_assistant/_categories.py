@@ -262,7 +262,7 @@ def operations_in_menu(category, search_string: str = None):
     choices = filter_operations(menu_name)
     if search_string is not None and len(search_string) > 0:
         choices = [c for c in choices if search_string in c.lower()]
-    choices = [c.split(">")[1] for c in choices]
+    choices = [c.split(">")[1].strip() for c in choices]
     choices = sorted(choices, key=str.casefold)
 
     #print("\n", category.name)
@@ -302,6 +302,7 @@ def operations_in_menu(category, search_string: str = None):
 
 def find_function(op_name):
     all_ops = all_operations()
+    cle_function = None
     for k, f in all_ops.items():
         if op_name in k:
             cle_function = f
