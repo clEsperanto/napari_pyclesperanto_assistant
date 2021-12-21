@@ -11,6 +11,27 @@ labels:
   - Image correction
   - Image denoising
   - Image thresholding
-  - Pixel classification
-  - Object classification
+  - Image segmentation
+  - Object feature extraction
+  - Image processing
+  - Smoothing
+  - Morphological operation
+  - Image feature detection
+  - Image projection
+  - Rotation
+  - Spot detection
+  - Semi-automatic segmentation
+  - Overlap analysis
+  - Edge detection
+  - Top-hat transform
+  - Image convolution
+  - Affine transformation
+  - Image crop
+  - Image analysis
+  - Closing
+  - Dilation
+  - Opening
+  - Erosion
+  - Linear transformation
+  - Geometrical transformation
   - Image enhancement
