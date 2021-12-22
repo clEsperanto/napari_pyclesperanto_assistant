@@ -58,10 +58,7 @@ class Assistant(QWidget):
         super().__init__()
         self._viewer = napari_viewer
         napari_viewer.layers.events.removed.connect(self._on_layer_removed)
-        if NAP048:
-            napari_viewer.layers.selection.events.changed.connect(self._on_selection)
-        else:
-            napari_viewer.events.active_layer.connect(self._on_active_layer_change)
+        napari_viewer.layers.selection.events.changed.connect(self._on_selection)
         self._layers = {}
 
         # visualize intermediate results human-readable from top-left to bottom-right
@@ -146,10 +143,7 @@ class Assistant(QWidget):
         self._activate(CATEGORIES.get(item.text()))
 
     def _get_active_layer(self):
-        if NAP048:
-            return self._viewer.layers.selection.active
-        else:
-            return self._viewer.active_layer
+        return self._viewer.layers.selection.active
 
     def _activate(self, category = Union[Category, Callable]):
         if callable(category):
