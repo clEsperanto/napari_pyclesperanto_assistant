@@ -336,19 +336,18 @@ def make_gui_for_category(category: Category, search_string:str = None, viewer: 
             getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
 
         if result is not None:
-            result_layer = _show_result(
-                result,
-                viewer,
-                name=f"Result of {op_name}",
-                layer_type=category.output,
-                op_id=id(gui_function),
-                cmap=category.color_map,
-                blending=category.blending,
-                scale=inputs[0].scale,
-            )
-
-            # store widget in metadata
-            result_layer.metadata['magic_gui_widget'] = widget
+            from napari.layers._source import layer_source
+            with layer_source(widget=widget):
+                result_layer = _show_result(
+                    result,
+                    viewer,
+                    name=f"Result of {op_name}",
+                    layer_type=category.output,
+                    op_id=id(gui_function),
+                    cmap=category.color_map,
+                    blending=category.blending,
+                    scale=inputs[0].scale,
+                )
 
             # notify workflow manage that something was created / updated
             try:
