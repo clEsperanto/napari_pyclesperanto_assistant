@@ -11,6 +11,7 @@ loguru
 jupytext
 jupyter
 pandas
-napari-tools-menu
-napari-time-slicer
+napari-tools-menu>=0.1.8
+napari-time-slicer>=0.4.0
 napari-skimage-regionprops>=0.2.0
+napari-workflows>=0.1.1
