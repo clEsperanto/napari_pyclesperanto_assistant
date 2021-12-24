@@ -239,7 +239,7 @@ def collect_tools():
 
             result[k] = f
 
-    print(allowed_types)
+    #print(allowed_types)
     return result
 
 
