@@ -76,3 +76,6 @@ def test_something_with_viewer(make_napari_viewer):
     assistant._activate(CATEGORIES.get("Label"))
     assistant._activate(CATEGORIES.get("Measure labeled image"))
     assistant.seach_field.setText("Gauss")
+    assistant.to_clipboard()
+    assistant.to_jython("test.py")
+    assistant.to_notebook("test.ipynb")

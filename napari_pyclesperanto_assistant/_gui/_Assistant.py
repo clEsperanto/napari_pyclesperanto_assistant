@@ -235,7 +235,9 @@ class Assistant(QWidget):
                     inputs.append(self._id_to_name(op_id, name_dict))
                 else:
                     args.append(w.value)
-            op = getattr(cle, getattr(mgui, OP_NAME_PARAM).value)
+            from .._categories import find_function
+            op = find_function(getattr(mgui, OP_NAME_PARAM).value)
+            #getattr(cle, getattr(mgui, OP_NAME_PARAM).value)
 
             # shorten args by eliminating not-used ones
             if op:
