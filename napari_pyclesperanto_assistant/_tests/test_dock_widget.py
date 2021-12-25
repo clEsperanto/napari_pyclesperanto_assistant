@@ -43,3 +43,15 @@ def test_workflow_processing_labels(viewer):
     viewer.window.add_plugin_dock_widget("clEsperanto", "Binarize")
     viewer.window.add_plugin_dock_widget("clEsperanto", "Label")
     viewer.window.add_plugin_dock_widget("clEsperanto", "Label measurements")
+
+
+def test_something_with_viewer(make_napari_viewer):
+
+    from napari_pyclesperanto_assistant import Assistant
+    viewer = make_napari_viewer()
+
+    assistant = Assistant(viewer)
+
+    num_dw = len(viewer.window._dock_widgets)
+    viewer.window.add_dock_widget(assistant)
+    assert len(viewer.window._dock_widgets) == num_dw + 1
