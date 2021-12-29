@@ -36,7 +36,7 @@ https://github.com/clEsperanto/napari_pyclesperanto_assistant/blob/master/instal
 in this field and click on `Install` before proceeding:
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot_installer2.png)
 
-Afterwards, click install clEsperanto like by clicking on `Install` here:
+Afterwards, you can install napari-pyclesperanto-assistant by clicking on `Install` here:
 
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot_installer.png)
 
