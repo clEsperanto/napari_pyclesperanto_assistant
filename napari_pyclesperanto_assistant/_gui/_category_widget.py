@@ -331,9 +331,8 @@ def make_gui_for_category(category: Category, search_string:str = None, viewer: 
         # add a help-button
         description = find_function(op_name).__doc__
         if description is not None:
-            description = description.replace("\n    ", "\n") + "\n\nRight-click to learn more..."
-            temp = description.split('https:')
-            getattr(widget, OP_NAME_PARAM).native.setToolTip(description)
+            description = description.replace("\n    ", "\n").replace("\n", "<br/>")
+            getattr(widget, OP_NAME_PARAM).native.setToolTip("<html>" + description + "</html>")
 
         if result is not None:
             from napari.layers._source import layer_source

@@ -8,6 +8,7 @@
 [![codecov](https://codecov.io/gh/clesperanto/napari_pyclesperanto_assistant/branch/master/graph/badge.svg)](https://codecov.io/gh/clesperanto/napari_pyclesperanto_assistant)
 [![Development Status](https://img.shields.io/pypi/status/napari_pyclesperanto_assistant.svg)](https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-pyclesperanto-assistant)](https://napari-hub.org/plugins/napari-pyclesperanto-assistant)
+[![DOI](https://zenodo.org/badge/322312181.svg)](https://zenodo.org/badge/latestdoi/322312181)
 
 The py-clEsperanto-assistant is a yet experimental [napari](https://github.com/napari/napari) plugin for building GPU-accelerated image processing workflows. 
 It is part of the [clEsperanto](http://clesperanto.net) project and thus, aims at removing programming language related barriers between image processing ecosystems in the life sciences. 
