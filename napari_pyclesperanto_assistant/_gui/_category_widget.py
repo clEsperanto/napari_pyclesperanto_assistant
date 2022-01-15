@@ -322,11 +322,11 @@ def make_gui_for_category(category: Category, search_string:str = None, viewer: 
         op_name = kwargs.pop("op_name")
         try:
             result, used_args = call_op(op_name, inputs, t_position, viewer, **kwargs)
-        except TypeError:
+        except TypeError as e:
             result = None
             used_args = []
             import warnings
-            warnings.warn("Operation failed. Please check input parameters and documentation.")
+            warnings.warn("Operation failed. Please check input parameters and documentation.\n" + str(e))
 
         # add a help-button
         description = find_function(op_name).__doc__
