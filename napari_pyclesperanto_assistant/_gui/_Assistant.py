@@ -99,10 +99,20 @@ class Assistant(QWidget):
         search_and_help = QWidget()
         search_and_help.setLayout(QHBoxLayout())
         from ._button_grid import _get_icon
-        help = QLabel("Legend")
+        help = QLabel("?")
         help.setToolTip(
-            '<img src="' + _get_icon("any_image") + '" width="16" heigth="16"> Any kind of image'
-            '<img src="' + _get_icon("any_image") + '" width="16" heigth="16"> Any kind of image')
+            '<html>'
+            'Use the search field on the left to enter a term describing the function you would like to apply to your image.\n'
+            'Searching will limit the number of shown categories and listed operations.\n'
+            '<br><br>The icons in the buttons below denote the processed image types:\n'
+            '<br><img src="' + _get_icon("intensity_image") + '" width="20" heigth="20"> In <b>intensity images</b> the pixel value represents a measurement, e.g. of collected light during acquisition in a microscope.\n'
+            '<br><img src="' + _get_icon("binary_image") + '" width="20" heigth="20"> In <b>binary images</b> pixels with value 0 mean there is no object present. All other pixels (typically value 1) represent any object.\n'
+            '<br><img src="' + _get_icon("label_image") + '" width="20" heigth="20"> In <b>label images</b> the integer pixel intensity corresponds to the object identity. E.g. all pixels of object 2 have intensity 2.\n'
+            '<br><img src="' + _get_icon("parametric_image") + '" width="20" heigth="20"> In <b>parametric images</b> the pixel value represents an object measurement. All pixels of an object can for example contain the same value, e.g. the objects circularity or area.\n'
+            '<br><img src="' + _get_icon("mesh_image") + '" width="20" heigth="20"> In <b>mesh images</b> we can visualize connectivity between objects and distances as intensity along lines.\n'
+            '<br><img src="' + _get_icon("any_image") + '" width="20" heigth="20"> This icon means one can use <b>any kind of image</b> for this operation.'
+            '</html>'
+        )
         help.setMaximumWidth(20)
         search_and_help.layout().addWidget(self.seach_field)
         search_and_help.layout().addWidget(help)
