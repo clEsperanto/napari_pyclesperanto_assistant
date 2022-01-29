@@ -160,17 +160,6 @@ CATEGORIES = {
         blending="translucent",
         tools_menu="Measurement",
     ),
-    "Mesh": Category(
-        name="Mesh",
-        description="Draw connectivity meshes between\ncentroids of labeled objects.",
-        inputs=(LabelsInput,),
-        default_op="draw_mesh_between_touching_labels (clesperanto)",
-        default_values=[1],
-        include=("label measurement", "mesh"),
-        color_map="green",
-        blending="additive",
-        tools_menu="Visualization",
-    ),
     "Label neighbor filters": Category(
         name="Label neighbor filters",
         description="Process values associated with labeled objects\naccording to the neighborhood-graph of the labels.",
@@ -192,6 +181,18 @@ CATEGORIES = {
         exclude=("neighbor",),
         tools_menu="Label filters",
     ),
+    "Mesh": Category(
+        name="Mesh",
+        description="Draw connectivity meshes between\ncentroids of labeled objects.",
+        inputs=(LabelsInput,),
+        default_op="draw_mesh_between_touching_labels (clesperanto)",
+        default_values=[1],
+        include=("label measurement", "mesh"),
+        color_map="green",
+        blending="additive",
+        tools_menu="Visualization",
+    ),
+
 }
 
 

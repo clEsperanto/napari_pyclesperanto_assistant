@@ -13,7 +13,7 @@ STYLES = r"""
     }
     QListWidget::item {
         width: 58;
-        height: 73;
+        height: 85;
         border-radius: 0;
         margin: 2;
         padding: 8;
@@ -32,7 +32,7 @@ class ButtonGrid(QListWidget):
         self.setViewMode(self.IconMode)  # make items icons
         self.setResizeMode(self.Adjust)  # relayout when view is resized.
         self.setUniformItemSizes(True)  # better performance
-        self.setIconSize(QSize(40, 30))
+        self.setIconSize(QSize(64, 44))
         self.setWordWrap(True)
         self.setStyleSheet(STYLES)
 
