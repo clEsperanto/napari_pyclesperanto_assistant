@@ -25,6 +25,12 @@ STYLES = r"""
 """
 
 
+def _get_icon(name):
+    path = ICON_ROOT / f'{name.lower().replace(" ", "_")}.png'
+    if not path.exists():
+        return ""
+    return str(path)
+
 class ButtonGrid(QListWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -36,17 +42,13 @@ class ButtonGrid(QListWidget):
         self.setWordWrap(True)
         self.setStyleSheet(STYLES)
 
-    def _get_icon(self, name):
-        path = ICON_ROOT / f'{name.lower().replace(" ", "_")}.png'
-        if not path.exists():
-            return ""
-        return str(path)
+
 
     def addItem(self, label : str, tool_tip : str = None):
         if isinstance(label, QListWidgetItem):
             super().addItem(label)
 
-        item = QListWidgetItem(QIcon(self._get_icon(label)), label)
+        item = QListWidgetItem(QIcon(_get_icon(label)), label)
         if tool_tip is not None:
             item.setToolTip(tool_tip)
         super().addItem(item)

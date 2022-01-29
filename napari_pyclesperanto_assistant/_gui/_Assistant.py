@@ -7,8 +7,8 @@ from warnings import warn
 import napari
 
 import pyclesperanto_prototype as cle
-from qtpy.QtWidgets import QFileDialog, QLineEdit, QVBoxLayout, QWidget, QMenu
-from qtpy.QtGui import QCursor
+from qtpy.QtWidgets import QFileDialog, QLineEdit, QVBoxLayout, QHBoxLayout, QWidget, QMenu, QLabel
+from qtpy.QtGui import QCursor, QIcon
 
 from typing import Union
 
@@ -96,8 +96,20 @@ class Assistant(QWidget):
             pass
 
         self.setLayout(QVBoxLayout())
-        self.layout().addWidget(self.seach_field)
+        search_and_help = QWidget()
+        search_and_help.setLayout(QHBoxLayout())
+        from ._button_grid import _get_icon
+        help = QLabel("Legend")
+        help.setToolTip(
+            '<img src="' + _get_icon("any_image") + '" width="16" heigth="16"> Any kind of image'
+            '<img src="' + _get_icon("any_image") + '" width="16" heigth="16"> Any kind of image')
+        help.setMaximumWidth(20)
+        search_and_help.layout().addWidget(self.seach_field)
+        search_and_help.layout().addWidget(help)
+
+        self.layout().addWidget(search_and_help)
         self.layout().addWidget(icon_grid)
+
         self.layout().setContentsMargins(5, 5, 5, 5)
         self.setMinimumWidth(345)
 
