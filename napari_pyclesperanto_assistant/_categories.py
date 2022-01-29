@@ -182,6 +182,16 @@ CATEGORIES = {
         blending="translucent",
         tools_menu="Label neighbor filters",
     ),
+    "Label filters": Category(
+        name="Label filters",
+        description="Process label images depending on values in corresponding images.\nPleease use parametric maps only as input image.",
+        inputs=(ImageInput, LabelsInput),
+        default_op="exclude_labels_with_map_values_out_of_range (clesperanto)",
+        default_values=[1, 100],
+        include=('label processing', 'combine'),
+        exclude=("neighbor",),
+        tools_menu="Label filters",
+    ),
 }
 
 
