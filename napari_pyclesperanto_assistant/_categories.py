@@ -106,7 +106,7 @@ CATEGORIES = {
     ),
     "Label": Category(
         name="Label",
-        description="Turn images or binary images into\nlabel images by labeling objects.",
+        description="Turn images into label images by labeling objects.",
         inputs=(LayerInput,),
         default_op="voronoi_otsu_labeling (clesperanto)",
         output="labels",
