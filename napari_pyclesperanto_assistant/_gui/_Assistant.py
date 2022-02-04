@@ -296,7 +296,7 @@ class Assistant(QWidget):
         from napari_workflows import WorkflowManager, _io_yaml_v1
 
         if not filename:
-            filename, _ = QFileDialog.getSaveFileName(self, "Export workflow ...", ".", "*.wfl")
+            filename, _ = QFileDialog.getSaveFileName(self, "Export workflow ...", ".", "*.yaml")
 
         # get the workflow, should one be installed
         workflow_manager = WorkflowManager.install(self._viewer)
