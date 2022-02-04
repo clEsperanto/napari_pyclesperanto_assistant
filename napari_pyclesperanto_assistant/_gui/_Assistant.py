@@ -86,6 +86,7 @@ class Assistant(QWidget):
             ("Export Python script to file", self.to_jython),
             ("Export Jupyter Notebook", self.to_notebook),
             ("Copy to clipboard", self.to_clipboard),
+            ("Export workflow to file", self.to_file)
         ]
 
         # add Send to script editor menu in case it's installed
@@ -290,3 +291,13 @@ class Assistant(QWidget):
         import napari_script_editor
         editor = napari_script_editor.ScriptEditor.get_script_editor_from_viewer(self._viewer)
         editor.set_code(Pipeline.from_assistant(self).to_napari_python())
+
+    def to_file(self, filename=None):
+        from napari_workflows import WorkflowManager, _io_yaml_v1
+
+        if not filename:
+            filename, _ = QFileDialog.getSaveFileName(self, "Export workflow ...", ".", "*.wfl")
+
+        # get the workflow, should one be installed
+        workflow_manager = WorkflowManager.install(self._viewer)
+        _io_yaml_v1.save_workflow(filename, workflow_manager.workflow)
