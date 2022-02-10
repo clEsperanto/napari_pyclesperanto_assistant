@@ -176,6 +176,7 @@ CATEGORIES = {
         description="Process label images depending on values in corresponding images.\nPleease use parametric maps only as input image.",
         inputs=(ImageInput, LabelsInput),
         default_op="exclude_labels_with_map_values_out_of_range (clesperanto)",
+        output="labels",
         default_values=[1, 100],
         include=('label processing', 'combine'),
         exclude=("neighbor",),
