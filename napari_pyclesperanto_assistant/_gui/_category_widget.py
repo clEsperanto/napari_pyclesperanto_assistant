@@ -375,7 +375,7 @@ def make_gui_for_category(category: Category, search_string:str = None, viewer: 
 
     # create the widget
     widget = magicgui(gui_function, auto_call=True)
-    widget.native.setMaximumWidth(345)
+    #widget.native.setMaximumWidth(345)
 
     # when the operation name changes, we want to update the argument labels
     # to be appropriate for the corresponding cle operation.
