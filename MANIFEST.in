@@ -1,3 +1,4 @@
 recursive-include napari_pyclesperanto_assistant *.png
+recursive-include napari_pyclesperanto_assistant *.tif
 recursive-exclude installation_help *
 recursive-exclude docs *
