@@ -12,11 +12,11 @@ STYLES = r"""
         color: #eee;
     }
     QListWidget::item {
-        width: 58;
+        width: 68;
         height: 85;
         border-radius: 0;
-        margin: 2;
-        padding: 8;
+        margin: 1;
+        padding: 4;
         background: #414851;
     }
     QListWidget::item::hover {

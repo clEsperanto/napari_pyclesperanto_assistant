@@ -3,7 +3,11 @@ from __future__ import annotations
 from inspect import Parameter, Signature, signature
 
 from qtpy import QtCore
+from qtpy.QtCore import QTimer
+from qtpy.QtWidgets import QDoubleSpinBox, QComboBox, QWidget
+
 from typing import Any, Optional, TYPE_CHECKING, Sequence
+from functools import partial
 
 import pyclesperanto_prototype as cle
 import toolz
@@ -276,7 +280,7 @@ def _generate_signature_for_category(category: Category, search_string:str= None
     return result
 
 
-def make_gui_for_category(category: Category, search_string:str = None, viewer: napari.Viewer = None) -> magicgui.widgets.FunctionGui[Layer]:
+def make_gui_for_category(category: Category, search_string:str = None, viewer: napari.Viewer = None, button_size=24) -> magicgui.widgets.FunctionGui[Layer]:
     """Generate a magicgui widget for a Category object
 
     Parameters
@@ -376,6 +380,7 @@ def make_gui_for_category(category: Category, search_string:str = None, viewer: 
     # create the widget
     widget = magicgui(gui_function, auto_call=True)
     widget.native.setMinimumWidth(100)
+    modify_layout(widget.native, button_size=button_size)
 
     # when the operation name changes, we want to update the argument labels
     # to be appropriate for the corresponding cle operation.
@@ -433,6 +438,38 @@ def make_gui_for_category(category: Category, search_string:str = None, viewer: 
 
     return widget
 
+
+def modify_layout(widget, button_size = 32):
+    QTimer.singleShot(100, partial(_modify_layout, widget, button_size))
+
+def _modify_layout(widget, button_size=32):
+    try:
+        if hasattr(widget, "layout"):
+            layout = widget.layout()
+            if layout is not None:
+                if isinstance(widget, QWidget):
+                    layout.setContentsMargins(5, 1, 5, 1)
+                    layout.setSpacing(0)
+
+                for i in range(layout.count()):
+                    w = layout.itemAt(i)
+                    if isinstance(w.widget(), QDoubleSpinBox):
+                        w.widget().setStyleSheet("""
+                           QDoubleSpinBox::down-button{
+                               width: {button_size};
+                               height: {button_size}
+                           }
+                           QDoubleSpinBox::up-button{
+                               height: {button_size};
+                               width: {button_size};
+                           }""".replace("{button_size}", str(button_size)))
+                        w.widget().setMinimumHeight(button_size)
+                    if isinstance(w.widget(), QComboBox):
+                        w.widget().setMinimumHeight(button_size)
+                        w.widget().view().setWordWrap(True)
+                    modify_layout(w.widget(), button_size=button_size)
+    except:
+        pass
 
 def separate_argnames_by_type(items):
     param_names = [
