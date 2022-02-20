@@ -66,6 +66,7 @@ class Assistant(QWidget):
 
         CATEGORIES["Measure"] = self._measure
         CATEGORIES["Generate code..."] = self._code_menu
+        CATEGORIES["Workflow IO"] = self._workflow_menu
 
         # build GUI
         icon_grid = ButtonGrid(self)
@@ -86,7 +87,13 @@ class Assistant(QWidget):
             ("Export Python script to file", self.to_jython),
             ("Export Jupyter Notebook", self.to_notebook),
             ("Copy to clipboard", self.to_clipboard),
-            ("Export workflow to file", self.to_file)
+        ]
+
+        # create workflow menu
+        self.workflow_actions = [
+                                 ("Export workflow to file", self.to_file),
+                                 ("Loading Step 1: Initialise workflow from file", self.initialise_from_file),
+                                 ("Loading Step 2: Load remaining workflow", self.load_remaining_workflow)
         ]
 
         # add Send to script editor menu in case it's installed
@@ -139,6 +146,16 @@ class Assistant(QWidget):
         menu = QMenu(self)
 
         for name, cb in self.actions:
+            submenu = menu.addAction(name)
+            submenu.triggered.connect(cb)
+
+        menu.move(QCursor.pos())
+        menu.show()
+
+    def _workflow_menu(self):
+        menu = QMenu(self)
+
+        for name, cb in self.workflow_actions:
             submenu = menu.addAction(name)
             submenu.triggered.connect(cb)
 
@@ -306,3 +323,28 @@ class Assistant(QWidget):
         # get the workflow, should one be installed
         workflow_manager = WorkflowManager.install(self._viewer)
         _io_yaml_v1.save_workflow(filename, workflow_manager.workflow)
+
+    def initialise_from_file(self, filename=None):
+        from napari_workflows import _io_yaml_v1
+        from .. _workflow_io_utility import old_wf_names_to_new_mapping, wf_steps_with_root_as_input, initialise_root_functions
+        
+        if not filename:
+            filename, _ = QFileDialog.getOpenFileName(self, "Import workflow ...", ".", "*.yaml")
+
+        self.workflow = _io_yaml_v1.load_workflow(filename)
+        self.name_mapping = old_wf_names_to_new_mapping(self.workflow)
+        self.root_functions = wf_steps_with_root_as_input(self.workflow)
+
+        initialise_root_functions(self.workflow,
+                                  self._viewer,
+                                  self.root_functions)      
+
+    def load_remaining_workflow(self):
+        from .. _workflow_io_utility import load_remaining_workflow
+        if self.workflow == None:
+            print('Warning: No Workflow Initialised')
+            return
+        
+        load_remaining_workflow(workflow=self.workflow,
+                                viewer= self._viewer,
+                                old_to_new_name_mapping=self.name_mapping)
