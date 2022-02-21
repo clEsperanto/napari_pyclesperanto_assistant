@@ -20,7 +20,7 @@ def initialise_root_functions(workflow, viewer, root_functions):
     root_functions: list
         list of workflow step names corresponding to functions with root images as input
     """
-    for i, wf_step_name in enumerate(root_functions):
+    for wf_step_name in root_functions:
         func = workflow._tasks[wf_step_name][0]
         args = workflow._tasks[wf_step_name][1:] 
 

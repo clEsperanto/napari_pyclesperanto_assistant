@@ -346,5 +346,5 @@ class Assistant(QWidget):
             return
         
         load_remaining_workflow(workflow=self.workflow,
-                                viewer= self._viewer,
-                                old_to_new_name_mapping=self.name_mapping)
+                                viewer=self._viewer,
+                                name_mapping=self.name_mapping)
