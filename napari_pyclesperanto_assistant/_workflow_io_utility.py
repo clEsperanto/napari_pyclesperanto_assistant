@@ -1,11 +1,13 @@
 from inspect import Signature, signature
 from functools import partial
+from tkinter import N
+from unicodedata import name
 from napari_workflows import Workflow
 from magicgui.widgets import FunctionGui
 from functools import wraps
 from napari.utils._magicgui import _make_choice_data_setter
 
-def initialise_root_functions(workflow, viewer, root_functions):
+def initialise_root_functions(workflow, viewer, func_name_mapping):
     """
     Makes widgets based on a list of functions, which should be the functions processing
     root images. The widgets are added to the viewer and correct input images must be
@@ -20,6 +22,8 @@ def initialise_root_functions(workflow, viewer, root_functions):
     root_functions: list
         list of workflow step names corresponding to functions with root images as input
     """
+    root_functions = wf_steps_with_root_as_input(workflow)
+
     for wf_step_name in root_functions:
         func = workflow._tasks[wf_step_name][0]
         args = workflow._tasks[wf_step_name][1:] 
@@ -27,10 +31,13 @@ def initialise_root_functions(workflow, viewer, root_functions):
         signat = signature_w_kwargs_from_function(func, args)
         func.__signature__ = signat
 
-        widget = make_flexible_gui(func, viewer, autocall = True)
-        viewer.window.add_dock_widget(widget)
+        widget = make_flexible_gui(func, 
+                                   viewer, 
+                                   func_name_mapping[wf_step_name],
+                                   autocall = True)
+        viewer.window.add_dock_widget(widget, name = func_name_mapping[wf_step_name])
 
-def load_remaining_workflow(workflow, viewer, name_mapping):
+def load_remaining_workflow(workflow, viewer, name_mapping, func_name_mapping):
     """
     Loads the remaining workflow once initialise_root_functions has been called with
     the same workflow and the same napari viewer
@@ -59,17 +66,17 @@ def load_remaining_workflow(workflow, viewer, name_mapping):
                     root_functions.append(root)
                     break
                 else:
-                    source = sources[0]
-
-
                     func = workflow._tasks[follower][0]
                     args = workflow._tasks[follower][1:]
 
                     signat = signature_w_kwargs_from_function(func, args)
                     func.__signature__ = signat
-
-                    widget = make_flexible_gui(func, viewer)
-                    viewer.window.add_dock_widget(widget, name = func.__name__)
+                    print(f'current follower: {follower}; current function: {func.__name__}')
+                    widget = make_flexible_gui(func, 
+                                               viewer, 
+                                               func_name_mapping[follower],
+                                               autocall = True)
+                    viewer.window.add_dock_widget(widget, name = func_name_mapping[follower])
 
                     set_choices(workflow= workflow,
                                 wf_step= follower,
@@ -83,7 +90,7 @@ def load_remaining_workflow(workflow, viewer, name_mapping):
                     followers += new_follower
 
 class flexible_gui(FunctionGui):
-    def __init__(self,function,param_options = {}, autocall = True):
+    def __init__(self,function,name,autocall = True, param_options = {}):
         super().__init__(
           function,
           call_button=True,
@@ -92,7 +99,7 @@ class flexible_gui(FunctionGui):
           param_options=param_options
         )
 
-def make_flexible_gui(func, viewer, autocall = True):
+def make_flexible_gui(func, viewer, name, autocall = True):
     """
     Function returns a widget with a GUI for the function provided in the parameters,
     that can be added to the napari viewer. Largely copied from @haesleinhuepf (I can't remember where though)
@@ -155,7 +162,7 @@ def make_flexible_gui(func, viewer, autocall = True):
         else:
             return data
 
-    gui = flexible_gui(worker_func, autocall)
+    gui = flexible_gui(worker_func, name, autocall)
     return gui
 
 
@@ -191,10 +198,38 @@ def signature_w_kwargs_from_function(function, arg_vals: list) -> Signature:
         except KeyError:
             pass
 
+    return signature(partial(function, **kw_dict))
+
+def function_name_mapping(workflow):
+    func_mapping = {}
+    roots = workflow.roots()
+    for result, task_tuple in workflow._tasks.items():
+        if result not in roots:
+            func = task_tuple[0]
+            funcname = func.__name__
+            if result.endswith(']'):
+                new_funcname = funcname + ' ' + result[-3:]
+                func_mapping[result] = new_funcname
+            else:
+                func_mapping[result] = funcname
+    return func_mapping 
+
+def old_wf_names_to_new_mapping(workflow):
+    """
+    Returns a dictionary mapping old workflow step names to new ones
+
+    Parameters
+    ----------
+    workflow: 
+        napari_workflows Workflow class
+    """
+    mapping = {}
+    for old_key, content in workflow._tasks.items():
+        func = content[0]
+        new_name = func.__name__ + ' result'
+        mapping[old_key] = new_name
     
-    sig = signature(partial(function, **kw_dict))
-    
-    return sig
+    return mapping
 
 def wf_steps_with_root_as_input(workflow):
     """
@@ -214,27 +249,11 @@ def wf_steps_with_root_as_input(workflow):
                         wf_step_with_rootinput.append(result)
     return wf_step_with_rootinput
 
-def old_wf_names_to_new_mapping(workflow):
-    """
-    Returns a dictionary mapping old workflow step names to new ones
-
-    Parameters
-    ----------
-    workflow: 
-        napari_workflows Workflow class
-    """
-    mapping = {}
-    for old_key, content in workflow._tasks.items():
-        func = content[0]
-        new_name = func.__name__ + ' result'
-        mapping[old_key] = new_name
-    
-    return mapping
-        
 def get_layers_data_of_name(layer_name: str, viewer, gui):
     """
     Returns a choices dictionary which can be utilised to set an input image of a 
-    widget with the function set_choices.
+    widget with the function set_choices. code modified from napari/utils/_magicgui
+    get_layers_data function.
 
     Parameters
     ----------

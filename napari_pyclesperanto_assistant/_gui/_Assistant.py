@@ -333,11 +333,10 @@ class Assistant(QWidget):
 
         self.workflow = _io_yaml_v1.load_workflow(filename)
         self.name_mapping = old_wf_names_to_new_mapping(self.workflow)
-        self.root_functions = wf_steps_with_root_as_input(self.workflow)
+        
 
         initialise_root_functions(self.workflow,
-                                  self._viewer,
-                                  self.root_functions)      
+                                  self._viewer)      
 
     def load_remaining_workflow(self):
         from .. _workflow_io_utility import load_remaining_workflow
