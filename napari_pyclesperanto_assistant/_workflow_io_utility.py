@@ -3,12 +3,11 @@ from functools import partial
 from tkinter import N
 from unicodedata import name
 from napari_workflows import Workflow
-from magicgui.widgets import FunctionGui
 from magicgui import magicgui
 from functools import wraps
 from napari.utils._magicgui import _make_choice_data_setter
 
-def initialise_root_functions(workflow, viewer, func_name_mapping):
+def initialise_root_functions(workflow, viewer):
     """
     Makes widgets based on a list of functions, which should be the functions processing
     root images. The widgets are added to the viewer and correct input images must be
@@ -34,11 +33,10 @@ def initialise_root_functions(workflow, viewer, func_name_mapping):
 
         widget = make_flexible_gui(func, 
                                    viewer, 
-                                   func_name_mapping[wf_step_name],
-                                   autocall = True)
-        viewer.window.add_dock_widget(widget, name = func_name_mapping[wf_step_name])
+                                   wf_step_name= wf_step_name)
+        viewer.window.add_dock_widget(widget, name = wf_step_name[10:])
 
-def load_remaining_workflow(workflow, viewer, name_mapping, func_name_mapping):
+def load_remaining_workflow(workflow, viewer):
     """
     Loads the remaining workflow once initialise_root_functions has been called with
     the same workflow and the same napari viewer
@@ -63,7 +61,7 @@ def load_remaining_workflow(workflow, viewer, name_mapping, func_name_mapping):
             layer_names = [str(lay) for lay in layers]
             sources = workflow.sources_of(follower)
             for source in sources:
-                if name_mapping[source] not in layer_names:
+                if source not in layer_names:
                     root_functions.append(root)
                     break
                 else:
@@ -75,32 +73,20 @@ def load_remaining_workflow(workflow, viewer, name_mapping, func_name_mapping):
                     print(f'current follower: {follower}; current function: {func.__name__}')
                     widget = make_flexible_gui(func, 
                                                viewer, 
-                                               func_name_mapping[follower],
-                                               autocall = True)
-                    viewer.window.add_dock_widget(widget, name = func_name_mapping[follower])
+                                               follower)
+                    viewer.window.add_dock_widget(widget, name= follower[10:])
 
                     set_choices(workflow= workflow,
                                 wf_step= follower,
                                 viewer= viewer,
-                                widget= widget,
-                                name_mapping= name_mapping)
+                                widget= widget)
 
-                    widget(layers[name_mapping[source]].data)
+                    widget(layers[source].data)
 
                     new_follower = workflow.followers_of(follower)
                     followers += new_follower
 
-class flexible_gui(FunctionGui):
-    def __init__(self,function,name,autocall = True, param_options = {}):
-        super().__init__(
-          function,
-          call_button=True,
-          layout='vertical',
-          auto_call=autocall,
-          param_options=param_options
-        )
-
-def make_flexible_gui(func, viewer, name, autocall = True):
+def make_flexible_gui(func, viewer, wf_step_name):
     """
     Function returns a widget with a GUI for the function provided in the parameters,
     that can be added to the napari viewer. Largely copied from @haesleinhuepf (I can't remember where though)
@@ -112,12 +98,11 @@ def make_flexible_gui(func, viewer, name, autocall = True):
         input function to generate the gui for
     viewer:
         napari.Viewer instance to which the widget is added
-    
-    autocall: Boolean
-        set wether the function is automatically called when a parameter is changed
+    wf_step_name: str
+        name of the workflow step matching the function
     """
     gui = None
-
+    name = wf_step_name[10:]
     from napari.types import ImageData, LabelsData
     import inspect
     sig = inspect.signature(func)
@@ -132,7 +117,7 @@ def make_flexible_gui(func, viewer, name, autocall = True):
 
         if sig.return_annotation in [ImageData, "napari.types.ImageData", LabelsData, "napari.types.LabelsData"]:
             op_name = name
-            new_name = f"{op_name} result"
+            new_name = f"Result of {op_name}"
 
             # we now search for a layer that has -this- magicgui attached to it
             try:
@@ -201,6 +186,7 @@ def signature_w_kwargs_from_function(function, arg_vals: list) -> Signature:
 
     return signature(partial(function, **kw_dict))
 
+'''
 def function_name_mapping(workflow):
     func_mapping = {}
     roots = workflow.roots()
@@ -215,22 +201,25 @@ def function_name_mapping(workflow):
                 func_mapping[result] = funcname
     return func_mapping 
 
-def old_wf_names_to_new_mapping(workflow):
+def old_wf_names_to_new_mapping(func_name_mapping):
     """
     Returns a dictionary mapping old workflow step names to new ones
+    based on the names of the new functions
 
     Parameters
     ----------
-    workflow: 
-        napari_workflows Workflow class
+    func_name_mapping: dict 
+        dictionary mapping the old workflow step name to the new function
+        names
     """
     mapping = {}
-    for old_key, content in workflow._tasks.items():
-        func = content[0]
-        new_name = func.__name__ + ' result'
+    for old_key, func_name in func_name_mapping:
+        new_name = 'Result of ' + func_name
         mapping[old_key] = new_name
     
     return mapping
+'''
+
 
 def wf_steps_with_root_as_input(workflow):
     """
@@ -269,7 +258,7 @@ def get_layers_data_of_name(layer_name: str, viewer, gui):
 
     return choices
 
-def set_choices(workflow, wf_step: str, viewer, widget, name_mapping = None):
+def set_choices(workflow, wf_step: str, viewer, widget):
     """
     Sets the choices for image drop downs to the images specified by the workflow
 
@@ -293,13 +282,6 @@ def set_choices(workflow, wf_step: str, viewer, widget, name_mapping = None):
 
     keyword_list = list(signature(func).parameters.keys())
     image_keywords = [(key,value) for key, value in zip(keyword_list,args) if isinstance(value, str)]
-    image_names = [key for key, value in zip(keyword_list,args) if isinstance(value, str)]
-
-    if name_mapping is None:
-        conversion_dict = {name: name for name in image_names}
-    else:
-        conversion_dict = name_mapping
-
     
     for key, name in image_keywords:
-        widget[key].choices = get_layers_data_of_name(conversion_dict[name], viewer, widget[key])
+        widget[key].choices = get_layers_data_of_name(name, viewer, widget[key])
