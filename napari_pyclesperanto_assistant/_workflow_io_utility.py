@@ -4,6 +4,7 @@ from tkinter import N
 from unicodedata import name
 from napari_workflows import Workflow
 from magicgui.widgets import FunctionGui
+from magicgui import magicgui
 from functools import wraps
 from napari.utils._magicgui import _make_choice_data_setter
 
@@ -130,7 +131,7 @@ def make_flexible_gui(func, viewer, name, autocall = True):
         target_layer = None
 
         if sig.return_annotation in [ImageData, "napari.types.ImageData", LabelsData, "napari.types.LabelsData"]:
-            op_name = func.__name__
+            op_name = name
             new_name = f"{op_name} result"
 
             # we now search for a layer that has -this- magicgui attached to it
@@ -162,7 +163,7 @@ def make_flexible_gui(func, viewer, name, autocall = True):
         else:
             return data
 
-    gui = flexible_gui(worker_func, name, autocall)
+    gui = magicgui(worker_func, auto_call= True)
     return gui
 
 
