@@ -1,0 +1,18 @@
+!!python/object:napari_workflows._workflow.Workflow
+_tasks:
+  Result of Gaussian (scikit-image, nsbatwm): !!python/tuple
+  - &id001 !!python/name:napari_segment_blobs_and_things_with_membranes.gaussian_blur ''
+  - blobs
+  - 3.0
+  Result of Gaussian (scikit-image, nsbatwm) [1]: !!python/tuple
+  - *id001
+  - blobs
+  - 6.0
+  Result of Gaussian (scikit-image, nsbatwm) [2]: !!python/tuple
+  - *id001
+  - blobs
+  - 10.0
+  Result of Gaussian (scikit-image, nsbatwm) [3]: !!python/tuple
+  - *id001
+  - blobs
+  - 14.0
