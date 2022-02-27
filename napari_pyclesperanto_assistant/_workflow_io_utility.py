@@ -27,9 +27,9 @@ def initialise_root_functions(workflow, viewer):
 
     for wf_step_name in root_functions:
         func = workflow._tasks[wf_step_name][0]
-        args = workflow._tasks[wf_step_name][1:] 
 
-        signat = signature_w_kwargs_from_function(func, args)
+        signat = signature_w_kwargs_from_function(workflow=workflow,
+                                                  wf_step_name=wf_step_name)
         func.__signature__ = signat
 
         widget = make_flexible_gui(func, 
@@ -69,7 +69,8 @@ def load_remaining_workflow(workflow, viewer):
                     func = workflow._tasks[follower][0]
                     args = workflow._tasks[follower][1:]
 
-                    signat = signature_w_kwargs_from_function(func, args)
+                    signat = signature_w_kwargs_from_function(workflow=workflow,
+                                                              wf_step_name=follower)
                     func.__signature__ = signat
                     print(f'current follower: {follower}; current function: {func.__name__}')
                     widget = make_flexible_gui(func, 
@@ -159,11 +160,11 @@ def signature_w_kwargs_from_function(workflow, wf_step_name) -> Signature:
 
     Parameters
     ----------
-    function: 
-        input function to generate new signature
+    workflow: 
+        napari-workflows object containing the function
 
-    arg_vals: list
-        list of arguments to replace defaults in signature
+    wf_step_name: str
+        key of the workflow step for which the signature should be generated
     """
     func     = workflow._tasks[wf_step_name][0]
     arg_vals = workflow._tasks[wf_step_name][1:] 
@@ -174,13 +175,12 @@ def signature_w_kwargs_from_function(workflow, wf_step_name) -> Signature:
     kw_dict = {}
     for kw, val in zip(keyword_list, arg_vals):
         kw_dict[kw] = val
-        
+
+    dict_keys = list(kw_dict.keys())    
     input_image_names = workflow.sources_of(wf_step_name)
-    for name in input_image_names:
-        try:
+    for name in dict_keys:
+        if ((kw_dict[name] in input_image_names) and (name != 'viewer')):
             kw_dict.pop(name) # we are making an assumption that the input will aways be this
-        except KeyError:
-            pass
 
     return signature(partial(func, **kw_dict))
 
