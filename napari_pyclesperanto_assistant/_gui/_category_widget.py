@@ -51,7 +51,7 @@ category_args_numeric = ["x", "y", "z", "u", "v", "w"]
 category_args_bool = ["a", "b", "c"]
 category_args_text = ["k", "l", "m"]
 
-def num_positional_args(func, types=[cle.Image, int, str, float, bool]) -> int:
+def num_positional_args(func, types=[np.ndarray, napari.types.ImageData, napari.types.LabelsData, cle.Image, int, str, float, bool]) -> int:
     params = signature(func).parameters
     return len([p for p in params.values() if p.annotation in types])
 
@@ -208,6 +208,9 @@ def _show_result(
     if clims[1] == 0:
         clims[1] = 1
 
+    if clims[0] == clims[1]:
+        clims = None
+
     # conversion will be done inside napari. We can continue working with the OCL-array from here.
     data = gpu_out
 
@@ -227,6 +230,7 @@ def _show_result(
             kwargs["colormap"] = cmap
             kwargs["blending"] = blending
             kwargs['contrast_limits'] = clims
+
         layer = add_layer(data, **kwargs)
 
     if scale is not None:
