@@ -6,6 +6,7 @@ from napari_workflows import Workflow
 from magicgui import magicgui
 from functools import wraps
 from napari.utils._magicgui import _make_choice_data_setter
+from pytools import word_wrap
 
 def initialise_root_functions(workflow, viewer):
     """
@@ -151,8 +152,7 @@ def make_flexible_gui(func, viewer, wf_step_name):
     gui = magicgui(worker_func, auto_call= True)
     return gui
 
-
-def signature_w_kwargs_from_function(function, arg_vals: list) -> Signature:
+def signature_w_kwargs_from_function(workflow, wf_step_name) -> Signature:
     """
     Returns a new signature for a function in which the default values are replaced
     with the arguments given in arg_vals
@@ -165,98 +165,24 @@ def signature_w_kwargs_from_function(function, arg_vals: list) -> Signature:
     arg_vals: list
         list of arguments to replace defaults in signature
     """
-
+    func     = workflow._tasks[wf_step_name][0]
+    arg_vals = workflow._tasks[wf_step_name][1:] 
     # getting the keywords corresponding to the values
-    keyword_list = list(signature(function).parameters.keys())
+    keyword_list = list(signature(func).parameters.keys())
 
     # creating the kwargs dict
     kw_dict = {}
     for kw, val in zip(keyword_list, arg_vals):
         kw_dict[kw] = val
         
-    possible_input_image_names = ['image',
-                                  'label_image',
-                                  'binary_image'
-                                 ]
-    for name in possible_input_image_names:
+    input_image_names = workflow.sources_of(wf_step_name)
+    for name in input_image_names:
         try:
             kw_dict.pop(name) # we are making an assumption that the input will aways be this
         except KeyError:
             pass
 
-    return signature(partial(function, **kw_dict))
-
-'''
-def function_name_mapping(workflow):
-    func_mapping = {}
-    roots = workflow.roots()
-    for result, task_tuple in workflow._tasks.items():
-        if result not in roots:
-            func = task_tuple[0]
-            funcname = func.__name__
-            if result.endswith(']'):
-                new_funcname = funcname + ' ' + result[-3:]
-                func_mapping[result] = new_funcname
-            else:
-                func_mapping[result] = funcname
-    return func_mapping 
-
-def old_wf_names_to_new_mapping(func_name_mapping):
-    """
-    Returns a dictionary mapping old workflow step names to new ones
-    based on the names of the new functions
-
-    Parameters
-    ----------
-    func_name_mapping: dict 
-        dictionary mapping the old workflow step name to the new function
-        names
-    """
-    mapping = {}
-    for old_key, func_name in func_name_mapping:
-        new_name = 'Result of ' + func_name
-        mapping[old_key] = new_name
-    
-    return mapping
-'''
-
-
-def wf_steps_with_root_as_input(workflow):
-    """
-    Returns a list of workflow steps that have root images as an input
-
-    Parameters
-    ----------
-    workflow: 
-        napari_workflows Workflow class
-    """
-    roots = workflow.roots()
-    wf_step_with_rootinput = []
-    for result, task in workflow._tasks.items():
-            for source in task:
-                if isinstance(source, str):
-                    if source in roots:
-                        wf_step_with_rootinput.append(result)
-    return wf_step_with_rootinput
-
-def get_layers_data_of_name(layer_name: str, viewer, gui):
-    """
-    Returns a choices dictionary which can be utilised to set an input image of a 
-    widget with the function set_choices. code modified from napari/utils/_magicgui
-    get_layers_data function.
-
-    Parameters
-    ----------
-    layer_name: str
-        the layer which should be selected as the only choice in a drop down menu
-    """
-    choices = []
-    for layer in [x for x in viewer.layers if str(x) == layer_name]:
-        choice_key = f'{layer.name} (data)'
-        choices.append((choice_key, layer.data))
-        layer.events.data.connect(_make_choice_data_setter(gui, choice_key))
-
-    return choices
+    return signature(partial(func, **kw_dict))
 
 def set_choices(workflow, wf_step: str, viewer, widget):
     """
@@ -285,3 +211,40 @@ def set_choices(workflow, wf_step: str, viewer, widget):
     
     for key, name in image_keywords:
         widget[key].choices = get_layers_data_of_name(name, viewer, widget[key])
+
+def get_layers_data_of_name(layer_name: str, viewer, gui):
+    """
+    Returns a choices dictionary which can be utilised to set an input image of a 
+    widget with the function set_choices. code modified from napari/utils/_magicgui
+    get_layers_data function.
+
+    Parameters
+    ----------
+    layer_name: str
+        the layer which should be selected as the only choice in a drop down menu
+    """
+    choices = []
+    for layer in [x for x in viewer.layers if str(x) == layer_name]:
+        choice_key = f'{layer.name} (data)'
+        choices.append((choice_key, layer.data))
+        layer.events.data.connect(_make_choice_data_setter(gui, choice_key))
+
+    return choices
+
+def wf_steps_with_root_as_input(workflow):
+    """
+    Returns a list of workflow steps that have root images as an input
+
+    Parameters
+    ----------
+    workflow: 
+        napari_workflows Workflow class
+    """
+    roots = workflow.roots()
+    wf_step_with_rootinput = []
+    for result, task in workflow._tasks.items():
+            for source in task:
+                if isinstance(source, str):
+                    if source in roots:
+                        wf_step_with_rootinput.append(result)
+    return wf_step_with_rootinput
