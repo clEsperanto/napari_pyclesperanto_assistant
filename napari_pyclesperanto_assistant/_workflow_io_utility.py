@@ -95,11 +95,7 @@ def load_remaining_workflow(workflow, viewer):
                         wf_step= follower,
                         viewer= viewer,
                         widget= widget)
-
-            if len(sources) > 1:
-                widget()
-            else:
-                widget(layers[sources[0]].data)
+            widget()
 
             new_follower = workflow.followers_of(follower)
             followers += new_follower
