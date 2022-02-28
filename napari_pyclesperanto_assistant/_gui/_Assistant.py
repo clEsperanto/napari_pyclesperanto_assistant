@@ -326,14 +326,12 @@ class Assistant(QWidget):
 
     def initialise_from_file(self, filename=None):
         from napari_workflows import _io_yaml_v1
-        from .. _workflow_io_utility import old_wf_names_to_new_mapping, wf_steps_with_root_as_input, initialise_root_functions
+        from .. _workflow_io_utility import initialise_root_functions
         
         if not filename:
             filename, _ = QFileDialog.getOpenFileName(self, "Import workflow ...", ".", "*.yaml")
 
         self.workflow = _io_yaml_v1.load_workflow(filename)
-        self.name_mapping = old_wf_names_to_new_mapping(self.workflow)
-        
 
         initialise_root_functions(self.workflow,
                                   self._viewer)      
@@ -345,5 +343,4 @@ class Assistant(QWidget):
             return
         
         load_remaining_workflow(workflow=self.workflow,
-                                viewer=self._viewer,
-                                name_mapping=self.name_mapping)
+                                viewer=self._viewer)
