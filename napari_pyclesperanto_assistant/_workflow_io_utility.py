@@ -60,7 +60,9 @@ def load_remaining_workflow(workflow, viewer):
     for root in root_functions:
         followers += workflow.followers_of(root)
 
+    reviseted_followers = []
     for follower in followers:
+        print('is anybody there?')
         layer_names = [str(lay) for lay in layers]
         sources = workflow.sources_of(follower)
 
@@ -72,7 +74,10 @@ def load_remaining_workflow(workflow, viewer):
 
         # if some input images are missing we will process other images first
         if not sources_present:
-            followers.append(follower)
+            print(f'we are here because of {follower} and the sources {sources}')
+            if follower not in reviseted_followers:
+                followers.append(follower)
+                print(f'appended {follower} because {sources} includes non existing layer')
         # if all input images are there we can continue
         else:
             func = workflow._tasks[follower][0]
@@ -99,6 +104,8 @@ def load_remaining_workflow(workflow, viewer):
 
             new_follower = workflow.followers_of(follower)
             followers += new_follower
+            if follower in reviseted_followers:
+                reviseted_followers.remove(follower)
 
 def make_flexible_gui(func, viewer, wf_step_name, autocall = True):
     """
