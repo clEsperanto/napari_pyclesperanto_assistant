@@ -1,5 +1,6 @@
 from inspect import Signature, signature
 from functools import partial
+from re import L
 from tkinter import N
 from unicodedata import name
 from napari_workflows import Workflow
@@ -55,40 +56,55 @@ def load_remaining_workflow(workflow, viewer):
     root_functions = wf_steps_with_root_as_input(workflow)
     layers = viewer.layers
     
+    followers = []
     for root in root_functions:
-        followers = workflow.followers_of(root)
+        followers += workflow.followers_of(root)
 
-        for follower in followers:
-            layer_names = [str(lay) for lay in layers]
-            sources = workflow.sources_of(follower)
-            for source in sources:
-                if source not in layer_names:
-                    root_functions.append(root)
-                    break
-                else:
-                    func = workflow._tasks[follower][0]
-                    args = workflow._tasks[follower][1:]
+    for follower in followers:
+        layer_names = [str(lay) for lay in layers]
+        sources = workflow.sources_of(follower)
 
-                    signat = signature_w_kwargs_from_function(workflow=workflow,
-                                                              wf_step_name=follower)
-                    func.__signature__ = signat
-                    print(f'current follower: {follower}; current function: {func.__name__}')
-                    widget = make_flexible_gui(func, 
-                                               viewer, 
-                                               follower)
-                    viewer.window.add_dock_widget(widget, name= follower[10:])
+        # checking if we have all input images to the function in the napari layers
+        sources_present = True
+        for source in sources:
+            if source not in layer_names:
+                sources_present = False
 
-                    set_choices(workflow= workflow,
-                                wf_step= follower,
-                                viewer= viewer,
-                                widget= widget)
+        # if some input images are missing we will process other images first
+        if not sources_present:
+            followers.append(follower)
+        # if all input images are there we can continue
+        else:
+            func = workflow._tasks[follower][0]
+            signat = signature_w_kwargs_from_function(workflow=workflow,
+                                                      wf_step_name=follower)
+            func.__signature__ = signat
 
-                    widget(layers[source].data)
+            if len(sources) > 1:
+                widget = make_flexible_gui(func, 
+                                           viewer, 
+                                           follower,
+                                           autocall= False)
+            else:
+                widget = make_flexible_gui(func, 
+                                           viewer, 
+                                           follower)
 
-                    new_follower = workflow.followers_of(follower)
-                    followers += new_follower
+            viewer.window.add_dock_widget(widget, name= follower[10:])
+            set_choices(workflow= workflow,
+                        wf_step= follower,
+                        viewer= viewer,
+                        widget= widget)
 
-def make_flexible_gui(func, viewer, wf_step_name):
+            if len(sources) > 1:
+                widget()
+            else:
+                widget(layers[sources[0]].data)
+
+            new_follower = workflow.followers_of(follower)
+            followers += new_follower
+
+def make_flexible_gui(func, viewer, wf_step_name, autocall = True):
     """
     Function returns a widget with a GUI for the function provided in the parameters,
     that can be added to the napari viewer. Largely copied from @haesleinhuepf (I can't remember where though)
@@ -102,6 +118,8 @@ def make_flexible_gui(func, viewer, wf_step_name):
         napari.Viewer instance to which the widget is added
     wf_step_name: str
         name of the workflow step matching the function
+    autocall: Boolean
+        sets the auto_call behaviour of the magicgui.magicgui function
     """
     gui = None
     name = wf_step_name[10:]
@@ -150,7 +168,7 @@ def make_flexible_gui(func, viewer, wf_step_name):
         else:
             return data
 
-    gui = magicgui(worker_func, auto_call= True)
+    gui = magicgui(worker_func, auto_call= autocall)
     return gui
 
 def signature_w_kwargs_from_function(workflow, wf_step_name) -> Signature:
@@ -205,9 +223,10 @@ def set_choices(workflow, wf_step: str, viewer, widget):
     """
     func = workflow._tasks[wf_step][0]
     args = workflow._tasks[wf_step][1:]
+    sources = workflow.sources_of(wf_step)
 
     keyword_list = list(signature(func).parameters.keys())
-    image_keywords = [(key,value) for key, value in zip(keyword_list,args) if isinstance(value, str)]
+    image_keywords = [(key,value) for key, value in zip(keyword_list,args) if value in sources]
     
     for key, name in image_keywords:
         widget[key].choices = get_layers_data_of_name(name, viewer, widget[key])
