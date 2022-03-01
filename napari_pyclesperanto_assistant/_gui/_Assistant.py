@@ -335,6 +335,3 @@ class Assistant(QWidget):
                                   self._viewer)
         load_remaining_workflow(workflow=self.workflow,
                                 viewer=self._viewer)
-
-
-                        
