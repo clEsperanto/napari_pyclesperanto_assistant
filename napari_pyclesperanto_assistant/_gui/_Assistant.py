@@ -92,8 +92,7 @@ class Assistant(QWidget):
         # create workflow menu
         self.workflow_actions = [
                                  ("Export workflow to file", self.to_file),
-                                 ("Loading Step 1: Initialise workflow from file", self.initialise_from_file),
-                                 ("Loading Step 2: Load remaining workflow", self.load_remaining_workflow)
+                                 ("Load workflow from file", self.load_workflow)
         ]
 
         # add Send to script editor menu in case it's installed
@@ -324,23 +323,18 @@ class Assistant(QWidget):
         workflow_manager = WorkflowManager.install(self._viewer)
         _io_yaml_v1.save_workflow(filename, workflow_manager.workflow)
 
-    def initialise_from_file(self, filename=None):
+    def load_workflow(self, filename=None):
         from napari_workflows import _io_yaml_v1
-        from .. _workflow_io_utility import initialise_root_functions
-        
+        from .. _workflow_io_utility import initialise_root_functions, load_remaining_workflow
+
         if not filename:
             filename, _ = QFileDialog.getOpenFileName(self, "Import workflow ...", ".", "*.yaml")
-
         self.workflow = _io_yaml_v1.load_workflow(filename)
 
         initialise_root_functions(self.workflow,
-                                  self._viewer)      
-
-    def load_remaining_workflow(self):
-        from .. _workflow_io_utility import load_remaining_workflow
-        if self.workflow == None:
-            print('Warning: No Workflow Initialised')
-            return
-        
+                                  self._viewer)
         load_remaining_workflow(workflow=self.workflow,
                                 viewer=self._viewer)
+
+
+                        
