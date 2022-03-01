@@ -55,14 +55,12 @@ def load_remaining_workflow(workflow, viewer):
     """
     root_functions = wf_steps_with_root_as_input(workflow)
     layers = viewer.layers
-    
+
     followers = []
     for root in root_functions:
         followers += workflow.followers_of(root)
 
-    reviseted_followers = []
-    for follower in followers:
-        print('is anybody there?')
+    for i,follower in enumerate(followers):
         layer_names = [str(lay) for lay in layers]
         sources = workflow.sources_of(follower)
 
@@ -74,26 +72,25 @@ def load_remaining_workflow(workflow, viewer):
 
         # if some input images are missing we will process other images first
         if not sources_present:
-            print(f'we are here because of {follower} and the sources {sources}')
-            if follower not in reviseted_followers:
+            if follower not in followers[i+1:]:
                 followers.append(follower)
-                print(f'appended {follower} because {sources} includes non existing layer')
+
         # if all input images are there we can continue
         else:
             func = workflow._tasks[follower][0]
             signat = signature_w_kwargs_from_function(workflow=workflow,
-                                                      wf_step_name=follower)
+                                                        wf_step_name=follower)
             func.__signature__ = signat
 
             if len(sources) > 1:
                 widget = make_flexible_gui(func, 
-                                           viewer, 
-                                           follower,
-                                           autocall= False)
+                                            viewer, 
+                                            follower,
+                                            autocall= False)
             else:
                 widget = make_flexible_gui(func, 
-                                           viewer, 
-                                           follower)
+                                            viewer, 
+                                            follower)
 
             viewer.window.add_dock_widget(widget, name= follower[10:])
             set_choices(workflow= workflow,
@@ -102,10 +99,11 @@ def load_remaining_workflow(workflow, viewer):
                         widget= widget)
             widget()
 
-            new_follower = workflow.followers_of(follower)
-            followers += new_follower
-            if follower in reviseted_followers:
-                reviseted_followers.remove(follower)
+            new_followers = workflow.followers_of(follower)
+            for new_follower in new_followers:
+                if new_follower not in followers[i+1:]:
+                    followers += new_followers
+                    break
 
 def make_flexible_gui(func, viewer, wf_step_name, autocall = True):
     """

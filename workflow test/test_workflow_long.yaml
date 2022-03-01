@@ -1,0 +1,35 @@
+!!python/object:napari_workflows._workflow.Workflow
+_tasks:
+  Result of Black top-hat (scipy, nsbatwm): !!python/tuple
+  - !!python/name:napari_segment_blobs_and_things_with_membranes.black_tophat ''
+  - Result of Percentile (scipy, nsbatwm)
+  - 16.0
+  Result of Gaussian (scikit-image, nsbatwm): !!python/tuple
+  - &id001 !!python/name:napari_segment_blobs_and_things_with_membranes.gaussian_blur ''
+  - blobs
+  - 4.0
+  Result of Gaussian (scikit-image, nsbatwm) [1]: !!python/tuple
+  - *id001
+  - blobs_messed_up
+  - 8.0
+  Result of Minimum (scipy, nsbatwm): !!python/tuple
+  - !!python/name:napari_segment_blobs_and_things_with_membranes.minimum_filter ''
+  - Result of Gaussian (scikit-image, nsbatwm)
+  - 3.0
+  Result of Multiply images (numpy, nsbatwm): !!python/tuple
+  - !!python/name:napari_segment_blobs_and_things_with_membranes.multiply_images ''
+  - Result of Black top-hat (scipy, nsbatwm)
+  - Result of Minimum (scipy, nsbatwm)
+  Result of Percentile (scipy, nsbatwm): !!python/tuple
+  - !!python/name:napari_segment_blobs_and_things_with_membranes.percentile_filter ''
+  - Result of Gaussian (scikit-image, nsbatwm) [1]
+  - 7.0
+  - 9.0
+  Result of Remove labeled objects at the image border (scikit-image, nsbatwm): !!python/tuple
+  - !!python/name:napari_segment_blobs_and_things_with_membranes.remove_labels_on_edges ''
+  - Result of Seeded watershed using local minima as seeds (nsbatwm)
+  Result of Seeded watershed using local minima as seeds (nsbatwm): !!python/tuple
+  - !!python/name:napari_segment_blobs_and_things_with_membranes.local_minima_seeded_watershed ''
+  - Result of Multiply images (numpy, nsbatwm)
+  - 9.0
+  - 8.0
