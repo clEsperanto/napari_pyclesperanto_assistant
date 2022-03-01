@@ -36,7 +36,13 @@ def initialise_root_functions(workflow, viewer):
         widget = make_flexible_gui(func, 
                                    viewer, 
                                    wf_step_name= wf_step_name)
-        viewer.window.add_dock_widget(widget, name = wf_step_name[10:])
+
+        key_source_list = get_source_keywords_and_sources(workflow,
+                                                  wf_step=wf_step_name)
+        for key, source in key_source_list:
+            widget[key].tooltip = f'Select {source} or equivalent'
+
+        viewer.window.add_dock_widget(widget, name = wf_step_name[10:] + '<b> - SELECT INPUT</b>')
 
 def load_remaining_workflow(workflow, viewer):
     """
@@ -268,3 +274,14 @@ def wf_steps_with_root_as_input(workflow):
                     if source in roots:
                         wf_step_with_rootinput.append(result)
     return wf_step_with_rootinput
+
+def get_source_keywords_and_sources(workflow,wf_step):
+    from inspect import signature
+    func = workflow._tasks[wf_step][0]
+    args = workflow._tasks[wf_step][1:]
+    
+    sources = workflow.sources_of(wf_step)
+    keyword_list = list(signature(func).parameters.keys())
+    image_keywords = [(key,value) for key, value in zip(keyword_list,args) if value in sources]
+    
+    return image_keywords
