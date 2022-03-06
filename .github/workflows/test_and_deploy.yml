@@ -22,8 +22,8 @@ jobs:
     runs-on: ${{ matrix.platform }}
     strategy:
       matrix:
-        platform: [ubuntu-latest] # windows-latest and macos-latest disabled because pocl installation doesnt work
-        python-version: [3.7, 3.8]
+        platform: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9]
 
     steps:
       - uses: actions/checkout@v2
@@ -64,10 +64,9 @@ jobs:
       - name: Conda info
         shell: bash -l {0}
         run: conda info
-      - name: Install pocl
-        if: runner.os == 'Linux'
+      - name: Install oclgrind
         shell: bash -l {0}
-        run: conda install -y pocl
+        run: conda install -y oclgrind
       - name: Install dependencies
         shell: bash -l {0}
         run: |
