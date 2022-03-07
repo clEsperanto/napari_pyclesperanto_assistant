@@ -38,7 +38,7 @@ def initialise_root_functions(workflow, viewer):
         # make a tooltip which tells the user to select the input image
         # specified by the workflow
         key_source_list = get_source_keywords_and_sources(workflow,
-                                                  wf_step=wf_step_name)
+                                                          wf_step_name)
         for key, source in key_source_list:
             widget[key].tooltip = f'Select {source} or equivalent'
 
@@ -111,7 +111,7 @@ def load_remaining_workflow(workflow, viewer):
             # the dropdown to the specified input images
             viewer.window.add_dock_widget(widget, name= follower[10:])
             set_choices(workflow= workflow,
-                        wf_step= follower,
+                        wf_step_name= follower,
                         viewer= viewer,
                         widget= widget)
 
