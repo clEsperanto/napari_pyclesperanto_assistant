@@ -1,6 +1,6 @@
 import warnings
 
-from napari.types import ImageData
+from napari.types import ImageData, LabelsData
 from napari import Viewer
 import pyclesperanto_prototype as cle
 import napari
@@ -8,11 +8,10 @@ import napari
 from napari_tools_menu import register_function
 
 @register_function(menu="Measurement > Statistics of labeled pixels (clEsperanto)")
-def statistics_of_labeled_pixels(image: ImageData, labels_layer: napari.layers.Labels, napari_viewer : Viewer, measure_background=False):
+def statistics_of_labeled_pixels(image: ImageData, labels: LabelsData, napari_viewer : Viewer=None, measure_background=False):
     """
     Adds a table widget to a given napari viewer with quantitative analysis results derived from an image-labelimage pair.
     """
-    labels = labels_layer.data
 
     if image is not None and labels is not None:
 
@@ -22,12 +21,17 @@ def statistics_of_labeled_pixels(image: ImageData, labels_layer: napari.layers.L
         else:
             table = cle.statistics_of_labelled_pixels(image, labels)
 
-        # Store results in the properties dictionary:
-        labels_layer.properties = table
+        if napari_viewer is not None:
+            # Store results in the properties dictionary:
+            from napari_workflows._workflow import _get_layer_from_data
+            labels_layer = _get_layer_from_data(napari_viewer, labels)
+            labels_layer.properties = table
 
-        # turn table into a widget
-        from napari_skimage_regionprops import add_table
-        add_table(labels_layer, napari_viewer)
+            # turn table into a widget
+            from napari_skimage_regionprops import add_table
+            add_table(labels_layer, napari_viewer)
+        else:
+            return table
     else:
         warnings.warn("Image and labels must be set.")
 
