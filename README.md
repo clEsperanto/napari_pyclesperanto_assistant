@@ -13,7 +13,10 @@
 The py-clEsperanto-assistant is a yet experimental [napari](https://github.com/napari/napari) plugin for building GPU-accelerated image processing workflows. 
 It is part of the [clEsperanto](http://clesperanto.net) project and thus, aims at removing programming language related barriers between image processing ecosystems in the life sciences. 
 It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) and with that [pyopencl](https://documen.tician.de/pyopencl/) as backend for processing images.
-This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiecutter) using with napari's [cookiecutter-napari-plugin](https://github.com/napari/cookiecutter-napari-plugin) template.
+
+This napari plugin adds some menu entries to the Tools menu. You can recognize them with their suffix `(clEsperanto)` in brackets.
+Furthermore, it can be used from the [napari-assistant](https://www.napari-hub.org/plugins/napari-assistant) graphical user interface. 
+Therefore, just click the menu `Tools > Utilities > Assistant (clEsperanto)`.
 
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support1.gif)
 
@@ -21,39 +24,60 @@ This plugin was generated with [Cookiecutter](https://github.com/audreyr/cookiec
 
 It is recommended to install the assistant via conda:
 ```shell
-conda create --name bio11 python==3.8.5 
-conda activate bio11 
-conda install -c conda-forge pyopencl
+conda create --name cle_39 python==3.9
+conda activate cle_39 
+conda install -c conda-forge pyopencl napari
 pip install napari-pyclesperanto-assistant
-pip install "napari[all]"
 ```
 
-Alternatively, you can install the assistant using napari's plugin installer in the menu `Plugins > Install/uninstall Packages`.
-Windows users should paste this URL
+## Usage
 
+### Start up the assistant
+Start up napari, e.g. from the command line:
 ```
-https://github.com/clEsperanto/napari_pyclesperanto_assistant/blob/master/installation_help/pyopencl-2020.3.1+cl12-cp38-cp38-win_amd64.whl?raw=true
-```
-
-in this field and click on `Install` before proceeding:
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot_installer2.png)
-
-Afterwards, you can install napari-pyclesperanto-assistant by clicking on `Install` here:
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot_installer.png)
-
-You can then start napari, e.g. from command line, and find the assistant in the `Plugins` menu.
-```shell
 napari
 ```
 
-Also consider installing napari-workflow-inspector for visualizing the workflows you build using the assistant:
+Load example data, e.g. from the menu `File > Open Samples > clEsperanto > CalibZAPWfixed` and 
+start the assistant from the menu `Tools > Utilities > Assistant (clEsperanto)`. 
+Select a GPU in case you are asked to.
 
-```
-pip install napari-workflow-inspector
-```
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot1.png)
 
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/workflow_inspector.gif)
+In case of two dimensional timelapse data, an initial conversion step might be necessary depending on your data source. 
+Click the menu `Tools > Utilities > Convert to 2d timelapse`. In the dialog, select the dataset and click ok. 
+You can delete the original dataset afterwards:
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot1a.png)
+
+### Set up a workflow
+
+Choose categories of operations in the top right panel, for example start with denoising using a Gaussian Blur with sigma 1 in x and y.
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2.png)
+
+Continue with background removal using the top-hat filter with radius 5 in x and y.
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2a.png)
+
+For labeling the objects, use [Voronoi-Otsu-Labeling](https://nbviewer.jupyter.org/github/clEsperanto/pyclesperanto_prototype/blob/master/demo/segmentation/voronoi_otsu_labeling.ipynb) with both sigma parameters set to 2.
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2b.png)
+
+The labeled objects can be extended using a Voronoi diagram to derive a estimations of cell boundaries.
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2c.png)
+
+You can then configure napari to show the label boundaries on top of the original image:
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2d.png)
+
+When your workflow is set up, click the play button below your dataset:
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/timelapse_2d.gif)
+
+### Code generation
+You can also export your workflow as Python/Jython code or as notebook. See the [napari-assistant documentation](https://www.napari-hub.org/plugins/napari-assistant) for details.
 
 ## Features
 [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) offers various possibilities for processing images. It comes from developers who work in life sciences and thus, it may be focused towards processing two- and three-dimensional microscopy image data showing cells and tissues. A selection of pyclesperanto's functionality is available via the assistant user interface. Typical workflows which can be built with this assistant include
@@ -127,98 +151,23 @@ pip install napari-workflow-inspector
   * cell differentiation
   * tissue classification
 
-## Usage
-
-### Start up the assistant
-Start up napari, e.g. from the command line:
-```
-napari
-```
-
-Load example data, e.g. from the menu `File > Open Samples > clEsperanto > CalibZAPWfixed` and 
-start the assistant from the menu `Plugins > clEsperanto > Assistant`. Select a GPU in case you are asked to.
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot1.png)
-
-In case of two dimensional timelapse data, an initial conversion step might be necessary depending on your data source. 
-Click the menu `Plugins > clEsperanto > Convert to 2d timelapse`. In the dialog, select the dataset and click ok. 
-You can delete the original dataset afterwards:
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot1a.png)
-
-### Set up a workflow
-
-Choose categories of operations in the top right panel, for example start with denoising using a Gaussian Blur with sigma 1 in x and y.
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2.png)
-
-Continue with background removal using the top-hat filter with radius 5 in x and y.
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2a.png)
-
-For labeling the objects, use [Voronoi-Otsu-Labeling](https://nbviewer.jupyter.org/github/clEsperanto/pyclesperanto_prototype/blob/master/demo/segmentation/voronoi_otsu_labeling.ipynb) with both sigma parameters set to 2.
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2b.png)
-
-The labeled objects can be extended using a Voronoi diagram to derive a estimations of cell boundaries.
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2c.png)
-
-You can then configure napari to show the label boundaries on top of the original image:
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot2d.png)
-
-When your workflow is set up, click the play button below your dataset:
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/timelapse_2d.gif)
-
-### Code generation
-You can also export your workflow as Python/Jython code or as notebook.
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot3.png)
-
-After exporting your workflow as Jupyter notebook, you can start the notebook from the command line using
-```
-jupyter notebook my_notebook.ipynb
-```
-
-In some cases you need to replace the command `cle.imread('None`)` with a command loading your image data. 
-After that, you can execute the notebook.
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/notebook.png)
-
-You can also export code to the clipboard or as python code to disc. 
-This python code can also be executed in [Fiji](https://fiji.sc)`s Jython, in case the [CLIJx-assistant is installed](https://clij.github.io/assistant/installation).
-
-![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/fiji_execution.png)
-
-Alternatively, you can also generate code and edit it directly in the Script Editor. 
-Therefore, the [napari-script-editor](https://www.napari-hub.org/plugins/napari-script-editor) must be installed.
-
-![img.png](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/script_editor.png)
-
-Also note: The generated python/jython code is not capable of processing timelapse data,
-you need to program a for-loop processing timepoints individually yourself. 
-See also [this notebook](https://github.com/BiAPoL/Bio-image_Analysis_with_Python/blob/main/image_processing/12_process_folders.ipynb) for how to do this.
-
-Work in progress, contributions welcome.
-
 ## For developers
 
 Getting the recent code from github and locally installing it
 ```
 git clone https://github.com/clesperanto/napari_pyclesperanto_assistant.git
-
-pip install -e ./napari_pyclesperanto_assistant
+cd napari_pyclesperanto_assistant
+pip install -e .
 ```
 
 Optional: Also install pyclesperantos recent source code from github:
 ```
 git clone https://github.com/clEsperanto/pyclesperanto_prototype.git
-
-pip install -e ./pyclesperanto_prototype
+cd pyclesperanto_prototype
+pip install -e .
 ```
 
-## Feedback welcome!
+## Feedback and contributions welcome!
 clEsperanto is developed in the open because we believe in the open source community. See our [community guidelines](https://clij.github.io/clij2-docs/community_guidelines). Feel free to drop feedback as [github issue](https://github.com/clEsperanto/pyclesperanto_prototype/issues) or via [image.sc](https://image.sc)
 
 [Imprint](https://clesperanto.github.io/imprint)
