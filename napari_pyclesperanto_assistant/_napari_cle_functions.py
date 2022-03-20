@@ -1,8 +1,7 @@
 import pyclesperanto_prototype as cle
 import napari
-from napari.layers import Image, Labels, Layer
 from napari.types import ImageData, LabelsData
-from napari_tools_menu import register_function, register_action
+from napari_tools_menu import register_function
 from napari_time_slicer import time_slicer
 
 @register_function(menu="Segmentation / labeling > Connected component labeling (clesperanto)")

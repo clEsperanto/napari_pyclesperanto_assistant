@@ -5,24 +5,17 @@ from pathlib import Path
 
 from napari_plugin_engine import napari_hook_implementation
 
-from ._categories import CATEGORIES
 from ._gui import Assistant
-from ._gui._category_widget import make_gui_for_category
 from ._statistics_of_labeled_pixels import statistics_of_labeled_pixels
 from ._convert_to_numpy import convert_to_numpy, make_labels_editable, \
     reset_brightness_contrast, auto_brightness_contrast, split_stack, auto_brightness_contrast_all_images, \
     set_voxel_size, set_voxel_size_of_all_layers, convert_labels_to_image, convert_image_to_labels
 from ._napari_cle_functions import label, voronoi_otsu_labeling
-from ._categories import attach_tooltips
 from skimage.io import imread
 
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
-    attach_tooltips()
-    return [Assistant] + [
-        (partial(make_gui_for_category, category), {"name": name})
-        for name, category in CATEGORIES.items()
-    ]
+    return [Assistant]
 
 def _load_Lund():
     return [(imread("https://github.com/clEsperanto/clesperanto_example_data/raw/main/Lund_000500_resampled-cropped.tif"), {'name': 'Lund'})]

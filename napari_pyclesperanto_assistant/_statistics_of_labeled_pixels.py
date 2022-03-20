@@ -1,13 +1,7 @@
 import warnings
 
-import numpy as np
-from magicgui.widgets import Table
-from napari_plugin_engine import napari_hook_implementation
-from napari.types import ImageData, LabelsData, LayerDataTuple
+from napari.types import ImageData
 from napari import Viewer
-from pandas import DataFrame
-from qtpy.QtCore import QTimer
-from qtpy.QtWidgets import QTableWidget, QTableWidgetItem, QWidget, QGridLayout, QPushButton, QFileDialog
 import pyclesperanto_prototype as cle
 import napari
 
