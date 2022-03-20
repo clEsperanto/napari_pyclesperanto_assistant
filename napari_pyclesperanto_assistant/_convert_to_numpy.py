@@ -63,15 +63,22 @@ def auto_brightness_contrast_all_images(napari_viewer : Viewer, lower_percentile
             lp = np.percentile(data, lower_percentile)
             up = np.percentile(data, upper_percentile)
             layer.contrast_limits = (lp, up)
-    napari_viewer.window.remove_dock_widget(auto_brightness_contrast_all_images.native)
 
+    try:
+        napari_viewer.window.remove_dock_widget(auto_brightness_contrast_all_images.native)
+    except:
+        pass
 
 @register_function(menu="Utilities > Split stack along axis")
 def split_stack(image : Image, napari_viewer : Viewer, axis : int = 0):
     data = np.asarray(image.data)
     for i in range(data.shape[axis]):
         napari_viewer.add_image(data.take(i, axis), name=image.name + "[" + str(i) + "]")
-    napari_viewer.window.remove_dock_widget(split_stack.native)
+
+    try:
+        napari_viewer.window.remove_dock_widget(split_stack.native)
+    except:
+        pass
 
 @register_function(menu="Utilities > Set voxel size")
 def set_voxel_size(image : LayerInput, voxel_width : float = 1, voxel_height : float = 1, voxel_depth : float = 1):
@@ -81,6 +88,10 @@ def set_voxel_size(image : LayerInput, voxel_width : float = 1, voxel_height : f
 @register_function(menu="Utilities > Set voxel size of all layers")
 def set_voxel_size_of_all_layers(napari_viewer : Viewer, voxel_width : float = 1, voxel_height : float = 1, voxel_depth : float = 1):
     for layer in napari_viewer.layers:
-        layer.scale = [voxel_depth, voxel_height, voxel_width]
-    napari_viewer.window.remove_dock_widget(set_voxel_size_of_all_layers.native)
+        voxel_size = [voxel_depth, voxel_height, voxel_width]
+        layer.scale = voxel_size[-len(layer.data.shape):]
+    try:
+        napari_viewer.window.remove_dock_widget(set_voxel_size_of_all_layers.native)
+    except:
+        pass
 

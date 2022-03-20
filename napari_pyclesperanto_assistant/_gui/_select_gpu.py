@@ -1,6 +1,8 @@
 from magicgui import magicgui
 import pyclesperanto_prototype as cle
+from napari_tools_menu import register_function
 
+@register_function(menu="Utilities > Select GPU")
 @magicgui(Select_GPU={
         "choices": cle.available_device_names(),
     },call_button='Select')
