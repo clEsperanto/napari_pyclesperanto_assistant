@@ -48,25 +48,17 @@ def advanced_statistics(
             columns, label_image, n_neighbors_list, region_props
         )
 
-    print("A")
     if napari_viewer is not None:
-        print("B")
         # Store results in the properties dictionary:
         from napari_workflows._workflow import _get_layer_from_data
         labels_layer = _get_layer_from_data(napari_viewer, label_image)
         labels_layer.properties = table
 
-        print("C")
-
         # turn table into a widget
         from napari_skimage_regionprops import add_table
         add_table(labels_layer, napari_viewer)
-
-        print("D")
     else:
         return table
-
-    print("E")
 
 
 def region_props_with_neighborhood_data(
@@ -112,10 +104,10 @@ def region_props_with_neighborhood_data(
         # addition to the regionprops dictionary
         region_props[
             f"avg_distance_of_{i}_nearest_neigbors"
-        ] = distance_of_n_closest_points
+        ] = distance_of_n_closest_points[1:]
 
     # processing touching neighbor count for addition to regionprops (deletion of background)
-    touching_neighbor_c = cle.pull(touching_neighbor_count)[1:]
+    touching_neighbor_c = cle.pull(touching_neighbor_count)[0,1:]
 
     # addition to the regionprops dictionary
     region_props["touching_neighbor_count"] = touching_neighbor_c
