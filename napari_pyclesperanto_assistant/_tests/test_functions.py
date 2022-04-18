@@ -1,3 +1,5 @@
+import numpy as np
+
 def test_labeling_and_statistics():
     from skimage.io import imread
     image = imread("napari_pyclesperanto_assistant/data/blobs.tif")
@@ -27,7 +29,6 @@ def test_select_gpu():
 
 
 def test_numpy_functions(make_napari_viewer):
-    import numpy as np
     from napari import Viewer
     from napari.layers import Image, Labels, Layer
     from napari_pyclesperanto_assistant._convert_to_numpy import convert_to_numpy, convert_image_to_labels, \
@@ -57,6 +58,17 @@ def test_numpy_functions(make_napari_viewer):
 
     from napari_pyclesperanto_assistant._statistics_of_labeled_pixels import statistics_of_labeled_pixels
     statistics_of_labeled_pixels(image, labels_layer.data, napari_viewer=viewer)
+
+def test_advanced_statistics(make_napari_viewer):
+    image = np.asarray([[[0, 1], [2, 3]], [[0, 1], [2, 3]]])
+
+    viewer = make_napari_viewer()
+
+    image_layer = viewer.add_image(image)
+    labels_layer = viewer.add_labels(image)
+
+    from napari_pyclesperanto_assistant._advanced_statistics import advanced_statistics
+    advanced_statistics(image, labels_layer.data, napari_viewer=viewer)
 
 def test_plugin_interface():
     from napari_pyclesperanto_assistant._napari_plugin import napari_experimental_provide_function, \
