@@ -8,6 +8,7 @@ from napari_plugin_engine import napari_hook_implementation
 from ._gui import Assistant
 from ._statistics_of_labeled_pixels import statistics_of_labeled_pixels
 from ._advanced_statistics import advanced_statistics
+from ._neighborhood_statistics import neighborhood_statistics
 from ._convert_to_numpy import convert_to_numpy, make_labels_editable, \
     reset_brightness_contrast, auto_brightness_contrast, split_stack, auto_brightness_contrast_all_images, \
     set_voxel_size, set_voxel_size_of_all_layers, convert_labels_to_image, convert_image_to_labels
@@ -66,6 +67,7 @@ def napari_experimental_provide_function():
     return [
         statistics_of_labeled_pixels,
         advanced_statistics,
+        neighborhood_statistics,
         make_labels_editable,
         auto_brightness_contrast,
         auto_brightness_contrast_all_images,
