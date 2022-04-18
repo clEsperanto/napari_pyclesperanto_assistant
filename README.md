@@ -142,6 +142,7 @@ You can also export your workflow as Python/Jython code or as notebook. See the 
   * centroid
   * mean / maximum distance to centroid (and extension ratio shape descriptor)
   * mean / maximum distance to center of mass (and extension ratio shape descriptor)
+  * statistics of neighbors (See related [publication](https://www.frontiersin.org/articles/10.3389/fcomp.2021.774396/full))
 * code export
   * python / Fiji-compatible jython
   * python jupyter notebooks
