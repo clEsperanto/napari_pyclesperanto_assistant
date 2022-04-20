@@ -30,6 +30,14 @@ conda install -c conda-forge pyopencl napari
 pip install napari-pyclesperanto-assistant
 ```
 
+Mac-users please also install this:
+
+    conda install -c conda-forge ocl_icd_wrapper_apple
+    
+Linux users please also install this:
+    
+    conda install -c conda-forge ocl-icd-system
+
 ## Usage
 
 ### Start up the assistant
