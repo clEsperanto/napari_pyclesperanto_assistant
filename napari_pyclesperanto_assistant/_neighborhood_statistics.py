@@ -111,8 +111,6 @@ def neighborhood_statistics_of_data(
             cle.set_row(neighborhood, 0, 0)
 
             if measure_mean_of_neighbors:
-                print("se", element.shape)
-                print("ne", neighborhood.shape)
                 mean = cle.mean_of_touching_neighbors(element, neighborhood)
                 output_table["mean_" + neighborhood_name + "_" + key] = np.asarray(mean)[0].tolist()
 
