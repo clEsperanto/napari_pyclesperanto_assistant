@@ -76,6 +76,17 @@ When your workflow is set up, click the play button below your dataset:
 
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/timelapse_2d.gif)
 
+### Neighbor statistics
+
+When working with 2D or 3D data you can analyze measurements in relationship with their neighbors. 
+For example, you can measure the area of blobs as shown in the example shown below using the menu 
+`Tools > Measurements > Statistics of labeled pixels (clesperant)` and visualize it as 'area' image by double-clicking on the table column.
+Additionally, you can measure the mean area of the 6 nearest neighbors using the menu `Tools > Measurments > Neighborhood statistics of measurements`.
+The new column will then be called "mean_nn6_area...". When visualizing such parametric images next by each other, it is recommended to use
+[napari-brightness-contrast](https://www.napari-hub.org/plugins/napari-brightness-contrast).
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/neighbor_statistics.png)
+
 ### Code generation
 You can also export your workflow as Python/Jython code or as notebook. See the [napari-assistant documentation](https://www.napari-hub.org/plugins/napari-assistant) for details.
 

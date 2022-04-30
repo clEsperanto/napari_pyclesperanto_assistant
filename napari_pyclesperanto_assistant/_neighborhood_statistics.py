@@ -18,7 +18,41 @@ def neighborhood_statistics(labels_layer: napari.layers.Labels,
                             measure_median_of_neighbors: bool = False,
                             napari_viewer: napari.Viewer = None
                             ):
-    import pyclesperanto_prototype as cle
+    """Takes a labels layer, reads out its feature table. Depending on which neighborhoods are specified
+    and which `measure_*` parameters are set to True, it will compute e.g. the mean of touching neighbors and add a
+    new column to the table. In this particular case, columns "mean_tn_[measure]" will be added.
+
+    Parameters
+    ----------
+    labels_layer: napari.layers.Labels
+        Napari labels layer
+    touching_neighbors: bool, optional
+        Touching neighbors will be considered for statistics
+    neighbors_of_touching_neighbors: bool, optional
+        touching neighbors of touching neighbors will be considered for statistics
+    proximal_neighbors: bool, optional
+        neighbors within a given distance will be considered for statistics
+    proximal_distance: float, optional
+        distance in pixels / voxels
+    n_nearest_neighbors: bool, optional
+        The n-nearest neighbors will be considered for statistics
+    n: int, optional
+        number of n-nearest neighbors. Note: n=1 is the cell itself.
+    measure_mean_of_neighbors: bool, optional
+        compute the mean of specified neighbors
+    measure_standard_deviation_of_neighbors: bool, optional
+        compute the standard deviation of specified neighbors
+    measure_minimum_of_neighbors: bool, optional
+        compute the minimum of specified neighbors
+    measure_maximum_of_neighbors: bool, optional
+        compute the maximum of specified neighbors
+    measure_median_of_neighbors: bool, optional
+        compute the median of specified neighbors
+    napari_viewer: napari.Viewer, optional
+        If the viewer is given, it will add this table to the graphical user interface of the viewer.
+        Otherwise, it will return the table.
+
+    """
     if hasattr(labels_layer, "features"):
         table = labels_layer.features
     else:
@@ -66,7 +100,14 @@ def neighborhood_statistics_of_data(
     measure_maximum_of_neighbors: bool = False,
     measure_median_of_neighbors: bool = False,
 ):
+    """Takes a label image and a table with corresponding measurements. Depending on which neighborhoods are specified
+    and which `measure_*` parameters are set to True, it will compute e.g. the mean of touching neighbors and add a
+    new column to the table. In this particular case, columns "mean_tn_[measure]" will be added.
+    """
     neighborhoods = {}
+
+    if not np.array_equal(table['label'], range(1, len(table['label']) + 1)):
+        raise ValueError("Measurements must contain a column 'label' which is sequentially ordered from 1 to n, for n labels.")
 
     if touching_neighbors or neighbors_of_touching_neighbors:
 
@@ -78,18 +119,18 @@ def neighborhood_statistics_of_data(
         if neighbors_of_touching_neighbors:
             # determine neighbors of neigbors
             neighbors_of_neighbors = cle.neighbors_of_neighbors(touch_matrix)
-            neighborhoods["tntn"] = neighbors_of_neighbors
+            neighborhoods["tntn"] = neighbors_of_neighbors[1:,1:] # ignore background (first row/column)
 
     if proximal_neighbors or n_nearest_neighbors:
         coordinates = cle.centroids_of_labels(label_image)
         distance_matrix = cle.generate_distance_matrix(coordinates, coordinates)
         if proximal_neighbors:
             proximal_neighbors_matrix = cle.generate_proximal_neighbors_matrix(distance_matrix, max_distance=proximal_distance)
-            neighborhoods["pn" + str(proximal_distance)] = proximal_neighbors_matrix
+            neighborhoods["pn" + str(proximal_distance)] = proximal_neighbors_matrix[1:,1:] # ignore background (first row/column)
 
         if n_nearest_neighbors:
             n_nearest_neighbors_matrix = cle.generate_n_nearest_neighbors_matrix(distance_matrix, n=n)
-            neighborhoods["nn" + str(n)] = n_nearest_neighbors_matrix
+            neighborhoods["nn" + str(n)] = n_nearest_neighbors_matrix[1:,1:] # ignore background (first row/column)
 
     output_table = {}
 
@@ -105,11 +146,6 @@ def neighborhood_statistics_of_data(
             element = np.asarray([element])
 
         for neighborhood_name, neighborhood in neighborhoods.items():
-
-            # ignore touching the background
-            cle.set_column(neighborhood, 0, 0)
-            cle.set_row(neighborhood, 0, 0)
-
             if measure_mean_of_neighbors:
                 mean = cle.mean_of_touching_neighbors(element, neighborhood)
                 output_table["mean_" + neighborhood_name + "_" + key] = np.asarray(mean)[0].tolist()
