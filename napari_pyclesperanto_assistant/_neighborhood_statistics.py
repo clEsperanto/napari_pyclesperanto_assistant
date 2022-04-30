@@ -136,7 +136,7 @@ def neighborhood_statistics_of_data(
 
     for key, element in table.items():
         output_table[key] = element
-        if key.lower() in ["label", "frame"]:
+        if key.lower() in ["label", "frame", "index"]:
             continue
 
         if isinstance(element, (tuple, list)):
