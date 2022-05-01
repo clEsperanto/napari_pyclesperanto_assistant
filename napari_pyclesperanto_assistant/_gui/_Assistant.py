@@ -1,10 +1,9 @@
 from __future__ import annotations
 from ._select_gpu import select_gpu
 from napari.viewer import Viewer
-from napari_tools_menu import register_dock_widget
 import napari_assistant
 
-@register_dock_widget(menu="Utilities > Assistant (clEsperanto)")
+
 class Assistant(napari_assistant.Assistant):
     """The main cle Assistant widget.
 
