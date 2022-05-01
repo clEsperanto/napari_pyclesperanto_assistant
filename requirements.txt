@@ -2,8 +2,8 @@ napari-plugin-engine>=0.1.4
 pyopencl
 toolz
 scikit-image
-napari >=0.4.7
-pyclesperanto-prototype >=0.15.4
+napari >=0.4.15
+pyclesperanto-prototype >=0.17.1
 magicgui
 numpy!=1.19.4
 pyperclip
@@ -15,4 +15,4 @@ napari-tools-menu>=0.1.8
 napari-time-slicer>=0.4.0
 napari-skimage-regionprops>=0.2.0
 napari-workflows>=0.1.1
-napari-assistant
+napari-assistant>=0.1.10
