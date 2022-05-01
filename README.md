@@ -84,6 +84,17 @@ When your workflow is set up, click the play button below your dataset:
 
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/timelapse_2d.gif)
 
+### Neighbor statistics
+
+When working with 2D or 3D data you can analyze measurements in relationship with their neighbors. 
+For example, you can measure the area of blobs as shown in the example shown below using the menu 
+`Tools > Measurements > Statistics of labeled pixels (clesperant)` and visualize it as `area` image by double-clicking on the table column (1).
+Additionally, you can measure the maximum area of the 6 nearest neighbors using the menu `Tools > Measurments > Neighborhood statistics of measurements`.
+The new column will then be called "max_nn6_area..." (2). When visualizing such parametric images next by each other, it is recommended to use
+[napari-brightness-contrast](https://www.napari-hub.org/plugins/napari-brightness-contrast) and visualize the same intensity range to see differences correctly.
+
+![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/neighbor_statistics.png)
+
 ### Code generation
 You can also export your workflow as Python/Jython code or as notebook. See the [napari-assistant documentation](https://www.napari-hub.org/plugins/napari-assistant) for details.
 
@@ -150,6 +161,7 @@ You can also export your workflow as Python/Jython code or as notebook. See the 
   * centroid
   * mean / maximum distance to centroid (and extension ratio shape descriptor)
   * mean / maximum distance to center of mass (and extension ratio shape descriptor)
+  * statistics of neighbors (See related [publication](https://www.frontiersin.org/articles/10.3389/fcomp.2021.774396/full))
 * code export
   * python / Fiji-compatible jython
   * python jupyter notebooks

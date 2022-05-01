@@ -114,3 +114,8 @@ def region_props_with_neighborhood_data(
     print("Measurements Completed.")
 
     return region_props
+
+from napari_skimage_regionprops._all_frames import analyze_all_frames
+
+regionprops_table_all_frames = analyze_all_frames(advanced_statistics)
+register_function(regionprops_table_all_frames, menu="Measurement > Statistics of labeled pixels including neighborhood statistics of all frames (clEsperanto)")
