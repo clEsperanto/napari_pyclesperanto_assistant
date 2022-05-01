@@ -1,8 +1,9 @@
 from magicgui import magicgui
 import pyclesperanto_prototype as cle
-from napari_tools_menu import register_function
+from napari_tools_menu import register_action
 
-@register_function(menu="Utilities > Select GPU")
+
+
 @magicgui(Select_GPU={
         "choices": cle.available_device_names(),
     },call_button='Select')
@@ -10,7 +11,8 @@ def gpu_selector(Select_GPU : str):
     print("Selected device:", cle.select_device(Select_GPU))
     gpu_selector.hide()
 
-def select_gpu():
+@register_action(menu="Utilities > Select GPU (clesperanto)")
+def select_gpu(viewer):
     if select_gpu.device != None:
         print("Changing the GPU device is currently not supported.\n"
               "See also https://github.com/clEsperanto/pyclesperanto_prototype/issues/110")
