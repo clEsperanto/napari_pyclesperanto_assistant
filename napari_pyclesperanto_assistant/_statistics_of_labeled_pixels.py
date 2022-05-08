@@ -1,14 +1,12 @@
 import warnings
 
-from napari.types import ImageData, LabelsData
-from napari import Viewer
-import pyclesperanto_prototype as cle
 import napari
+import pyclesperanto_prototype as cle
 
 from napari_tools_menu import register_function
 
 @register_function(menu="Measurement > Statistics of labeled pixels (clEsperanto)")
-def statistics_of_labeled_pixels(image: ImageData, labels: LabelsData, napari_viewer : Viewer=None, measure_background=False):
+def statistics_of_labeled_pixels(image: napari.types.ImageData, labels: napari.types.LabelsData, measure_background=False, napari_viewer : napari.Viewer=None) -> "pandas.DataFrame":
     """
     Adds a table widget to a given napari viewer with quantitative analysis results derived from an image-labelimage pair.
     """
@@ -31,7 +29,8 @@ def statistics_of_labeled_pixels(image: ImageData, labels: LabelsData, napari_vi
             from napari_skimage_regionprops import add_table
             add_table(labels_layer, napari_viewer)
         else:
-            return table
+            import pandas
+            return pandas.DataFrame(table)
     else:
         warnings.warn("Image and labels must be set.")
 

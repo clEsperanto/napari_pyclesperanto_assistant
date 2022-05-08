@@ -12,7 +12,7 @@ def advanced_statistics(
         measure_distance_to_n_nearest_neigbors: bool = True,
         n_neighbors: str = "2,3,4",
         napari_viewer: napari.Viewer = None
-    ):
+    ) -> "pandas.DataFrame":
 
     n_neighbors_list = map(int, n_neighbors.split(","))
 
@@ -58,7 +58,8 @@ def advanced_statistics(
         from napari_skimage_regionprops import add_table
         add_table(labels_layer, napari_viewer)
     else:
-        return table
+        import pandas
+        return pandas.DataFrame(table)
 
 
 def region_props_with_neighborhood_data(
