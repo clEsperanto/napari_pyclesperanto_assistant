@@ -20,24 +20,6 @@ Therefore, just click the menu `Tools > Utilities > Assistant (na)` or run `napa
 
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support1.gif)
 
-## Installation
-
-It is recommended to install the assistant via conda:
-```shell
-conda create --name cle_39 python==3.9
-conda activate cle_39 
-conda install -c conda-forge pyopencl napari
-pip install napari-pyclesperanto-assistant
-```
-
-Mac-users please also install this:
-
-    conda install -c conda-forge ocl_icd_wrapper_apple
-    
-Linux users please also install this:
-    
-    conda install -c conda-forge ocl-icd-system
-
 ## Usage
 
 ### Start up the assistant
@@ -47,8 +29,7 @@ napari
 ```
 
 Load example data, e.g. from the menu `File > Open Samples > clEsperanto > CalibZAPWfixed` and 
-start the assistant from the menu `Tools > Utilities > Assistant (clEsperanto)`. 
-Select a GPU in case you are asked to.
+start the assistant from the menu `Tools > Utilities > Assistant (na)`.
 
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/screenshot1.png)
 
@@ -170,6 +151,30 @@ You can also export your workflow as Python/Jython code or as notebook. See the 
   * cell counting
   * cell differentiation
   * tissue classification
+
+## Installation
+
+It is recommended to install the assistant using conda. If you have never used conda before, it is recommended to read 
+[this blog post](https://biapol.github.io/blog/johannes_mueller/anaconda_getting_started/) first. 
+
+```shell
+conda create --name cle_39 python==3.9 napari-pyclesperanto-assistant
+conda activate cle_39
+```
+
+Mac-users please also install this:
+
+    conda install -c conda-forge ocl_icd_wrapper_apple
+    
+Linux users please also install this:
+    
+    conda install -c conda-forge ocl-icd-system
+
+You can then start the napari-assistant using this command:
+
+```
+naparia
+```
 
 
 ## Feedback and contributions welcome!
