@@ -23,7 +23,7 @@ class Assistant(napari_assistant.Assistant):
         super().__init__(napari_viewer)
 
         if not Assistant._gpu_selected:
-            select_gpu()
+            select_gpu(napari_viewer)
             Assistant._gpu_selected = True
 
 Assistant._gpu_selected = False
