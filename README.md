@@ -16,7 +16,7 @@ It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) 
 
 This napari plugin adds some menu entries to the Tools menu. You can recognize them with their suffix `(clEsperanto)` in brackets.
 Furthermore, it can be used from the [napari-assistant](https://www.napari-hub.org/plugins/napari-assistant) graphical user interface. 
-Therefore, just click the menu `Tools > Utilities > Assistant (clEsperanto)`.
+Therefore, just click the menu `Tools > Utilities > Assistant (na)`.
 
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support1.gif)
 
