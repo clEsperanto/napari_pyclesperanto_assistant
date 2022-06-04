@@ -16,7 +16,7 @@ It uses [pyclesperanto](https://github.com/clEsperanto/pyclesperanto_prototype) 
 
 This napari plugin adds some menu entries to the Tools menu. You can recognize them with their suffix `(clEsperanto)` in brackets.
 Furthermore, it can be used from the [napari-assistant](https://www.napari-hub.org/plugins/napari-assistant) graphical user interface. 
-Therefore, just click the menu `Tools > Utilities > Assistant (na)`.
+Therefore, just click the menu `Tools > Utilities > Assistant (na)` or run `naparia` from the command line.
 
 ![](https://github.com/clEsperanto/napari_pyclesperanto_assistant/raw/master/docs/images/virtual_4d_support1.gif)
 
@@ -171,23 +171,13 @@ You can also export your workflow as Python/Jython code or as notebook. See the 
   * cell differentiation
   * tissue classification
 
-## For developers
-
-Getting the recent code from github and locally installing it
-```
-git clone https://github.com/clesperanto/napari_pyclesperanto_assistant.git
-cd napari_pyclesperanto_assistant
-pip install -e .
-```
-
-Optional: Also install pyclesperantos recent source code from github:
-```
-git clone https://github.com/clEsperanto/pyclesperanto_prototype.git
-cd pyclesperanto_prototype
-pip install -e .
-```
 
 ## Feedback and contributions welcome!
 clEsperanto is developed in the open because we believe in the open source community. See our [community guidelines](https://clij.github.io/clij2-docs/community_guidelines). Feel free to drop feedback as [github issue](https://github.com/clEsperanto/pyclesperanto_prototype/issues) or via [image.sc](https://image.sc)
 
+## Acknowledgements
+This project was supported by the Deutsche Forschungsgemeinschaft under Germany’s Excellence Strategy – EXC2068 - Cluster of Excellence "Physics of Life" of TU Dresden.
+This project has been made possible in part by grant number [2021-240341 (Napari plugin accelerator grant)](https://chanzuckerberg.com/science/programs-resources/imaging/napari/improving-image-processing/) from the Chan Zuckerberg Initiative DAF, an advised fund of the Silicon Valley Community Foundation.
+
 [Imprint](https://clesperanto.github.io/imprint)
+
