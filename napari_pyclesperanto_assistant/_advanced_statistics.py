@@ -1,9 +1,11 @@
+import warnings
+
 import napari
 import pyclesperanto_prototype as cle
 from napari_tools_menu import register_function
 import numpy as np
 
-@register_function(menu="Measurement > Statistics of labeled pixels including neighborhood statistics (clEsperanto)")
+@register_function(menu="Measurement > Statistics of labeled pixels including neighborhood statistics (deprecated, clEsperanto)")
 def advanced_statistics(
         intensity_image: napari.types.ImageData,
         label_image: napari.types.LabelsData,
@@ -13,6 +15,7 @@ def advanced_statistics(
         n_neighbors: str = "2,3,4",
         napari_viewer: napari.Viewer = None
     ) -> "pandas.DataFrame":
+    warnings.warn("'Statistics of labeled pixels including neighborhood statistics' is deprecated. Use 'Label statistics' instead.")
 
     n_neighbors_list = map(int, n_neighbors.split(","))
 
