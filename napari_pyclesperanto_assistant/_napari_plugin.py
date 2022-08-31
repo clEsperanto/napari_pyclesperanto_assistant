@@ -22,6 +22,9 @@ def napari_experimental_provide_dock_widget():
 def _load_Lund():
     return [(imread("https://github.com/clEsperanto/clesperanto_example_data/raw/main/Lund_000500_resampled-cropped.tif"), {'name': 'Lund'})]
 
+def _load_Lund_timelapse():
+    return [(imread("https://github.com/clEsperanto/clesperanto_example_data/raw/main/Lund-100MB.tif"), {'name': 'Lund timelapse (100 MB)'})]
+
 def _load_CalibZAPWfixed():
     return [(imread("https://github.com/clEsperanto/clesperanto_example_data/raw/main/CalibZAPWfixed_000154_max.tif"), {'name': 'CalibZAPWfixed'})]
 
@@ -51,6 +54,7 @@ def napari_provide_sample_data():
     data = Path(__file__).parent / "data"
     return {
         "Lund": _load_Lund,
+        "Lund timelapse (100 MB)": _load_Lund_timelapse,
         "CalibZAPWfixed": _load_CalibZAPWfixed,
         "Sonneberg": _load_Sonneberg,
         "Haase_MRT_tfl3d1": _load_Haase_MRT_tfl3d1,
