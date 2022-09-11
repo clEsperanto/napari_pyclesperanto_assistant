@@ -23,7 +23,7 @@ def smooth_labels(labels:LabelsData, radius: float = 1) -> LabelsData:
     return cle.smooth_labels(labels, radius=radius)
 
 
-@register_function(menu="Segmentation post-processing > Merge labels with intensity along borders within range (clesperanto)",
+@register_function(menu="Segmentation post-processing > Merge touching labels with intensity along borders within range (clesperanto)",
                    minimum_intensity={"min": 0, "max":100000},
                    maximum_intensity={"min": 0, "max":100000},
                    auto_call=True)
@@ -34,3 +34,9 @@ def merge_labels_with_border_intensity_within_range(image:ImageData, labels:Labe
                                                                minimum_intensity=minimum_intensity,
                                                                maximum_intensity=maximum_intensity
                                                                )
+
+
+@register_function(menu="Segmentation post-processing > Merge touching labels (clesperanto)")
+@time_slicer
+def merge_labels_with_border_intensity_within_range(labels:LabelsData) -> LabelsData:
+    return cle.merge_touching_labels(labels)
