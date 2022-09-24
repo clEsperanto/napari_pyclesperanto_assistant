@@ -5,23 +5,23 @@ from napari_skimage_regionprops._all_frames import analyze_all_frames
 from napari_tools_menu import register_function
 
 @register_function(menu="Measurement > Label statistics (clEsperanto)")
-def label_statistics(image: "napari.types.ImageData",
-                                 labels: "napari.types.LabelsData",
-                                 intensity:bool = True,
-                                 size:bool = True,
-                                 shape:bool = False,
-                                 position:bool = False,
-                                 neighbors:bool = False,
-                                 napari_viewer : "napari.Viewer"=None) -> "pandas.DataFrame":
+def label_statistics(intensity_image: "napari.types.ImageData",
+                     label_image: "napari.types.LabelsData",
+                     intensity:bool = True,
+                     size:bool = True,
+                     shape:bool = False,
+                     position:bool = False,
+                     neighbors:bool = False,
+                     napari_viewer : "napari.Viewer"=None) -> "pandas.DataFrame":
     """
     Adds a table widget to a given napari viewer with quantitative analysis results derived from an image-label-image pair.
     """
-    if image is not None and labels is not None:
+    if intensity_image is not None and label_image is not None:
         import pandas as pd
 
         table = {}
         if intensity or size or shape or position:
-            result = cle.statistics_of_labelled_pixels(image, labels)
+            result = cle.statistics_of_labelled_pixels(intensity_image, label_image)
             copy_keys(result, table, ['label'])
             if intensity:
                 copy_keys(result, table, ['min_intensity', 'max_intensity', 'mean_intensity',
@@ -40,7 +40,7 @@ def label_statistics(image: "napari.types.ImageData",
                 copy_keys(result, table, ['mean_max_distance_to_mass_center_ratio',
                                           'mean_max_distance_to_centroid_ratio'])
         if neighbors:
-            result = cle.statistics_of_labelled_neighbors(label_image=labels)
+            result = cle.statistics_of_labelled_neighbors(label_image=label_image)
             if len(table.keys()) > 0:
                 df1 = pd.DataFrame(result)
                 df2 = pd.DataFrame(table)
@@ -53,7 +53,7 @@ def label_statistics(image: "napari.types.ImageData",
         if napari_viewer is not None:
             # Store results in the properties dictionary:
             from napari_workflows._workflow import _get_layer_from_data
-            labels_layer = _get_layer_from_data(napari_viewer, labels)
+            labels_layer = _get_layer_from_data(napari_viewer, label_image)
             labels_layer.properties = table
 
             # turn table into a widget
@@ -102,3 +102,22 @@ def statistics_of_labeled_pixels(image: "napari.types.ImageData", labels: "napar
     else:
         warnings.warn("Image and labels must be set.")
 
+try:
+    # morphometrics API
+    from morphometrics.measure import register_measurement_set
+
+    register_measurement_set(
+        label_statistics,
+        name="label statistics (clEsperanto)",
+        choices=["intensity", "size", "shape", "position", "neighbors"],
+        uses_intensity_image=True,
+    )
+
+    from napari_tools_menu import register_dock_widget
+    from morphometrics._gui._qt.measurement_widgets import QtMeasurementWidget
+    register_dock_widget(
+        QtMeasurementWidget,
+        "Measurement > Region properties (morphometrics)"
+    )
+except:
+    pass
