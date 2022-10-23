@@ -211,21 +211,21 @@ def pixel_count_map(labels:"napari.types.LabelsData") -> "napari.types.ImageData
     return cle.pixel_count_map(labels)
 
 
-@register_function(menu="Measurement > Reciprocal (clesperanto)")
+@register_function(menu="Image math > Reciprocal (clesperanto)")
 @time_slicer
 @_package_ncle
 def reciprocal(image:"napari.types.ImageData") -> "napari.types.ImageData":
     return cle.reciprocal(image)
 
 
-@register_function(menu="Measurement > Absolute difference (clesperanto)")
+@register_function(menu="Image math > Absolute difference (clesperanto)")
 @time_slicer
 @_package_ncle
 def absolute_difference(image1:"napari.types.ImageData", image2:"napari.types.ImageData") -> "napari.types.ImageData":
     return cle.absolute_difference(image1, image2)
 
 
-@register_function(menu="Measurement > Squared difference (clesperanto)")
+@register_function(menu="Image math > Squared difference (clesperanto)")
 @time_slicer
 @_package_ncle
 def squared_difference(image1:"napari.types.ImageData", image2:"napari.types.ImageData") -> "napari.types.ImageData":
