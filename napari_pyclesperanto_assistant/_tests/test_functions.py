@@ -100,8 +100,12 @@ def test_cle_functions():
         pixel_count_map,
         reciprocal,
         absolute_difference,
-        squared_difference
+        squared_difference,
+        mean_box,
+        gaussian_blur
     )
+    mean_box(image)
+    gaussian_blur(image)
     difference_of_gaussian(image)
     laplacian_of_gaussian(image)
     subtract_gaussian_background(image)

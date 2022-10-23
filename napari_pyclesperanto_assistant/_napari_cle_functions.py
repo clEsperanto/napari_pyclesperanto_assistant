@@ -45,6 +45,13 @@ def top_hat_box(image:"napari.types.ImageData", radius_x: int = 10, radius_y: in
     return cle.top_hat_box(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
 
 
+@register_function(menu="Filtering / noise removal > Mean (box, clesperanto)")
+@time_slicer
+@_package_ncle
+def mean_box(image:"napari.types.ImageData", radius_x: int = 10, radius_y: int = 10, radius_z: int = 0) -> "napari.types.ImageData":
+    return cle.mean_box(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
+
+
 @register_function(menu="Filtering > Difference of Gaussian (clesperanto)")
 @time_slicer
 @_package_ncle
@@ -70,6 +77,16 @@ def laplacian_of_gaussian(image:"napari.types.ImageData",
                                       sigma_x=sigma_x, sigma_y=sigma_y, sigma_z=sigma_z,
                            )
     )
+
+
+@register_function(menu="Filtering / noise removal > Gaussian (clesperanto)")
+@time_slicer
+def gaussian_blur(image:"napari.types.ImageData",
+                           sigma_x: float = 1, sigma_y: float = 1, sigma_z: float = 0,
+                           ) -> "napari.types.ImageData":
+    return cle.gaussian_blur(image,
+                      sigma_x=sigma_x, sigma_y=sigma_y, sigma_z=sigma_z,
+           )
 
 
 @register_function(menu="Filtering / background removal > Subtract Gaussian background (clesperanto)")
