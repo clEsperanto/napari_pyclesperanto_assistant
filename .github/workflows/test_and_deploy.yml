@@ -71,15 +71,12 @@ jobs:
 
           pip install -e .
       # this runs the platform-specific tests declared in tox.ini
-      #- name: Install tox-conda
-      #  run: pip install tox-conda
-      #- name: Test with tox
-      #  run: tox
-      #  env:
-      #    PLATFORM: ${{ matrix.platform }}
-      - name: Test
-        shell: bash -l {0}
-        run: pytest -v --cov=./ --cov-report=xml
+      - name: Test with tox
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: python -m tox
+        env:
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Coverage
         uses: codecov/codecov-action@v2
