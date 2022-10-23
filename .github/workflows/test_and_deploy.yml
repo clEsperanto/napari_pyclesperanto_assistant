@@ -39,6 +39,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel pytest pytest-cov pytest-benchmark dask networkx igraph pandas
           pip install -e .
+      # these libraries enable testing on Qt on linux
+      - uses: tlambert03/setup-qt-libs@v1
       - name: Test
         shell: bash -l {0}
         run: pytest -v --cov=./ --cov-report=xml
