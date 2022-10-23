@@ -59,6 +59,33 @@ def test_numpy_functions(make_napari_viewer):
     from napari_pyclesperanto_assistant._statistics_of_labeled_pixels import statistics_of_labeled_pixels
     statistics_of_labeled_pixels(image, labels_layer.data, napari_viewer=viewer)
 
+def test_cle_functions():
+    image = np.asarray([[[0, 1], [2, 3]], [[0, 1], [2, 3]]])
+    labels = image.astype(int)
+
+    from napari_pyclesperanto_assistant import (
+        label,
+        voronoi_otsu_labeling,
+        merge_touching_labels,
+        merge_labels_with_border_intensity_within_range,
+        dilate_labels,
+        erode_labels,
+        opening_labels,
+        closing_labels,
+        smooth_labels
+    )
+    label(labels)
+    voronoi_otsu_labeling(image)
+    merge_touching_labels(labels)
+    merge_labels_with_border_intensity_within_range(image, labels)
+    dilate_labels(labels)
+    erode_labels(labels)
+    opening_labels(labels)
+    closing_labels(labels)
+    smooth_labels(labels)
+
+
+
 def test_advanced_statistics(make_napari_viewer):
     image = np.asarray([[[0, 1], [2, 3]], [[0, 1], [2, 3]]])
 
