@@ -5,27 +5,27 @@ def test_labeling_and_statistics():
     image = imread("napari_pyclesperanto_assistant/data/blobs.tif")
 
     from napari_pyclesperanto_assistant._napari_cle_functions import  voronoi_otsu_labeling
-    labels = voronoi_otsu_labeling(image)
+    labels = voronoi_otsu_labeling(image, spot_sigma=3.5)
 
     from napari_pyclesperanto_assistant._statistics_of_labeled_pixels import statistics_of_labeled_pixels
     stats = statistics_of_labeled_pixels(image, labels)
 
-    assert len(stats) == 37
+    assert len(stats) == 65
 
     binary = labels >= 1
 
     from napari_pyclesperanto_assistant._napari_cle_functions import label
     cca = label(binary)
 
-    assert cca.max() == 59
+    assert cca.max() == 60
 
-def test_select_gpu():
-    from napari_pyclesperanto_assistant._gui._select_gpu import select_gpu, gpu_selector
-
-    gpu_selector("")
-    select_gpu()
-    select_gpu.device = 1
-    select_gpu()
+# def test_select_gpu():
+#     from napari_pyclesperanto_assistant._gui._select_gpu import select_gpu, gpu_selector
+#
+#     gpu_selector("")
+#     select_gpu()
+#     select_gpu.device = 1
+#     select_gpu()
 
 
 def test_numpy_functions(make_napari_viewer):
@@ -58,6 +58,92 @@ def test_numpy_functions(make_napari_viewer):
 
     from napari_pyclesperanto_assistant._statistics_of_labeled_pixels import statistics_of_labeled_pixels
     statistics_of_labeled_pixels(image, labels_layer.data, napari_viewer=viewer)
+
+def test_cle_functions():
+    image = np.asarray([[[0, 1], [2, 3]], [[0, 1], [2, 3]]])
+    labels = image.astype(int)
+
+    from napari_pyclesperanto_assistant import (
+        label,
+        voronoi_otsu_labeling,
+        merge_touching_labels,
+        merge_labels_with_border_intensity_within_range,
+        dilate_labels,
+        erode_labels,
+        opening_labels,
+        closing_labels,
+        smooth_labels,
+        top_hat_box,
+        eroded_otsu_labeling,
+        gauss_otsu_labeling,
+        difference_of_gaussian,
+        laplacian_of_gaussian,
+        subtract_gaussian_background,
+        divide_by_gaussian_background,
+        small_hessian_eigenvalue,
+        large_hessian_eigenvalue,
+        standard_deviation_box,
+        variance_box,
+        exclude_large_labels,
+        exclude_small_labels,
+        exclude_labels_with_map_values_out_of_range,
+        exclude_labels_with_map_values_within_range,
+        extend_labeling_via_voronoi,
+        reduce_labels_to_label_edges,
+        reduce_labels_to_centroids,
+        binary_not,
+        binary_or,
+        binary_and,
+        binary_subtract,
+        binary_xor,
+        extension_ratio_map,
+        pixel_count_map,
+        reciprocal,
+        absolute_difference,
+        squared_difference,
+        mean_box,
+        gaussian_blur
+    )
+    mean_box(image)
+    gaussian_blur(image)
+    difference_of_gaussian(image)
+    laplacian_of_gaussian(image)
+    subtract_gaussian_background(image)
+    divide_by_gaussian_background(image)
+    small_hessian_eigenvalue(image)
+    large_hessian_eigenvalue(image)
+    standard_deviation_box(image)
+    variance_box(image)
+    exclude_small_labels(labels)
+    exclude_large_labels(labels)
+    exclude_labels_with_map_values_out_of_range(image, labels)
+    exclude_labels_with_map_values_within_range(image, labels)
+    extend_labeling_via_voronoi(labels)
+    reduce_labels_to_centroids(labels)
+    reduce_labels_to_label_edges(labels)
+    binary_not(labels)
+    binary_or(labels, labels)
+    binary_xor(labels, labels)
+    binary_and(labels, labels)
+    binary_subtract(labels, labels)
+    extension_ratio_map(labels)
+    pixel_count_map(labels)
+    reciprocal(image)
+    absolute_difference(image, image)
+    squared_difference(image, image)
+    label(labels)
+    voronoi_otsu_labeling(image)
+    merge_touching_labels(labels)
+    merge_labels_with_border_intensity_within_range(image, labels)
+    dilate_labels(labels)
+    erode_labels(labels)
+    opening_labels(labels)
+    closing_labels(labels)
+    smooth_labels(labels)
+    top_hat_box(image)
+    eroded_otsu_labeling(image)
+    gauss_otsu_labeling(image)
+
 
 def test_advanced_statistics(make_napari_viewer):
     image = np.asarray([[[0, 1], [2, 3]], [[0, 1], [2, 3]]])
