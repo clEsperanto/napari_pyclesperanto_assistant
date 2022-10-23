@@ -19,13 +19,13 @@ def test_labeling_and_statistics():
 
     assert cca.max() == 59
 
-def test_select_gpu():
-    from napari_pyclesperanto_assistant._gui._select_gpu import select_gpu, gpu_selector
-
-    gpu_selector("")
-    select_gpu()
-    select_gpu.device = 1
-    select_gpu()
+# def test_select_gpu():
+#     from napari_pyclesperanto_assistant._gui._select_gpu import select_gpu, gpu_selector
+#
+#     gpu_selector("")
+#     select_gpu()
+#     select_gpu.device = 1
+#     select_gpu()
 
 
 def test_numpy_functions(make_napari_viewer):
