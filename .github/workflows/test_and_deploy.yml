@@ -64,7 +64,7 @@ jobs:
           run: pytest -v --cov=./ --cov-report=xml
 
       - name: Coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v1
 
   deploy:
     # this will run when you have tagged a commit, starting with "v*"
