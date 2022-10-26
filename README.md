@@ -158,7 +158,7 @@ It is recommended to install the assistant using conda. If you have never used c
 [this blog post](https://biapol.github.io/blog/johannes_mueller/anaconda_getting_started/) first. 
 
 ```shell
-conda create --name cle_39 python==3.9 napari-pyclesperanto-assistant
+conda create --name cle_39 python=3.9 napari-pyclesperanto-assistant
 conda activate cle_39
 ```
 
