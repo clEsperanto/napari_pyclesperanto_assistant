@@ -305,5 +305,44 @@ def closing_labels(labels:"napari.types.LabelsData", radius: int = 1) -> "napari
     return cle.closing_labels(labels, radius=radius)
 
 
+@register_function(menu="Transforms > Rotate (clesperanto)")
+@time_slicer
+@_package_ncle
+def rotate(image:"napari.types.ImageData", angle_around_x_in_degrees: float = 0, angle_around_y_in_degrees: float = 0, angle_around_z_in_degrees: float = 0, rotate_around_center:bool=True, linear_interpolation:bool=False, auto_size:bool=False) -> "napari.types.ImageData":
+    return cle.rotate(image, angle_around_x_in_degrees=angle_around_x_in_degrees, angle_around_y_in_degrees=angle_around_y_in_degrees, angle_around_z_in_degrees=angle_around_z_in_degrees, rotate_around_center=rotate_around_center, linear_interpolation=linear_interpolation, auto_size=auto_size)
 
+
+@register_function(menu="Transforms > Scale (clesperanto)")
+@time_slicer
+@_package_ncle
+def scale(image:"napari.types.ImageData", factor_x: float = 0, factor_y: float = 0, factor_z: float = 0, centered:bool=False, linear_interpolation:bool=True, auto_size:bool=False) -> "napari.types.ImageData":
+    return cle.scale(image, factor_x=factor_x, factor_y=factor_y, factor_z=factor_z, centered=centered, linear_interpolation=linear_interpolation, auto_size=auto_size)
+
+
+@register_function(menu="Transforms > Translate (clesperanto)")
+@time_slicer
+@_package_ncle
+def translate(image:"napari.types.ImageData", translate_x: float = 0, translate_y: float = 0, translate_z: float = 0, linear_interpolation:bool=True) -> "napari.types.ImageData":
+    return cle.translate(image, translate_x=translate_x, translate_y=translate_y, translate_z=translate_z, linear_interpolation=linear_interpolation)
+
+
+@register_function(menu="Transforms > Rigid transform (clesperanto)")
+@time_slicer
+@_package_ncle
+def rigid_transform(image:"napari.types.ImageData", translate_x: float = 0, translate_y: float = 0, translate_z: float = 0, angle_around_x_in_degrees: float = 0, angle_around_y_in_degrees: float = 0, angle_around_z_in_degrees: float = 0, rotate_around_center:bool=True, linear_interpolation:bool=False, auto_size:bool=False) -> "napari.types.ImageData":
+    return cle.rigid_transform(image, translate_x=translate_x, translate_y=translate_y, translate_z=translate_z, angle_around_x_in_degrees=angle_around_x_in_degrees, angle_around_y_in_degrees=angle_around_y_in_degrees, angle_around_z_in_degrees=angle_around_z_in_degrees, rotate_around_center=rotate_around_center, linear_interpolation=linear_interpolation, auto_size=auto_size)
+
+
+@register_function(menu="Transforms > Sub-stack (clesperanto)")
+@time_slicer
+@_package_ncle
+def sub_stack(image:"napari.types.ImageData", start_z:int = 0, end_z:int = 1) -> "napari.types.ImageData":
+    return cle.sub_stack(image, start_z=start_z, end_z=end_z)
+
+
+@register_function(menu="Transforms > Reduce stack (clesperanto)")
+@time_slicer
+@_package_ncle
+def reduce_stack(image:"napari.types.ImageData", reduction_factor:int = 2, offset:int = 0) -> "napari.types.ImageData":
+    return cle.reduce_stack(image, reduction_factor=reduction_factor, offset=offset)
 
