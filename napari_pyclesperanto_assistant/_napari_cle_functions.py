@@ -346,3 +346,10 @@ def sub_stack(image:"napari.types.ImageData", start_z:int = 0, end_z:int = 1) ->
 def reduce_stack(image:"napari.types.ImageData", reduction_factor:int = 2, offset:int = 0) -> "napari.types.ImageData":
     return cle.reduce_stack(image, reduction_factor=reduction_factor, offset=offset)
 
+
+@register_function(menu="Segmentation post-processing > Merge annotated touching labels (clesperanto)")
+@time_slicer
+@_package_ncle
+def merge_annotated_touching_labels(labels:"napari.types.LabelsData", binary_annotation: "napari.types.LabelsData") -> "napari.types.LabelsData":
+    return cle.merge_annotated_touching_labels(labels, binary_annotation)
+
