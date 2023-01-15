@@ -5,7 +5,7 @@ import pyclesperanto_prototype as cle
 from napari_tools_menu import register_function
 import numpy as np
 
-@register_function(menu="Measurement > Statistics of labeled pixels including neighborhood statistics (deprecated, clEsperanto)")
+@register_function(menu="Measurement tables > Statistics of labeled pixels including neighborhood statistics (deprecated, clEsperanto)")
 def advanced_statistics(
         intensity_image: napari.types.ImageData,
         label_image: napari.types.LabelsData,
@@ -122,4 +122,4 @@ def region_props_with_neighborhood_data(
 from napari_skimage_regionprops._all_frames import analyze_all_frames
 
 regionprops_table_all_frames = analyze_all_frames(advanced_statistics)
-register_function(regionprops_table_all_frames, menu="Measurement > Statistics of labeled pixels including neighborhood statistics of all frames (clEsperanto)")
+register_function(regionprops_table_all_frames, menu="Measurement tables > Statistics of labeled pixels including neighborhood statistics of all frames (clEsperanto)")

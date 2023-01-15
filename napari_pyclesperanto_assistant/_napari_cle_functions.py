@@ -214,14 +214,14 @@ def binary_xor(labels1:"napari.types.LabelsData", labels2:"napari.types.LabelsDa
     return cle.binary_xor(labels1, labels2)
 
 
-@register_function(menu="Measurement > Extension ratio map (clesperanto)")
+@register_function(menu="Measurement maps > Extension ratio map (clesperanto)")
 @time_slicer
 @_package_ncle
 def extension_ratio_map(labels:"napari.types.LabelsData") -> "napari.types.ImageData":
     return cle.extension_ratio_map(labels)
 
 
-@register_function(menu="Measurement > Pixel count map (clesperanto)")
+@register_function(menu="Measurement maps > Pixel count map (clesperanto)")
 @time_slicer
 @_package_ncle
 def pixel_count_map(labels:"napari.types.LabelsData") -> "napari.types.ImageData":

@@ -3,7 +3,7 @@ import numpy as np
 import pyclesperanto_prototype as cle
 from napari_tools_menu import register_function
 
-@register_function(menu="Measurement > Neighborhood statistics of measurements (clEsperanto)")
+@register_function(menu="Measurement tables > Neighborhood statistics of measurements (clEsperanto)")
 def neighborhood_statistics(labels_layer: napari.layers.Labels,
                             touching_neighbors:bool = True,
                             neighbors_of_touching_neighbors:bool = True,

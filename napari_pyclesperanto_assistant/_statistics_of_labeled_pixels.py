@@ -4,7 +4,7 @@ import pyclesperanto_prototype as cle
 from napari_skimage_regionprops._all_frames import analyze_all_frames
 from napari_tools_menu import register_function
 
-@register_function(menu="Measurement > Label statistics (clEsperanto)")
+@register_function(menu="Measurement tables > Label statistics (clEsperanto)")
 def label_statistics(intensity_image: "napari.types.ImageData",
                      label_image: "napari.types.LabelsData",
                      intensity:bool = True,
@@ -65,14 +65,14 @@ def label_statistics(intensity_image: "napari.types.ImageData",
         warnings.warn("Image and labels must be set.")
 
 regionprops_table_all_frames = analyze_all_frames(label_statistics)
-register_function(regionprops_table_all_frames, menu="Measurement > Label statistics of all frames (clEsperanto)")
+register_function(regionprops_table_all_frames, menu="Measurement tables > Label statistics of all frames (clEsperanto)")
 
 def copy_keys(source, target, keys):
     for k in keys:
         target[k] = source[k]
 
 
-@register_function(menu="Measurement > Statistics of labeled pixels (deprecated, clEsperanto)")
+@register_function(menu="Measurement tables > Statistics of labeled pixels (deprecated, clEsperanto)")
 def statistics_of_labeled_pixels(image: "napari.types.ImageData", labels: "napari.types.LabelsData", measure_background=False, napari_viewer : "napari.Viewer"=None) -> "pandas.DataFrame":
     """
     Adds a table widget to a given napari viewer with quantitative analysis results derived from an image-labelimage pair.
@@ -117,7 +117,7 @@ try:
     from morphometrics._gui._qt.measurement_widgets import QtMeasurementWidget
     register_dock_widget(
         QtMeasurementWidget,
-        "Measurement > Region properties (morphometrics)"
+        "Measurement tables > Region properties (morphometrics)"
     )
 except:
     pass
