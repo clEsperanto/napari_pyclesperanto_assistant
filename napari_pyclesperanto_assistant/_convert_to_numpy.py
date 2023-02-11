@@ -82,7 +82,7 @@ def split_stack(image : Image, napari_viewer : Viewer, axis : int = 0):
 
 @register_function(menu="Utilities > Set voxel size")
 def set_voxel_size(image : LayerInput, voxel_width : float = 1, voxel_height : float = 1, voxel_depth : float = 1):
-    image.scale = [voxel_depth, voxel_height, voxel_width]
+    image.scale = [voxel_depth, voxel_height, voxel_width][-len(image.scale):]
 
 
 @register_function(menu="Utilities > Set voxel size of all layers")
