@@ -1,4 +1,4 @@
-import pyclesperanto_prototype as cle
+import pyclesperanto as cle
 from napari_tools_menu import register_function
 from napari_time_slicer import time_slicer
 
@@ -13,7 +13,7 @@ def _package_ncle(func):
 @_package_ncle
 def label(binary_image: "napari.types.LabelsData") -> "napari.types.LabelsData":
     """Connected component labeling using box-neighborhood (8-connected in 2D, 26-connected in 3D)"""
-    result = cle.connected_components_labeling_box(binary_image)
+    result = cle.connected_components_labeling(binary_image)
     return result
 
 
@@ -42,14 +42,14 @@ def gauss_otsu_labeling(image:"napari.types.ImageData", outline_sigma: float = 2
 @time_slicer
 @_package_ncle
 def top_hat_box(image:"napari.types.ImageData", radius_x: int = 10, radius_y: int = 10, radius_z: int = 0) -> "napari.types.ImageData":
-    return cle.top_hat_box(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
+    return cle.top_hat(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
 
 
 @register_function(menu="Filtering / noise removal > Mean (box, clesperanto)")
 @time_slicer
 @_package_ncle
 def mean_box(image:"napari.types.ImageData", radius_x: int = 10, radius_y: int = 10, radius_z: int = 0) -> "napari.types.ImageData":
-    return cle.mean_box(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
+    return cle.mean(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
 
 
 @register_function(menu="Filtering > Difference of Gaussian (clesperanto)")
@@ -72,7 +72,7 @@ def laplacian_of_gaussian(image:"napari.types.ImageData",
                            ) -> "napari.types.ImageData":
     """Applies a Laplace-box filter to a Gaussian-blurred image of the original.
     That might be useful for edge detection"""
-    return cle.laplace_box(
+    return cle.laplace(
                            cle.gaussian_blur(image,
                                       sigma_x=sigma_x, sigma_y=sigma_y, sigma_z=sigma_z,
                            )
@@ -121,14 +121,14 @@ def large_hessian_eigenvalue(image:"napari.types.ImageData") -> "napari.types.Im
 @time_slicer
 @_package_ncle
 def standard_deviation_box(image:"napari.types.ImageData", radius_x: int = 10, radius_y: int = 10, radius_z: int = 0) -> "napari.types.ImageData":
-    return cle.standard_deviation_box(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
+    return cle.standard_deviation(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
 
 
 @register_function(menu="Filtering / edge enhancement > Variance (box, clesperanto)")
 @time_slicer
 @_package_ncle
 def variance_box(image:"napari.types.ImageData", radius_x: int = 10, radius_y: int = 10, radius_z: int = 0) -> "napari.types.ImageData":
-    return cle.variance_box(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
+    return cle.variance(image, radius_x=radius_x, radius_y=radius_y, radius_z=radius_z)
 
 
 @register_function(menu="Segmentation post-processing > Exclude large labels (clesperanto)")
