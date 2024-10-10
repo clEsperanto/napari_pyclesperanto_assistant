@@ -150,14 +150,14 @@ def exclude_small_labels(labels:"napari.types.LabelsData", maximum_size: float =
 @time_slicer
 @_package_ncle
 def exclude_labels_with_map_values_out_of_range(values_map:"napari.types.ImageData", labels:"napari.types.LabelsData", minimum_value_range: float = 0, maximum_value_range: float=100) -> "napari.types.LabelsData":
-    return clep.exclude_labels_with_map_values_out_of_range(values_map, labels, minimum_value_range=minimum_value_range, maximum_value_range=maximum_value_range)
+    return cle.exclude_labels_with_map_values_out_of_range(values_map, labels, minimum_value_range=minimum_value_range, maximum_value_range=maximum_value_range)
 
 
 @register_function(menu="Segmentation post-processing > Exclude labels with map values within range (pyclesperanto_prototype)")
 @time_slicer
 @_package_ncle
 def exclude_labels_with_map_values_within_range(values_map:"napari.types.ImageData", labels:"napari.types.LabelsData", minimum_value_range: float = 0, maximum_value_range: float=100) -> "napari.types.LabelsData":
-    return clep.exclude_labels_with_map_values_within_range(values_map, labels, minimum_value_range=minimum_value_range, maximum_value_range=maximum_value_range)
+    return cle.exclude_labels_with_map_values_within_range(values_map, labels, minimum_value_range=minimum_value_range, maximum_value_range=maximum_value_range)
 
 @register_function(menu="Segmentation post-processing > Extend labels via Voronoi (pyclesperanto)")
 @time_slicer
@@ -226,7 +226,7 @@ def extension_ratio_map(labels:"napari.types.LabelsData") -> "napari.types.Image
 @time_slicer
 @_package_ncle
 def pixel_count_map(labels:"napari.types.LabelsData") -> "napari.types.ImageData":
-    return clep.pixel_count_map(labels)
+    return cle.pixel_count_map(labels)
 
 
 @register_function(menu="Image math > Reciprocal (pyclesperanto)")
