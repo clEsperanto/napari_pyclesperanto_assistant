@@ -41,7 +41,7 @@ setup(
     url="https://github.com/clesperanto/napari_pyclesperanto_assistant",
     packages=find_packages(),
     include_package_data=True,
-    python_requires=">=3.6",
+    python_requires=">=3.9",
     install_requires=requirements,
     #use_scm_version=use_scm,
     setup_requires=["setuptools_scm"],
