@@ -31,7 +31,7 @@ with open(filename) as f:
 #use_scm = {"write_to": "napari_pyclesperanto_assistant/_version.py"}
 setup(
     name="napari_pyclesperanto_assistant",
-    version="0.22.1",
+    version="0.23.0",
     author="Robert Haase, Talley Lambert",
     author_email="robert.haase@tu-dresden.de",
     description="GPU-accelerated image processing in napari using OpenCL",
@@ -41,7 +41,7 @@ setup(
     url="https://github.com/clesperanto/napari_pyclesperanto_assistant",
     packages=find_packages(),
     include_package_data=True,
-    python_requires=">=3.6",
+    python_requires=">=3.9",
     install_requires=requirements,
     #use_scm_version=use_scm,
     setup_requires=["setuptools_scm"],
