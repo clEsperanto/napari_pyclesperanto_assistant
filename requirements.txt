@@ -4,7 +4,7 @@ toolz
 scikit-image
 napari >=0.4.15
 pyclesperanto-prototype >=0.24.5
-pyclesperanto==0.14.1
+pyclesperanto==0.14.2
 magicgui
 numpy!=1.19.4
 pyperclip
