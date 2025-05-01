@@ -162,6 +162,8 @@ mamba create --name cle_39 python=3.9 napari-pyclesperanto-assistant -c conda-fo
 mamba activate cle_39
 ```
 
+Note: This plugin is not compatible with napari 0.6.0 or later.
+
 Mac-users please also install this:
 
     mamba install -c conda-forge ocl_icd_wrapper_apple
